@@ -342,7 +342,7 @@ final class IRC_Server {
 	}
 	
 	public function setPass($pass) {
-		$this->sendRaw('PASS', $pass);
+		$this->sendRaw('PASS '.$pass);
 	}
 	
 	public function setUser($username, $hostname, $servername, $realname) {

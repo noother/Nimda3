@@ -60,6 +60,7 @@ class Nimda {
 	public function connectServer($data) {
 		// Expects 1 full row of mysql table `servers`
 		$Server = new IRC_Server($data['host'], $data['port'], $data['ssl']);
+		if(!empty($data['password'])) $Server->setPass($data['password']);
 		$Server->setUser(
 			$data['my_username'],
 			$data['my_hostname'],
