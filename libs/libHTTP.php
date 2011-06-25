@@ -39,7 +39,7 @@ class libHTTP {
 		// TODO: Ugly follow
 		if(isset($output['header']['Location'])) {
 			$data = parse_url($output['header']['Location']);
-			return self::GET($data['host'], $data['path'], $cookie, $timeout, $port);
+			return self::GET($data['host'], $data['path'].'?'.$data['query'], $cookie, $timeout, $port);
 		}
 		
 		$output['raw'] = implode("\n",$output['content']);
