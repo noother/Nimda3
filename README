@@ -1,0 +1,11 @@
+Sneak peak of the new recode of Nimda3.
+
+This is far from complete - not for productive use.
+
+Install:
+
+1) Create new MySQL-Database and import SQL/nimda3.sql into it
+2) Change database auth in nimda.conf
+3) Start Nimda with ./nimda
+
+The bot will connect to irc.freenode.net, channel #nimda by default
