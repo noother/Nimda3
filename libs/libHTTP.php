@@ -36,6 +36,12 @@ class libHTTP {
 		
 		fclose($fp);
 		
+		// TODO: Ugly follow
+		if(isset($output['header']['Location'])) {
+			$data = parse_url($output['header']['Location']);
+			return self::GET($data['host'], $data['path'], $cookie, $timeout, $port);
+		}
+		
 		$output['raw'] = implode("\n",$output['content']);
 	return $output;
 	}
@@ -77,6 +83,13 @@ class libHTTP {
 			
 		}
 		fclose($fp);
+		
+		// TODO: Ugly follow
+		if(isset($output['header']['Location'])) {
+			$data = parse_url($output['header']['Location']);
+			return self::POST($data['host'], $data['path'], $post, $cookie, $timeout, $port);
+		}
+		
 		$output['raw'] = implode("\n",$output['content']);
 	return $output;
 	}
