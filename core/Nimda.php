@@ -9,7 +9,6 @@ require_once('classes/Plugin.php');
 
 class Nimda {
 	
-	public $name    = 'Nimda3';
 	public $servers = array();
 	public $plugins = array();
 	
@@ -127,6 +126,7 @@ class Nimda {
 			switch($command) {
 				case '001':     $Plugin->onConnect(); break;
 				case '315':     $Plugin->onMeJoin();  break;
+				case '433':		$Plugin->onNickAlreadyInUse(); break;
 				case 'ERROR':	$Plugin->onMeQuit();  break;
 				case 'JOIN':    if($User) $Plugin->onJoin(); break;
 				case 'KICK':	if(isset($data['Victim'])) $Plugin->onKick(); else $Plugin->onMeKick(); break;

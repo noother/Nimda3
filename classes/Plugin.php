@@ -133,6 +133,17 @@ abstract class Plugin {
 		*/
 	}
 	
+	public function onNickAlreadyInUse() {
+		/*
+			IRC command "433"
+			Triggered on connect if nickname is already in use
+			
+			array data [
+				nick => The nickname that the bot has tried to use
+			]
+		*/
+	}
+	
 	public function onPart() {
 		/*
 			IRC command "PART"

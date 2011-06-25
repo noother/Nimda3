@@ -178,7 +178,7 @@ final class IRC_Server {
 		
 		switch($data['command']) {
 			case '001':
-				// First message sent by an IRC server after auth
+				// First message sent by an IRC server after successful auth
 				$data['server']          = $parsed['servername'];
 				$data['my_nick']         = $parsed['params'][0];
 				$data['welcome_message'] = $parsed['params'][1];
@@ -212,6 +212,10 @@ final class IRC_Server {
 				if(!isset($User->channels[$Channel->id])) {
 					$User->channels[$Channel->id] = $Channel;
 				}
+			break;
+			case '433':
+				// Sent on connect if nickname is already in use
+				$data['nick'] = $parsed['params'][1];
 			break;
 			case 'ERROR':
 				// Sent when the bot quitted the server
