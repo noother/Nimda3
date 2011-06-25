@@ -126,12 +126,12 @@ class Nimda {
 			switch($command) {
 				case '001':     $Plugin->onConnect(); break;
 				case '315':     $Plugin->onMeJoin();  break;
-				case '433':		$Plugin->onNickAlreadyInUse(); break;
-				case 'ERROR':	$Plugin->onMeQuit();  break;
+				case '433':     $Plugin->onNickAlreadyInUse(); break;
+				case 'ERROR':   $Plugin->onMeQuit();  break;
 				case 'JOIN':    if($User) $Plugin->onJoin(); break;
-				case 'KICK':	if(isset($data['Victim'])) $Plugin->onKick(); else $Plugin->onMeKick(); break;
-				case 'NICK':	if($User) $Plugin->onNick(); else $Plugin->onMeNick(); break;
-				case 'PART':	if($User) $Plugin->onPart(); else $Plugin->onMePart(); break;
+				case 'KICK':    if(isset($data['Victim'])) $Plugin->onKick(); else $Plugin->onMeKick(); break;
+				case 'NICK':    if($User) $Plugin->onNick(); else $Plugin->onMeNick(); break;
+				case 'PART':    if($User) $Plugin->onPart(); else $Plugin->onMePart(); break;
 				case 'PING':    $Plugin->onPing();    break;
 				case 'PRIVMSG': $Plugin->onPrivmsg(); break;
 				case 'QUIT':    $Plugin->onQuit(); break;
