@@ -10,4 +10,4 @@ Install:
 
 The bot will connect to irc.freenode.net, channel #nimda by default
 
-If you want to code for it - please only touch the plugins/user/ directory - everything else is under construction exclusively by me
+If you want to code for it - please only touch the plugins/user/ directory - everything else is under construction exclusively by me for now.
