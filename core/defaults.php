@@ -1,7 +1,9 @@
 <?php
 	
 	mb_internal_encoding('UTF-8');
-
+	
+	require_once('functions.php');
+	
 	require_once('libs/libArray.php');
 	require_once('libs/libConvert.php');
 	require_once('libs/libCrypt.php');
