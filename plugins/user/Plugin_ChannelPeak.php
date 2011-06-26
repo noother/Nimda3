@@ -54,7 +54,7 @@ class Plugin_ChannelPeak extends Plugin {
 				NOW()
 			)");
 			
-			$this->Channel->data['peak'] = array('peak' => sizeof($this->Channel->users), 'date' => date('Y-m-d H:i:s'));
+			$this->Channel->data['peak'] = array('peak' => $user_count, 'date' => date('Y-m-d H:i:s'));
 		} else {
 			$this->Channel->data['peak'] = $peak;
 		}
