@@ -68,7 +68,7 @@ class Nimda {
 			$data['my_realname']
 		);
 		$Server->setNick($data['my_username']);
-		$Server->serverID = $data['id'];
+		$Server->id = $data['id'];
 		
 		$this->servers[$data['id']] = $Server;
 	}

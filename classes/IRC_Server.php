@@ -9,12 +9,13 @@ final class IRC_Server {
 	
 	private $socket;
 	
+	public $id = 0;
+	
 	public $channels  = array();
 	public $users     = array();
 	public $host         = '';
 	public $port         = 0;
 	public $isSSL        = false;
-	public $serverID     = 0;
 	public $myNick       = '';
 	public $myUser       = '';
 	public $myHost       = '';
