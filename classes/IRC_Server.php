@@ -16,6 +16,10 @@ final class IRC_Server {
 	public $isSSL        = false;
 	public $serverID     = 0;
 	public $myNick       = '';
+	public $myUser       = '';
+	public $myHost       = '';
+	public $myRealname   = '';
+	public $myBanmask    = '';
 	public $myID;
 	public $lastLifeSign = 0;
 	
@@ -185,6 +189,22 @@ final class IRC_Server {
 				
 				$this->myNick = $data['my_nick'];
 				$this->myID   = strtolower($data['my_nick']);
+				$this->sendWhois($this->myNick);
+			break;
+			case '311':
+				// WHOIS reply
+				$data['nick']     = $parsed['params'][1];
+				$data['user']     = $parsed['params'][2];
+				$data['host']     = $parsed['params'][3];
+				$data['realname'] = $parsed['params'][5];
+				$data['banmask']  = $data['nick'].'!'.$data['user'].'@'.$data['host'];
+				
+				if($data['nick'] == $this->myNick) {
+					$this->myUser     = $data['user'];
+					$this->myHost     = $data['host'];
+					$this->myRealname = $data['realname'];
+					$this->myBanmask  = $data['banmask'];
+				}
 			break;
 			case '315':
 				// End of WHO list (Channel join complete)
@@ -269,8 +289,9 @@ final class IRC_Server {
 				$this->changeUserName($User, $new_name);
 				
 				if($old_id == $this->myID) {
-					$this->myNick = $new_name;
-					$this->myID   = $new_id;
+					$this->myID      = $new_id;
+					$this->myNick    = $new_name;
+					$this->myBanmask = $this->myNick.'!'.$this->myUser.'@'.$this->myHost;
 				} else {
 					$data['User'] = $User;
 				}
@@ -339,6 +360,10 @@ final class IRC_Server {
 	
 	public function sendPong($string) {
 		$this->sendRaw('PONG :'.$string);
+	}
+	
+	public function sendWhois($nick) {
+		$this->sendRaw('WHOIS '.$nick);
 	}
 	
 	public function setPass($pass) {
