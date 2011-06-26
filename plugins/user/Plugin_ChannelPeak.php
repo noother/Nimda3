@@ -13,7 +13,7 @@ class Plugin_ChannelPeak extends Plugin {
 		$peak = $this->Channel->data['peak'];
 		
 		$this->reply(sprintf(
-			"Current channel peak for \x02%s\x02: \x02%d\x02 users online at %s (%s ago)",
+			"Current channel peak for \x02%s\x02: %d users online at %s (%s ago)",
 				$this->Channel->name,
 				$peak['peak'],
 				$peak['date'],
@@ -31,7 +31,7 @@ class Plugin_ChannelPeak extends Plugin {
 			$this->Channel->data['peak'] = array('peak' => $user_count, 'date' => date('Y-m-d H:i:s'));
 			
 			$this->reply(sprintf(
-				"New channel peak for \x02%s\x02: \x02%d\x02 users online. Old one was %d users online at %s (%s ago)",
+				"New channel peak for \x02%s\x02: %d users online. Old one was %d users online at %s (%s ago)",
 					$this->Channel->name,
 					$user_count,
 					$old_peak['peak'],
