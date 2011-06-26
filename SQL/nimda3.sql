@@ -35,3 +35,18 @@ CREATE TABLE IF NOT EXISTS `server_channels` (
 INSERT INTO `server_channels` (`id`, `server_id`, `channel`, `key`, `active`) VALUES
 (1, 1, '#nimda', '', 1);
 
+-- --------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `server_channelpeaks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `server_id` int(11) NOT NULL,
+  `channel` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `peak` int(11) NOT NULL,
+  `date` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `server_id` (`server_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+

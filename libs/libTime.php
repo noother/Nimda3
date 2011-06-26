@@ -57,6 +57,13 @@ class libTime {
 		
 	return $days;
 	}
+	
+	static function getSecondsDifference($date1, $date2) {
+		$time1 = strtotime($date1);
+		$time2 = strtotime($date2);
+		
+	return abs($time1-$time2);
+	}
 }
 
 
