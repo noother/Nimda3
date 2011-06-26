@@ -28,12 +28,12 @@ abstract class IRC_Target {
 		
 		$max_length = 498 - strlen($this->Server->myBanmask) - strlen($this->name); 
 		
-		do {
+		while(!empty($message)) {
 			$to_send = substr($message, 0, $max_length);
 			$this->Server->sendRaw('PRIVMSG '.$this->name.' :'.$to_send);
 			
 			$message = substr($message, $max_length);
-		} while(!empty($message));
+		}
 		
 	}
 	
