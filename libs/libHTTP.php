@@ -39,7 +39,9 @@ class libHTTP {
 		// TODO: Ugly follow
 		if(isset($output['header']['Location'])) {
 			$data = parse_url($output['header']['Location']);
-			return self::GET($data['host'], $data['path'].'?'.$data['query'], $cookie, $timeout, $port);
+			$path = $data['path'];
+			if(isset($data['query'])) $path.='?'.$data['query'];
+			return self::GET($data['host'], $path, $cookie, $timeout, $port);
 		}
 		
 		$output['raw'] = implode("\n",$output['content']);
@@ -87,7 +89,9 @@ class libHTTP {
 		// TODO: Ugly follow
 		if(isset($output['header']['Location'])) {
 			$data = parse_url($output['header']['Location']);
-			return self::POST($data['host'], $data['path'], $post, $cookie, $timeout, $port);
+			$path = $data['path'];
+			if(isset($data['query'])) $path.='?'.$data['query'];
+			return self::POST($data['host'], $path, $post, $cookie, $timeout, $port);
 		}
 		
 		$output['raw'] = implode("\n",$output['content']);
