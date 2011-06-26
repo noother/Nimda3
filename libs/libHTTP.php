@@ -27,7 +27,7 @@ class libHTTP {
 			
 			if($headersCheck) {
 				$tmp = explode(": ",$row,2);
-				$output['header'][$tmp[0]] = $tmp[1];
+				$output['header'][$tmp[0]] = isset($tmp[1]) ? $tmp[1] : true;
 			} else {
 				array_push($output['content'],$row);
 			}
@@ -76,7 +76,7 @@ class libHTTP {
 			
 			if($headersCheck) {
 				$tmp = explode(": ",$row,2);
-				$output['header'][$tmp[0]] = $tmp[1];
+				$output['header'][$tmp[0]] = isset($tmp[1]) ? $tmp[1] : true;
 			} else {
 				array_push($output['content'],$row);
 			}
