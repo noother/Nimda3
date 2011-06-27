@@ -14,12 +14,12 @@ class Plugin_Hash extends Plugin {
 	}
 	
 	function isTriggered() {
-		if($this->data['trigger'] == '!hash' && !isset($this->data['text'])) {
-			$this->reply('Usage: !hash <algo> <text> or !hash algos for a list');
-			return;
-		}
-		
 		if($this->data['trigger'] == '!hash') {
+			if(!isset($this->data['text'])) {
+				$this->reply('Usage: !hash <algo> <text> or !hash algos for a list');
+				return;
+			}
+			
 			$tmp = explode(' ', $this->data['text'], 2);
 			$algo = $tmp[0];
 			if(isset($tmp[1])) $text = $tmp[1];
@@ -28,7 +28,7 @@ class Plugin_Hash extends Plugin {
 			if(isset($this->data['text'])) $text = $this->data['text'];
 		}
 		
-		if ($algo == 'algos') {
+		if($algo == 'algos') {
 			/* output list of available algorithms */
 			$this->reply('Algos: '.implode('; ', hash_algos()));
 		} elseif(!isset($text)) {
