@@ -65,7 +65,14 @@ class MySQL {
 		
 		$end = libSystem::getMicrotime();
 		
-		if(!$result) die("MySQL Error: ".$this->instance->error);
+		if(!$result) {
+			if($this->instance->error == 'MySQL server has gone away') {
+				$this->connect();
+				return $this->query($sql, $memcache, $memcache_timeout);
+			} else {
+				die("MySQL Error: ".$this->instance->error."\n");
+			}
+		}
 		
 		/*
 		$log = array();
