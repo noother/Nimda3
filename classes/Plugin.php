@@ -49,17 +49,22 @@ abstract class Plugin {
 	}
 	
 	// Events
-	public function onLoad(){}
-	
-	/*
-		All following events have object Server set
-	*/
+	public function onLoad() {
+		/*
+			Triggered once when the bot starts
+		*/
+	}
 	
 	public function onInterval() {
 		/*
 			Triggered every $this->interval seconds, if interval is not 0
 		*/
 	}
+	
+	
+	/*
+		All following events have object Server set
+	*/
 	
 	public function onConnect(){
 		/*
