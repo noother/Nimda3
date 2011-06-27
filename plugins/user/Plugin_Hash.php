@@ -4,19 +4,38 @@ class Plugin_Hash extends Plugin {
 	
 	public $triggers = array('!hash');
 	
+	function onLoad() {
+		$algos = hash_algos();
+		foreach($algos as $algo) {
+			if(strstr($algo, ',') === false) {
+				$this->triggers[] = '!'.$algo;
+			}
+		}
+	}
+	
 	function isTriggered() {
 		if(!isset($this->data['text'])) {
-			$this->reply('Usage: !hash <algo> <text> or !hash algos for a list');
+			if($this->data['trigger'] == '!hash') {
+				$this->reply('Usage: !hash <algo> <text> or !hash algos for a list');
+			} else {
+				$this->reply('Usage: '.$this->data['trigger'].' <text>');
+			}
 			return;
 		}
-
-		$algo = strtok($this->data['text'], ' ');
-		$text = $this->substrFrom($this->data['text'], ' ');
-
+		
+		if($this->data['trigger'] == '!hash') {
+			$tmp = explode(' ', $this->data['text'], 2);
+			$algo = $tmp[0];
+			if(isset($tmp[1])) $text = $tmp[1];
+		} else {
+			$algo = substr($this->data['trigger'], 1);
+			$text = $this->data['text'];
+		}
+		
 		if ($algo == 'algos') {
 			/* output list of available algorithms */
 			$this->reply('Algos: '.implode('; ', hash_algos()));
-		} else if ($text == '') {
+		} elseif(!isset($text)) {
 			/* show info about algorithm */
 			$x = hash($algo, 'abc', false);
 	        $len = strlen($x)/2;
@@ -26,17 +45,6 @@ class Plugin_Hash extends Plugin {
 			$this->reply('Result: '.hash($algo, $text, false));
 		}
 
-	}
-	
-	/* borrowed from gizmore's util/Common.php :) */
-	function substrFrom($string, $from, $default='') {
-		$pos = strpos($string, $from);
-		
-		if ($pos === false) 
-			return $default;
-		
-		$len = strlen($from);
-		return substr($string, $pos+$len);
 	}
 	
 }
