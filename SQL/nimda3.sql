@@ -23,7 +23,7 @@ INSERT INTO `servers` (`id`, `host`, `port`, `ssl`, `password`, `my_username`, `
 
 CREATE TABLE IF NOT EXISTS `autojoin` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `server` int(11) NOT NULL,
+  `server` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `channel` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `key` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `active` int(11) NOT NULL DEFAULT '1',
@@ -39,7 +39,7 @@ INSERT INTO `autojoin` (`id`, `server`, `channel`, `key`, `active`) VALUES
 
 CREATE TABLE IF NOT EXISTS `channelpeaks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `server` int(11) NOT NULL,
+  `server` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `channel` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `peak` int(11) NOT NULL,
   `date` datetime NOT NULL,
