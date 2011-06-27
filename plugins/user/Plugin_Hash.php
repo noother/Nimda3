@@ -31,21 +31,22 @@ class Plugin_Hash extends Plugin {
 		if($algo == 'algos') {
 			/* output list of available algorithms */
 			$this->reply('Algos: '.implode('; ', hash_algos()));
-		} elseif(!isset($text)) {
-			/* show info about algorithm */
+		} else {
 			if(array_search($algo, hash_algos()) === false) {
 				$this->reply('Unknown hash algorithm');
 				return;
 			}
 			
-			$x = hash($algo, 'abc', false);
-			$len = strlen($x)/2;
-			$this->reply(sprintf('Length: %d bit (%d bytes)', $len*8, $len));
-		} else {
-			/* hash input with algorithm */
-			$this->reply('Result: '.hash($algo, $text, false));
+			if(!isset($text)) {
+				/* show info about algorithm */
+				$x = hash($algo, 'abc', false);
+				$len = strlen($x)/2;
+				$this->reply(sprintf('Length: %d bit (%d bytes)', $len*8, $len));
+			} else {
+				/* hash input with algorithm */
+				$this->reply('Result: '.hash($algo, $text, false));
+			}
 		}
-	
 	}
 	
 }
