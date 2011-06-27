@@ -21,30 +21,30 @@ INSERT INTO `servers` (`id`, `host`, `port`, `ssl`, `password`, `my_username`, `
 
 -- --------------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS `server_channels` (
+CREATE TABLE IF NOT EXISTS `autojoin` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `server_id` int(11) NOT NULL,
+  `server` int(11) NOT NULL,
   `channel` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `key` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `active` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  KEY `server_id` (`server_id`),
+  KEY `server` (`server`),
   KEY `active` (`active`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
 
-INSERT INTO `server_channels` (`id`, `server_id`, `channel`, `key`, `active`) VALUES
-(1, 1, '#nimda', '', 1);
+INSERT INTO `autojoin` (`id`, `server`, `channel`, `key`, `active`) VALUES
+(1, 'irc.freenode.net', '#nimda', '', 1);
 
 -- --------------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS `server_channelpeaks` (
+CREATE TABLE IF NOT EXISTS `channelpeaks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `server_id` int(11) NOT NULL,
+  `server` int(11) NOT NULL,
   `channel` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `peak` int(11) NOT NULL,
   `date` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `server_id` (`server_id`)
+  KEY `server` (`server`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------

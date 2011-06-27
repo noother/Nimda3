@@ -19,7 +19,7 @@ class CorePlugin_Connect extends Plugin {
 			'my_hostname' => 'Nimda3',
 			'my_servername' => 'Nimda3',
 			'my_realname' => 'noother\'s new bot',
-			'id' => rand(1000,20000)
+			'id' => strtolower($tmp[0])
 		);
 		
 		$this->Bot->connectServer($data);

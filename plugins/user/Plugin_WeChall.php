@@ -2,7 +2,7 @@
 
 class Plugin_WeChall extends Plugin {
 	
-	protected $triggers = array('!wechall', '!wc', '!wcc');
+	public $triggers = array('!wechall', '!wc', '!wcc');
 	private $usage = 'Usage: %s <nick>';
 
 

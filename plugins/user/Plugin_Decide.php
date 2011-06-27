@@ -2,7 +2,7 @@
 
 class Plugin_Decide extends Plugin {
 	
-	protected $triggers = array('!decide', '!choose');
+	public $triggers = array('!decide', '!choose');
 	private $usage = 'Usage: !decide <option1> or <option2> or ...';
 	
 	function isTriggered() {

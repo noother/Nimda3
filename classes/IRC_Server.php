@@ -9,8 +9,6 @@ final class IRC_Server {
 	
 	private $socket;
 	
-	public $id = 0;
-	
 	public $channels  = array();
 	public $users     = array();
 	public $host         = '';
@@ -329,7 +327,8 @@ final class IRC_Server {
 				}
 				
 				$data['User'] = $User;
-				$data['text'] = $parsed['params'][1];
+				// TODO: fail with todo at parseIRCMessage
+				$data['text'] = isset($parsed['params'][1]) ? $parsed['params'][1] : '';
 				if(strtolower($parsed['params'][0]) == $this->myID) {
 					$data['isQuery'] = true;
 				} else {

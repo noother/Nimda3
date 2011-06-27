@@ -2,7 +2,7 @@
 
 class Plugin_Reverse extends Plugin {
 	
-	protected $triggers = array('!reverse');
+	public $triggers = array('!reverse');
 	
 	function isTriggered() {
 		if(!isset($this->data['text'])) {

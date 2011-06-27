@@ -6,17 +6,24 @@ abstract class Plugin {
 	public $Server;
 	public $Channel;
 	public $User;
+	public $MySQL;
 	public $data;
 	public $command;
-	
-	protected $MySQL;
-	protected $triggers = array();
+	public $lastInterval;
 	
 	private $messageIsQuery;
 	
+	
+	// You can override the following properties in plugins
+	public $triggers = array();
+	public $interval = 0;
+	
+	
+	
 	public final function __construct($Bot, $MySQL) {
-		$this->Bot   = $Bot;
-		$this->MySQL = $MySQL;
+		$this->Bot          = $Bot;
+		$this->MySQL        = $MySQL;
+		$this->lastInterval = time();
 	}
 	
 	protected final function reply($string) {
@@ -47,6 +54,12 @@ abstract class Plugin {
 	/*
 		All following events have object Server set
 	*/
+	
+	public function onInterval() {
+		/*
+			Triggered every $this->interval seconds (for each server), if interval is not 0
+		*/
+	}
 	
 	public function onConnect(){
 		/*
@@ -291,6 +304,15 @@ abstract class Plugin {
 		unset($this->data['isQuery']);
 		if($this->messageIsQuery) $this->onQuery();
 		else $this->onChannelMessage();
+	}
+	
+	public final function triggerTimer() {
+		if(!$this->interval) return;
+		
+		if($this->Bot->time >= $this->lastInterval+$this->interval) {
+			$this->onInterval();
+			$this->lastInterval = $this->Bot->time;
+		}
 	}
 	
 }

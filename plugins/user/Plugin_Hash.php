@@ -2,7 +2,7 @@
 
 class Plugin_Hash extends Plugin {
 	
-	protected $triggers = array('!hash');
+	public $triggers = array('!hash');
 	
 	function isTriggered() {
 		if(!isset($this->data['text'])) {

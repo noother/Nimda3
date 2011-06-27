@@ -2,7 +2,7 @@
 
 class Plugin_Translate extends Plugin {
 	
-	protected $triggers = array('!translate', '!de-en', '!de-fr', '!de-it', '!de-nl', '!de-pl', '!de-sv', '!de-es', '!de-no', '!en-de',
+	public $triggers = array('!translate', '!de-en', '!de-fr', '!de-it', '!de-nl', '!de-pl', '!de-sv', '!de-es', '!de-no', '!en-de',
 						'!fr-de', '!it-de', '!nl-de', '!pl-de', '!sv-de', '!es-de', '!no-de', '!en-fr', '!en-it', '!en-nl',
 						'!en-pl', '!en-sv', '!en-es', '!en-no', '!fr-en', '!it-en', '!nl-en', '!pl-en', '!sv-en', '!es-en',
 						'!no-en');

@@ -2,7 +2,7 @@
 
 class Plugin_PHP extends Plugin {
 	
-	protected $triggers = array('!php', '!phpmanual');
+	public $triggers = array('!php', '!phpmanual');
 	private $redirects;
 	private $language = 'de';
 	private $notfoundtext = 'Nothing matches your query, try search:';

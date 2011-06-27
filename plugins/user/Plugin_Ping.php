@@ -2,7 +2,7 @@
 
 class Plugin_Ping extends Plugin {
 	
-	protected $triggers = array('!ping', '!pong', '!pang', '!peng', '!pung');
+	public $triggers = array('!ping', '!pong', '!pang', '!peng', '!pung');
 	
 	function isTriggered() {
 		switch($this->data['trigger']) {

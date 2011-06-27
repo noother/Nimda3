@@ -11,9 +11,11 @@ class Nimda {
 	
 	public $servers = array();
 	public $plugins = array();
+	public $time;
 	
 	private $CONFIG = array();
 	private $MySQL;
+	private $timersLastTriggered;
 	
 	function __construct() {
 		$this->initBot();
@@ -24,15 +26,20 @@ class Nimda {
 				break;
 			}
 			
+			$this->time = time();
+			$this->triggerTimers();
+			
 			$check = false;
 			foreach($this->servers as $Server) {
-				//echo $Server->host."\n";
-				if(false === $data = $Server->getData()) continue;
-				$check = true;
-				unset($data['raw']); // TODO: Logging & stuff
-				$this->triggerPlugins($data, $Server);
+				$data = $Server->getData();
+				if($data !== false) {
+					$check = true;
+					unset($data['raw']); // TODO: Logging & stuff
+					$this->triggerPlugins($data, $Server);
+				}
 			}
 			if(!$check) usleep(20000);
+			
 		}
 	}
 	
@@ -45,8 +52,9 @@ class Nimda {
 			$this->CONFIG['mysql_db']
 		);
 		
-		$this->initServers();
 		$this->initPlugins();
+		$this->initServers();
+		$this->timersLastTriggered = time()+10; // Give him some time to do the connecting before triggering the timers
 	}
 	
 	private function initServers() {
@@ -68,9 +76,8 @@ class Nimda {
 			$data['my_realname']
 		);
 		$Server->setNick($data['my_username']);
-		$Server->id = $data['id'];
 		
-		$this->servers[$data['id']] = $Server;
+		$this->servers[$Server->host] = $Server;
 	}
 	
 	private function initPlugins() {
@@ -94,6 +101,16 @@ class Nimda {
 			$Plugin = new $classname($this, $this->MySQL);
 			$Plugin->onLoad();
 			$this->plugins[] = $Plugin;
+		}
+	}
+	
+	private function triggerTimers() {
+		if($this->time >= $this->timersLastTriggered+1) {
+			foreach($this->plugins as $Plugin) {
+				$Plugin->triggerTimer();
+			}
+		
+			$this->timersLastTriggered = $this->time;
 		}
 	}
 	

@@ -2,7 +2,7 @@
 
 class Plugin_MemoryUsage extends Plugin {
 	
-	protected $triggers = array('!mem');
+	public $triggers = array('!mem');
 	
 	function isTriggered() {
 		$current = number_format(memory_get_usage()/1000000,2);

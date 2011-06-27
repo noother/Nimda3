@@ -2,7 +2,7 @@
 
 class Plugin_Wiki extends Plugin {
 	
-	protected $triggers = array('!wiki', '!wikipedia', '!wiki-en', '!stupi');
+	public $triggers = array('!wiki', '!wikipedia', '!wiki-en', '!stupi');
 	private $wikiServer = 'de.wikipedia.org';
 	private $wikiAltServer = 'en.wikipedia.org';
 	private $maxlength = 433;

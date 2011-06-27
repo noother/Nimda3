@@ -12,7 +12,7 @@ class CorePlugin_Quit extends Plugin {
 	}
 	
 	function onMeQuit() {
-		unset($this->Bot->servers[$this->Server->id]);
+		unset($this->Bot->servers[$this->Server->host]);
 	}
 	
 }
