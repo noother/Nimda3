@@ -34,13 +34,13 @@ class Plugin_Hash extends Plugin {
 		} elseif(!isset($text)) {
 			/* show info about algorithm */
 			$x = hash($algo, 'abc', false);
-	        $len = strlen($x)/2;
-	        $this->reply(sprintf('Length: %d bit (%d bytes)', $len*8, $len));
+			$len = strlen($x)/2;
+			$this->reply(sprintf('Length: %d bit (%d bytes)', $len*8, $len));
 		} else {
 			/* hash input with algorithm */
 			$this->reply('Result: '.hash($algo, $text, false));
 		}
-
+	
 	}
 	
 }
