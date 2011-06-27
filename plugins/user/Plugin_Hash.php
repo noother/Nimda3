@@ -33,6 +33,11 @@ class Plugin_Hash extends Plugin {
 			$this->reply('Algos: '.implode('; ', hash_algos()));
 		} elseif(!isset($text)) {
 			/* show info about algorithm */
+			if(array_search($algo, hash_algos()) === false) {
+				$this->reply('Unknown hash algorithm');
+				return;
+			}
+			
 			$x = hash($algo, 'abc', false);
 			$len = strlen($x)/2;
 			$this->reply(sprintf('Length: %d bit (%d bytes)', $len*8, $len));
