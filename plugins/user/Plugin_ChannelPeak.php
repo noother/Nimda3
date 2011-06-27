@@ -27,7 +27,7 @@ class Plugin_ChannelPeak extends Plugin {
 		if($user_count > $this->Channel->data['peak']['peak']) {
 			$old_peak = $this->Channel->data['peak'];
 			
-			$this->MySQL->query("UPDATE `channelpeaks` SET `peak` = ".$user_count.", `date` = NOW() WHERE server = '".addslashes($this->Server->host)."' AND channel = '".addslashes($this->Channel->name)."'");
+			$this->MySQL->query("UPDATE `channelpeaks` SET `peak` = ".$user_count.", `date` = NOW() WHERE `server` = '".addslashes($this->Server->host)."' AND `channel` = '".addslashes($this->Channel->name)."'");
 			$this->Channel->data['peak'] = array('peak' => $user_count, 'date' => date('Y-m-d H:i:s'));
 			
 			$this->reply(sprintf(
@@ -48,7 +48,7 @@ class Plugin_ChannelPeak extends Plugin {
 			$user_count = sizeof($this->Channel->users);
 			
 			$this->MySQL->query("INSERT INTO `channelpeaks` (`server`, `channel`, `peak`, `date`) VALUES (
-				".$this->Server->host.",
+				'".addslashes($this->Server->host)."',
 				'".addslashes($this->Channel->name)."',
 				".$user_count.",
 				NOW()
