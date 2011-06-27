@@ -57,7 +57,7 @@ abstract class Plugin {
 	
 	public function onInterval() {
 		/*
-			Triggered every $this->interval seconds (for each server), if interval is not 0
+			Triggered every $this->interval seconds, if interval is not 0
 		*/
 	}
 	
