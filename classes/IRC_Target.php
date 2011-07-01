@@ -28,7 +28,7 @@ abstract class IRC_Target {
 				- 2 (CRLF)
 		*/
 		
-		$max_length = 498 - strlen($this->Server->myBanmask) - strlen($this->name); 
+		$max_length = 498 - strlen($this->Server->Me->banmask) - strlen($this->name); 
 		
 		while(!empty($message)) {
 			$to_send = substr($message, 0, $max_length);
