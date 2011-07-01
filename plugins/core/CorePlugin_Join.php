@@ -5,7 +5,7 @@ class CorePlugin_Join extends Plugin {
 	public $triggers = array('!join');
 	
 	function isTriggered() {
-		if($this->User->name != 'noother') return;
+		if($this->User->nick != 'noother') return;
 		if(!isset($this->data['text'])) return;
 		
 		if(isset($this->Server->channels[strtolower($this->data['text'])])) {

@@ -5,7 +5,7 @@ class CorePlugin_Connect extends Plugin {
 	public $triggers = array('!connect');
 	
 	function isTriggered() {
-		if($this->User->name != 'noother') return;
+		if($this->User->nick != 'noother') return;
 		if(!isset($this->data['text'])) return;
 		
 		$tmp = explode(' ',$this->data['text']);

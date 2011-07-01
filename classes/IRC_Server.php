@@ -14,12 +14,7 @@ final class IRC_Server {
 	public $host         = '';
 	public $port         = 0;
 	public $isSSL        = false;
-	public $myNick       = '';
-	public $myUser       = '';
-	public $myHost       = '';
-	public $myRealname   = '';
-	public $myBanmask    = '';
-	public $myID;
+	public $Me           = '';
 	public $lastLifeSign = 0;
 	
 	public function __construct($host, $port, $ssl=false) {
@@ -47,83 +42,27 @@ final class IRC_Server {
 		fputs($this->socket, $string."\n");
 	}
 	
-	private function addUser($banmask) {
-		$data = $this->parseBanmask($banmask);
-		//while(strlen($data['host']) < 1000000) $data['host'].='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-		
-		$User = new IRC_User(
-			$data['nick'],
-			$data['user'],
-			$data['host'],
-			$data['banmask'],
-			$this
-		);
-		
-		$this->users[$User->id] = $User;
-	
-	return $User;
+	private function getUser($nick) {
+		$id = strtolower($nick);
+		if(!isset($this->users[$id])) $this->addUser($id);
+	return $this->users[$id];
 	}
 	
-	private function removeUser($User) {
-		foreach($User->channels as $Channel) {
-			unset($Channel->users[$User->id]);
-		}
-		unset($this->users[$User->id]);
+	private function addUser($nick) {
+		$User = new IRC_User($nick, $this);
+		$this->users[$User->id] = $User;
+	}
+	
+	private function getChannel($channel) {
+		$id = strtolower($channel);
+		if(!isset($this->channels[$id])) $this->addChannel($channel);
+	return $this->channels[$id];
 	}
 	
 	private function addChannel($channel) {
 		$Channel = new IRC_Channel($channel, $this);
 		$this->channels[$Channel->id] = $Channel;
 	return $Channel;
-	}
-	
-	private function removeChannel($Channel) {
-		foreach($Channel->users as $User) {
-			$this->removeUserFromChannel($User, $Channel);
-		}
-		unset($this->channels[$Channel->id]);
-	}
-	
-	private function removeUserFromChannel($User, $Channel) {
-		if(sizeof($User->channels) == 1) {
-			$this->removeUser($User);
-		} else {
-			unset($Channel->users[$User->id]);
-			unset($User->channels[$Channel->id]);
-		}
-	}
-	
-	private function changeUserName($User, $new_name) {
-		$new_id = strtolower($new_name);
-		
-		foreach($User->channels as $Channel) {
-			unset($Channel->users[$User->id]);
-			$Channel->users[$new_id] = $User;
-		}
-		
-		unset($this->users[$User->id]);
-		$this->users[$new_id] = $User;
-		
-		$User->name = $new_name;
-	}
-	
-	private function parseBanmask($banmask) {
-		preg_match('/^(.+?)!~?(.+?)@(.+?)$/', $banmask, $arr);
-		$data = array(
-			'banmask' => $arr[0],
-			'nick' => $arr[1],
-			'user' => $arr[2],
-			'host' => $arr[3]
-		);
-		
-	return $data;
-	}
-	
-	private function getUserByBanmask($banmask) {
-		$data = $this->parseBanmask($banmask);
-		$id = strtolower($data['nick']);
-		if(isset($this->users[$id])) return $this->users[$id];
-	return false;
 	}
 	
 	private function parseIRCMessage($string) {
@@ -186,50 +125,51 @@ final class IRC_Server {
 				$data['my_nick']         = $parsed['params'][0];
 				$data['welcome_message'] = $parsed['params'][1];
 				
-				$this->myNick = $data['my_nick'];
-				$this->myID   = strtolower($data['my_nick']);
-				$this->sendWhois($this->myNick);
+				$this->Me = new IRC_User($data['my_nick'], $this);
+				$this->sendWhois($this->Me->nick);
 			break;
 			case '311':
 				// WHOIS reply
-				$data['nick']     = $parsed['params'][1];
-				$data['user']     = $parsed['params'][2];
-				$data['host']     = $parsed['params'][3];
-				$data['realname'] = $parsed['params'][5];
-				$data['banmask']  = $data['nick'].'!'.$data['user'].'@'.$data['host'];
+				$User = $this->getUser($parsed['params'][1]);
+				$User->user     = $parsed['params'][2];
+				$User->host     = $parsed['params'][3];
+				$User->realname = $parsed['params'][5];
+				$User->banmask  = $User->nick.'!'.$User->user.'@'.$User->host;
 				
-				if($data['nick'] == $this->myNick) {
-					$this->myUser     = $data['user'];
-					$this->myHost     = $data['host'];
-					$this->myRealname = $data['realname'];
-					$this->myBanmask  = $data['banmask'];
-				}
+				$data['User'] = $User;
 			break;
 			case '315':
 				// End of WHO list (Channel join complete)
-				$data['Channel'] = $this->channels[strtolower($parsed['params'][1])];
+				$data['Channel'] = $this->getChannel($parsed['params'][1]);
 			break;
 			case '352':
 				// Server WHO reply
-				$Channel  = $this->channels[strtolower($parsed['params'][1])];
-				$user     = $parsed['params'][2];
-				$host     = $parsed['params'][3];
-				$nick     = $parsed['params'][5];
-				$realname = substr($parsed['params'][7], 2);
-				$banmask = $nick.'!'.$user.'@'.$host;
+				$Channel  = $this->getChannel($parsed['params'][1]);
 				
-				if(false === $User = $this->getUserByBanmask($banmask)) {
-					$User = $this->addUser($banmask);
-				}
-				
-				$User->realname = $realname;
+				$User = $this->getUser($parsed['params'][5]);
+				$User->user     = $parsed['params'][2];
+				$User->host     = $parsed['params'][3];
+				$User->realname = substr($parsed['params'][7], 2);
+				$User->banmask  = $User->nick.'!'.$User->user.'@'.$User->host;
 				
 				if(!isset($Channel->users[$User->id])) {
-					$Channel->users[$User->id] = $User;
+					$Channel->addUser($User);
 				}
 				
-				if(!isset($User->channels[$Channel->id])) {
-					$User->channels[$Channel->id] = $Channel;
+				$User->modes[$Channel->id] = strlen($parsed['params'][6]) > 1 ? $parsed['params'][6]{1} : '';
+			break;
+			case '353':
+				// Server NAMES reply
+				$Channel = $this->getChannel($parsed['params'][2]);
+				
+				$users = explode(' ', $parsed['params'][3]);
+				foreach($users as $user) {
+					preg_match('/^([+@%])?(.+)$/', $user, $arr);
+					$mode = $arr[1];
+					$nick = $arr[2];
+					
+					$User = $this->getUser($nick);
+					$User->modes[$Channel->id] = $mode;
 				}
 			break;
 			case '433':
@@ -239,74 +179,83 @@ final class IRC_Server {
 			case 'ERROR':
 				// Sent when the bot quitted the server
 				foreach($this->channels as $Channel) {
-					$this->removeChannel($Channel);
+					$Channel->remove();
 				}
 			break;
 			case 'JOIN':
 				// Sent when the bot or a user joins a channel
-				if(false === $User = $this->getUserByBanmask($parsed['banmask'])) {
-					$User = $this->addUser($parsed['banmask']);
+				$User = $this->getUser($parsed['nick']);
+				$User->banmask = $parsed['banmask'];
+				$User->user    = $parsed['user'];
+				$User->host    = $parsed['host'];
+				$User->mode    = '';
+				
+				$Channel = $this->getChannel($parsed['params'][0]);
+				$Channel->addUser($User);
+				
+				if($User->id != $this->Me->id) {
+					$data['User']    = $User;
+					$data['Channel'] = $Channel;
 				}
-				
-				if($User->id == $this->myID) {
-					$Channel = $this->addChannel($parsed['params'][0]);
-				} else {
-					$Channel = $this->channels[strtolower($parsed['params'][0])];
-				}
-				
-				$Channel->users[$User->id]    = $User;
-				$User->channels[$Channel->id] = $Channel;
-				
-				if($User->id != $this->myID) $data['User'] = $User;
-				$data['Channel'] = $Channel;
 			break;
 			case 'KICK':
 				// Sent when a user gets kicked from a channel
-				$User         = $this->users[strtolower($parsed['nick'])];
-				$Channel      = $this->channels[strtolower($parsed['params'][0])];
-				$Victim       = $this->users[strtolower($parsed['params'][1])];
+				$User         = $this->getUser($parsed['nick']);
+				$Channel      = $this->getChannel($parsed['params'][0]);
+				$Victim       = $this->getUser($parsed['params'][1]);
+				$User->mode   = $User->modes[$Channel->id];
+				$Victim->mode = $Victim->modes[$Channel->id];
 				$kick_message = $parsed['params'][2];
 				
-				if($Victim->id == $this->myID) {
-					$this->removeChannel($Channel);
+				if($Victim->id == $this->Me->id) {
+					$Channel->remove();
 				} else {
-					$data['Victim']  = $Victim;
-					$this->removeUserFromChannel($Victim, $Channel);
+					$data['Victim'] = $Victim;
+					$Channel->removeUser($Victim);
 				}
 				
 				$data['User']         = $User;
 				$data['Channel']      = $Channel;
 				$data['kick_message'] = $kick_message;
 			break;
+			case 'MODE':
+				if(sizeof($parsed['params']) == 3) {
+					// Sent if a mode for a user in a channel is changed
+					$User    = $this->getUser($parsed['nick']);
+					$Victim  = $this->getUser($parsed['params'][2]);
+					$Channel = $this->getChannel($parsed['params'][0]);
+					$Channel->sendNames();
+					// TODO: onMode() Event
+				} else {
+					if(isset($parsed['user'])) {
+						// TODO: Sent when the channel modes are changed
+					} else {
+						// TODO: Sent on connect to show us our user modes on the server
+					}
+				}
+			break;
 			case 'NICK':
 				// Sent when a user or the bot changes nick
-				$User = $this->users[strtolower($parsed['nick'])];
-				$old_name = $User->name;
-				$old_id   = $User->id;
-				$new_name = $parsed['params'][0];
-				$new_id   = strtolower($new_name);
-				$this->changeUserName($User, $new_name);
-				
-				if($old_id == $this->myID) {
-					$this->myID      = $new_id;
-					$this->myNick    = $new_name;
-					$this->myBanmask = $this->myNick.'!'.$this->myUser.'@'.$this->myHost;
-				} else {
+				$User = $this->getUser($parsed['nick']);
+				if($User->id != $this->Me->id) {
 					$data['User'] = $User;
 				}
 				
-				$data['old_name'] = $old_name;
+				$data['old_nick'] = $User->nick;
+				$User->changeNick($new_nick);
 			break;
 			case 'PART':
 				// Sent when a user or the bot parts a channel
-				$User    = $this->users[strtolower($parsed['nick'])];
-				$Channel = $this->channels[strtolower($parsed['params'][0])];
+				$User       = $this->getUser($parsed['nick']);
+				$Channel    = $this->getChannel($parsed['params'][0]);
+				$User->mode = $User->modes[$Channel->id];
+				unset($User->modes[$Channel->id]);
 				
-				if($User->id == $this->myID) {
-					$this->removeChannel($Channel);
+				if($User->id == $this->Me->id) {
+					$Channel->remove();
 				} else {
-					$data['User']    = $User;
-					$this->removeUserFromChannel($User, $Channel);
+					$Channel->removeUser($User);
+					$data['User'] = $User;
 				}
 				
 				$data['Channel'] = $Channel;
@@ -322,26 +271,27 @@ final class IRC_Server {
 			break;
 			case 'PRIVMSG':
 				// Sent when a user sends a message to a channel where the bot is in, or to the bot itself
-				if(false === $User = $this->getUserByBanmask($parsed['banmask'])) {
-					$User = $this->addUser($parsed['banmask']);
-				}
+				$data['User'] = $this->getUser($parsed['nick']);
 				
-				$data['User'] = $User;
 				// TODO: fail with todo at parseIRCMessage
 				$data['text'] = isset($parsed['params'][1]) ? $parsed['params'][1] : '';
-				if(strtolower($parsed['params'][0]) == $this->myID) {
+				
+				if(strtolower($parsed['params'][0]) == $this->Me->id) {
 					$data['isQuery'] = true;
+					$data['User']->mode = '';
 				} else {
-					$data['isQuery'] = false;
-					$data['Channel'] = $this->channels[strtolower($parsed['params'][0])];
+					$data['isQuery']    = false;
+					$data['Channel']    = $this->getChannel($parsed['params'][0]);
+					$data['User']->mode = $data['User']->modes[$data['Channel']->id];
 				}
 			break;
 			case 'QUIT':
 				// Sent when a user quits the server
-				$User = $this->users[strtolower($parsed['nick'])];
-				$this->removeUser($User);
+				$User = $this->getUser($parsed['nick']);
+				$User->remove();
 				
 				$data['User'] = $User;
+				
 				// TODO: fail with todo at parseIRCMessage
 				if(isset($parsed['params'][0])) $data['quit_message'] = $parsed['params'][0];
 				else $data['quit_message'] = '';

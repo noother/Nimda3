@@ -135,7 +135,7 @@ abstract class Plugin {
 			object User
 			
 			array data [
-				old_name => The nick the user had before
+				old_nick => The nick the user had before
 			]
 		*/
 	}
@@ -146,7 +146,7 @@ abstract class Plugin {
 			Triggered when the bot changes its nick
 
 			array data [
-				old_name => The nick the bot had before
+				old_nick => The nick the bot had before
 			]
 		*/
 	}
@@ -263,6 +263,15 @@ abstract class Plugin {
 			array data [
 				string text => The text sent by the User
 			]
+		*/
+	}
+	
+	public function onWhoisReply() {
+		/*
+			IRC command "WHOIS"
+			Triggered on server's reply to our WHOIS command
+			
+			object User
 		*/
 	}
 	

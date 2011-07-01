@@ -31,7 +31,11 @@ final class IRC_Channel extends IRC_Target {
 	}
 	
 	public function invite($User) {
-		$this->sendRaw('INVITE '.$User.' '.$this->name);
+		$this->Server->sendRaw('INVITE '.$User.' '.$this->name);
+	}
+	
+	public function sendNames() {
+		$this->Server->sendRaw('NAMES '.$this->name);
 	}
 	
 	public function setTopic($topic) {
@@ -87,6 +91,30 @@ final class IRC_Channel extends IRC_Target {
 		}
 		
 		$this->setUserMode($modes, $users);
+	}
+	
+	public function remove() {
+		foreach($this->users as $User) {
+			$this->removeUser($User);
+		}
+		unset($this->Server->channels[$this->id]);
+	}
+	
+	public function addUser($User) {
+		$User->modes[$this->id]    = '';
+		$this->users[$User->id]    = $User;
+		$User->channels[$this->id] = $this;
+	}
+	
+	public function removeUser($User) {
+		unset($this->users[$User->id]);
+		
+		if(sizeof($User->channels) == 1) {
+			$User->remove();
+		} else {
+			unset($this->users[$User->id]);
+			unset($User->channels[$this->id]);
+		}
 	}
 	
 }

@@ -143,7 +143,7 @@ class Nimda {
 			
 			switch($command) {
 				case '001':     $Plugin->onConnect(); break;
-				case '311':     /* TODO: WHOIS reply */ break;
+				case '311':     $Plugin->onWhoisReply(); break;
 				case '315':     $Plugin->onMeJoin();  break;
 				case '433':     $Plugin->onNickAlreadyInUse(); break;
 				case 'ERROR':   $Plugin->onMeQuit();  break;

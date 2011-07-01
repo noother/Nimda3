@@ -5,7 +5,7 @@ class CorePlugin_Part extends Plugin {
 	public $triggers = array('!part');
 	
 	function isTriggered() {
-		if($this->User->name != 'noother') return;
+		if($this->User->nick != 'noother') return;
 		
 		if($this->data['isQuery'] && !isset($this->data['text'])) return;
 		

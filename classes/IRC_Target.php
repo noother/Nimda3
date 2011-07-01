@@ -11,7 +11,9 @@ abstract class IRC_Target {
 	
 	public $data = array(); // This unused property is meant for plugins to write to
 	
-	public function privmsg($message) {
+	abstract public function remove();
+	
+	public final function privmsg($message) {
 		/*
 			irc max message length is 512 bytes including CRLF
 			The irc message received by clients counts - NOT what we send
@@ -37,11 +39,11 @@ abstract class IRC_Target {
 		
 	}
 	
-	public function sendCTCP($message) {
+	public final function sendCTCP($message) {
 		$this->privmsg("\x01".$message."\x01");
 	}
 	
-	public function action($message) {
+	public final function action($message) {
 		$this->sendCTCP('ACTION '.$message);
 	}
 	
