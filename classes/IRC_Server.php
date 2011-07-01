@@ -14,7 +14,7 @@ final class IRC_Server {
 	public $host         = '';
 	public $port         = 0;
 	public $isSSL        = false;
-	public $Me           = '';
+	public $Me;
 	public $lastLifeSign = 0;
 	
 	public function __construct($host, $port, $ssl=false) {
