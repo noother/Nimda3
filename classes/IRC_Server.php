@@ -44,7 +44,7 @@ final class IRC_Server {
 	
 	private function getUser($nick) {
 		$id = strtolower($nick);
-		if(!isset($this->users[$id])) $this->addUser($id);
+		if(!isset($this->users[$id])) $this->addUser($nick);
 	return $this->users[$id];
 	}
 	
