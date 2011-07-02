@@ -66,7 +66,7 @@ abstract class Plugin {
 		All following events have object Server set
 	*/
 	
-	public function onConnect(){
+	public function onConnect() {
 		/*
 			IRC command "001"
 			Triggered when the bot connects
@@ -76,6 +76,15 @@ abstract class Plugin {
 				string my_nick         => the final bots nick
 				string welcome_message => The welcome message, the server sent
 			]
+		*/
+	}
+	
+	public function onEndOfNames() {
+		/*
+			IRC command "366"
+			TODO: Temp - Triggered after a MODE has been set and user modes have been re-read
+			
+			object Channel
 		*/
 	}
 	

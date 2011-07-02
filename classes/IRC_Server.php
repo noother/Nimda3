@@ -172,6 +172,10 @@ final class IRC_Server {
 					$User->modes[$Channel->id] = $mode;
 				}
 			break;
+			case '366':
+				// Server End of NAMES list
+				$data['Channel'] = $this->getChannel($parsed['params'][1]);
+			break;
 			case '433':
 				// Sent on connect if nickname is already in use
 				$data['nick'] = $parsed['params'][1];

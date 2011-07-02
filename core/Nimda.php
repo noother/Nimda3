@@ -145,6 +145,7 @@ class Nimda {
 				case '001':     $Plugin->onConnect(); break;
 				case '311':     $Plugin->onWhoisReply(); break;
 				case '315':     $Plugin->onMeJoin();  break;
+				case '366':     $Plugin->onEndOfNames(); break; // TODO: Temp until onMode() is done
 				case '433':     $Plugin->onNickAlreadyInUse(); break;
 				case 'ERROR':   $Plugin->onMeQuit();  break;
 				case 'JOIN':    if($User) $Plugin->onJoin(); break;
