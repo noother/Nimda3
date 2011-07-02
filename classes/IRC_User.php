@@ -69,7 +69,6 @@ final class IRC_User extends IRC_Target {
 			}
 		}
 		
-		
 		return ($this->nickservStatus == 3);
 	}
 	
