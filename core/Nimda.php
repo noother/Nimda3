@@ -31,7 +31,7 @@ class Nimda {
 			
 			$check = false;
 			foreach($this->servers as $Server) {
-				if(false !== $data = $Server->tick()) {
+				while(false !== $data = $Server->tick()) {
 					$check = true;
 					if(is_array($data)) {
 						unset($data['raw']); // TODO: Logging & stuff
