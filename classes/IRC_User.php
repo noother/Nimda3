@@ -12,6 +12,7 @@ final class IRC_User extends IRC_Target {
 	public $banmask  = '';
 	public $modes    = array();
 	public $mode     = '';
+	public $nickservStatus = 0;
 	
 	public $channels = array();
 	
@@ -30,6 +31,49 @@ final class IRC_User extends IRC_Target {
 		$this->Server->sendRaw('NOTICE '.$this->name.' :'.$message);
 	}
 	
+	public function isIdentified() {
+		if($this->nickservStatus == 3) return true;
+		if(!$this->Server->nickservIdentifyCommand) return false;
+		else {
+			$this->Server->NickServ->privmsg($this->Server->nickservIdentifyCommand.' '.$this->nick);
+			$this->Server->flushSendQueue();
+			
+			$c = 100;
+			while(true) {
+				$data = $this->Server->getData();
+				if(!$data) {
+					usleep(20000);
+					if(--$c <= 0) return false;
+					continue;
+				}
+				
+				if($data['command'] == 'NOTICE' && isset($data['User']) && $data['User']->id == 'nickserv') {
+					$tmp = explode(' ', $data['text']);
+					$status = $tmp[2];
+					
+					switch($this->Server->nickservIdentifyCommand) {
+						case 'ACC':
+							$nick = $tmp[0];
+						break;
+						case 'STATUS':
+							$nick = $tmp[1];
+						break;
+					}
+					
+					if(strtolower($nick) == $this->id) {
+						$this->nickservStatus = $status;
+						break;
+					}
+				} else {
+					$this->Server->enqueueRead($data);
+				}
+			}
+			
+			
+			return ($this->nickservStatus == 3);
+		}
+	}
+	
 	public function changeNick($nick) {
 		$new_id = strtolower($nick);
 		
@@ -45,6 +89,7 @@ final class IRC_User extends IRC_Target {
 		$this->name = $nick;
 		$this->id   = $new_id;
 		$this->banmask = $this->nick.'!'.$this->user.'@'.$this->host;
+		$this->nickservStatus = 0;
 	}
 	
 	public function remove() {

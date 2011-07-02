@@ -31,11 +31,12 @@ class Nimda {
 			
 			$check = false;
 			foreach($this->servers as $Server) {
-				$data = $Server->getData();
-				if($data !== false) {
+				if(false !== $data = $Server->tick()) {
 					$check = true;
-					unset($data['raw']); // TODO: Logging & stuff
-					$this->triggerPlugins($data, $Server);
+					if(is_array($data)) {
+						unset($data['raw']); // TODO: Logging & stuff
+						$this->triggerPlugins($data, $Server);
+					}
 				}
 			}
 			if(!$check) usleep(20000);
@@ -151,6 +152,7 @@ class Nimda {
 				case 'JOIN':    if($User) $Plugin->onJoin(); break;
 				case 'KICK':    if(isset($data['Victim'])) $Plugin->onKick(); else $Plugin->onMeKick(); break;
 				case 'NICK':    if($User) $Plugin->onNick(); else $Plugin->onMeNick(); break;
+				case 'NOTICE':  if($User) $Plugin->onNotice(); break;
 				case 'PART':    if($User) $Plugin->onPart(); else $Plugin->onMePart(); break;
 				case 'PING':    $Plugin->onPing();    break;
 				case 'PRIVMSG': $Plugin->onPrivmsg(); break;

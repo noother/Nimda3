@@ -8,6 +8,8 @@ require_once('IRC_User.php');
 final class IRC_Server {
 	
 	private $socket;
+	private $queueRead = array();
+	private $queueSend = array();
 	
 	public $channels  = array();
 	public $users     = array();
@@ -15,7 +17,9 @@ final class IRC_Server {
 	public $port         = 0;
 	public $isSSL        = false;
 	public $Me;
+	public $NickServ;
 	public $lastLifeSign = 0;
+	public $nickservIdentifyCommand = false;
 	
 	public function __construct($host, $port, $ssl=false) {
 		$this->socket = fsockopen(($ssl?'ssl://':'').$host, $port);
@@ -109,6 +113,48 @@ final class IRC_Server {
 	
 	return $parsed;
 	}
+	
+	public function tick() {
+		$check = false;
+		
+		if(false !== $data = $this->getData()) {
+			$this->queueRead[] = $data;
+			$check = true;
+		}
+		
+		if($this->sendQueue()) $check = true;
+		
+		if(false !== $data = $this->readQueue()) $check = $data;
+		
+	return $check;
+	}
+	
+	public function enqueueRead($data) {
+		$this->queueRead[] = $data;
+	}
+	
+	private function readQueue() {
+		if(sizeof($this->queueRead) > 0) {
+			return array_shift($this->queueRead);
+		}
+	
+	return false;
+	}
+	
+	private function sendQueue() {
+		if(sizeof($this->queueSend) > 0) {
+			$this->write(array_shift($this->queueSend));
+			return true;
+		}
+		
+	return false;
+	}
+	
+	public function flushSendQueue() {
+		while($message = array_shift($this->queueSend)) {
+			$this->write($message);
+		}
+	}
 
 	public function getData() {
 		if(false === $raw = $this->read()) return false;
@@ -125,8 +171,11 @@ final class IRC_Server {
 				$data['my_nick']         = $parsed['params'][0];
 				$data['welcome_message'] = $parsed['params'][1];
 				
-				$this->Me = new IRC_User($data['my_nick'], $this);
+				$this->Me       = new IRC_User($data['my_nick'], $this);
+				$this->NickServ = new IRC_User('NickServ', $this);
 				$this->sendWhois($this->Me->nick);
+				$this->NickServ->privmsg('ACC '.$this->Me->nick);
+				$this->NickServ->privmsg('STATUS '.$this->Me->nick);
 			break;
 			case '311':
 				// WHOIS reply
@@ -249,6 +298,33 @@ final class IRC_Server {
 				$data['old_nick'] = $User->nick;
 				$User->changeNick($parsed['params'][0]);
 			break;
+			case 'NOTICE':
+				if(isset($parsed['nick'])) {
+					// Sent when a user sends a notice
+					$User = $this->getUser($parsed['nick']);
+					$text = $parsed['params'][1];
+				
+					if($User->id == 'nickserv') {
+						// Sent when nickserv sends a notice
+						$tmp = explode(' ', $parsed['params'][1]);
+						if($tmp[0] == $this->Me->nick && $tmp[1] == 'ACC') {
+							$this->nickservIdentifyCommand = 'ACC';
+						} elseif($tmp[0] == 'STATUS' && $tmp[1] == $this->Me->nick) {
+							$this->nickservIdentifyCommand = 'STATUS';
+						}
+						
+						$id = false;
+						if($tmp[1] == 'ACC')        $id = strtolower($tmp[0]);
+						elseif($tmp[0] == 'STATUS') $id = strtolower($tmp[1]);
+						if($id && isset($this->users[$id])) $this->users[$id]->nickservStatus = $tmp[2];
+					}
+					
+					$data['User'] = $User;
+					$data['text'] = $text;
+				} else {
+					// TODO: Sent when the server sends a notice
+				}
+			break;
 			case 'PART':
 				// Sent when a user or the bot parts a channel
 				$User       = $this->getUser($parsed['nick']);
@@ -305,12 +381,11 @@ final class IRC_Server {
 		
 		$this->lastLifeSign = libSystem::getMicrotime();
 		
-		
 	return $data;
 	}
 	
 	public function sendRaw($string) {
-		$this->write($string);
+		$this->queueSend[] = $string;
 	}
 	
 	public function sendPong($string) {

@@ -171,6 +171,19 @@ abstract class Plugin {
 		*/
 	}
 	
+	public function onNotice() {
+		/*
+			IRC command "NOTICE"
+			Triggered when a user sends a NOTICE to the bot
+			
+			object User
+			
+			array data [
+				text => The text sent with the NOTICE
+			]
+		*/
+	}
+	
 	public function onPart() {
 		/*
 			IRC command "PART"
