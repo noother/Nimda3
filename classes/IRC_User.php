@@ -34,44 +34,43 @@ final class IRC_User extends IRC_Target {
 	public function isIdentified() {
 		if($this->nickservStatus == 3) return true;
 		if(!$this->Server->nickservIdentifyCommand) return false;
-		else {
-			$this->Server->NickServ->privmsg($this->Server->nickservIdentifyCommand.' '.$this->nick);
-			$this->Server->flushSendQueue();
 			
-			$c = 100;
-			while(true) {
-				$data = $this->Server->getData();
-				if(!$data) {
-					usleep(20000);
-					if(--$c <= 0) return false;
-					continue;
-				}
-				
-				if($data['command'] == 'NOTICE' && isset($data['User']) && $data['User']->id == 'nickserv') {
-					$tmp = explode(' ', $data['text']);
-					$status = $tmp[2];
-					
-					switch($this->Server->nickservIdentifyCommand) {
-						case 'ACC':
-							$nick = $tmp[0];
-						break;
-						case 'STATUS':
-							$nick = $tmp[1];
-						break;
-					}
-					
-					if(strtolower($nick) == $this->id) {
-						$this->nickservStatus = $status;
-						break;
-					}
-				} else {
-					$this->Server->enqueueRead($data);
-				}
+		$this->Server->NickServ->privmsg($this->Server->nickservIdentifyCommand.' '.$this->nick);
+		$this->Server->flushSendQueue();
+		
+		$c = 100;
+		while(true) {
+			$data = $this->Server->getData();
+			if(!$data) {
+				usleep(20000);
+				if(--$c <= 0) return false;
+				continue;
 			}
 			
-			
-			return ($this->nickservStatus == 3);
+			if($data['command'] == 'NOTICE' && isset($data['User']) && $data['User']->id == 'nickserv') {
+				$tmp = explode(' ', $data['text']);
+				$status = $tmp[2];
+				
+				switch($this->Server->nickservIdentifyCommand) {
+					case 'ACC':
+						$nick = $tmp[0];
+					break;
+					case 'STATUS':
+						$nick = $tmp[1];
+					break;
+				}
+				
+				if(strtolower($nick) == $this->id) {
+					$this->nickservStatus = $status;
+					break;
+				}
+			} else {
+				$this->Server->enqueueRead($data);
+			}
 		}
+		
+		
+		return ($this->nickservStatus == 3);
 	}
 	
 	public function changeNick($nick) {
