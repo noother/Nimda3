@@ -223,8 +223,10 @@ final class IRC_Server {
 				$data['kick_message'] = $kick_message;
 			break;
 			case 'MODE':
-				if(sizeof($parsed['params']) == 3) {
+				var_dump($parsed);
+				if(sizeof($parsed['params']) >= 3) {
 					// Sent if a mode for a user in a channel is changed
+					// TODO: Many modes with 1 command
 					$User    = $this->getUser($parsed['nick']);
 					$Victim  = $this->getUser($parsed['params'][2]);
 					$Channel = $this->getChannel($parsed['params'][0]);
