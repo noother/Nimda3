@@ -246,7 +246,7 @@ final class IRC_Server {
 				}
 				
 				$data['old_nick'] = $User->nick;
-				$User->changeNick($new_nick);
+				$User->changeNick($parsed['params'][0]);
 			break;
 			case 'PART':
 				// Sent when a user or the bot parts a channel
