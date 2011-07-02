@@ -31,11 +31,12 @@ class Nimda {
 			
 			$check = false;
 			foreach($this->servers as $Server) {
-				while(false !== $data = $Server->tick()) {
+				if(false !== $data = $Server->tick()) {
 					$check = true;
 					if(is_array($data)) {
 						unset($data['raw']); // TODO: Logging & stuff
 						$this->triggerPlugins($data, $Server);
+						$Server->sendQueue();
 					}
 				}
 			}
@@ -110,7 +111,7 @@ class Nimda {
 			foreach($this->plugins as $Plugin) {
 				$Plugin->triggerTimer();
 			}
-		
+			
 			$this->timersLastTriggered = $this->time;
 		}
 	}

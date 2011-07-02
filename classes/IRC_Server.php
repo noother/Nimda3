@@ -141,19 +141,15 @@ final class IRC_Server {
 	return false;
 	}
 	
-	private function sendQueue() {
-		if(sizeof($this->queueSend) > 0) {
-			$this->write(array_shift($this->queueSend));
-			return true;
-		}
-		
-	return false;
-	}
-	
-	public function flushSendQueue() {
+	public function sendQueue() {
+		// TODO: Flood protection
+		$check = false;
 		while($message = array_shift($this->queueSend)) {
+			$check = true;
 			$this->write($message);
 		}
+		
+	return $check;
 	}
 
 	public function getData() {
@@ -384,37 +380,38 @@ final class IRC_Server {
 	return $data;
 	}
 	
-	public function sendRaw($string) {
-		$this->queueSend[] = $string;
+	public function sendRaw($string, $bypass_queue=false) {
+		if($bypass_queue) $this->write($string);
+		else $this->queueSend[] = $string;
 	}
 	
-	public function sendPong($string) {
-		$this->sendRaw('PONG :'.$string);
+	public function sendPong($string, $bypass_queue=true) {
+		$this->sendRaw('PONG :'.$string, $bypass_queue);
 	}
 	
-	public function sendWhois($nick) {
-		$this->sendRaw('WHOIS '.$nick);
+	public function sendWhois($nick, $bypass_queue=false) {
+		$this->sendRaw('WHOIS '.$nick, $bypass_queue);
 	}
 	
-	public function setPass($pass) {
-		$this->sendRaw('PASS '.$pass);
+	public function setPass($pass, $bypass_queue=true) {
+		$this->sendRaw('PASS '.$pass, $bypass_queue);
 	}
 	
-	public function setUser($username, $hostname, $servername, $realname) {
-		$this->sendRaw('USER '.$username.' '.$hostname.' '.$servername.' :'.$realname);
+	public function setUser($username, $hostname, $servername, $realname, $bypass_queue=true) {
+		$this->sendRaw('USER '.$username.' '.$hostname.' '.$servername.' :'.$realname, $bypass_queue);
 	}
 	
-	public function setNick($nick) {
-		$this->sendRaw('NICK '.$nick);
+	public function setNick($nick, $bypass_queue=false) {
+		$this->sendRaw('NICK '.$nick, $bypass_queue);
 	}
 	
-	public function joinChannel($channel, $key=false) {
-		$this->sendRaw('JOIN '.$channel.($key?' '.$key:''));
+	public function joinChannel($channel, $key=false, $bypass_queue=false) {
+		$this->sendRaw('JOIN '.$channel.($key?' '.$key:''), $bypass_queue);
 	}
 	
-	public function quit($message=null) {
-		if(isset($message)) $this->sendRaw('QUIT :'.$message);
-		else                $this->sendRaw('QUIT');
+	public function quit($message=null, $bypass_queue=true) {
+		if(isset($message)) $this->sendRaw('QUIT :'.$message, $bypass_queue);
+		else                $this->sendRaw('QUIT', $bypass_queue);
 	}
 	
 	public function __destruct() {

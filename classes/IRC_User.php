@@ -23,20 +23,19 @@ final class IRC_User extends IRC_Target {
 		$this->nick    = $nick;
 	}
 	
-	public function answerCTCP($message) {
-		$this->notice("\x01".$message."\x01");
+	public function answerCTCP($message, $bypass_queue=false) {
+		$this->notice("\x01".$message."\x01", $bypass_queue);
 	}
 	
-	public function notice($message) {
-		$this->Server->sendRaw('NOTICE '.$this->name.' :'.$message);
+	public function notice($message, $bypass_queue=false) {
+		$this->Server->sendRaw('NOTICE '.$this->name.' :'.$message, $bypass_queue);
 	}
 	
 	public function isIdentified() {
 		if($this->nickservStatus == 3) return true;
 		if(!$this->Server->nickservIdentifyCommand) return false;
 			
-		$this->Server->NickServ->privmsg($this->Server->nickservIdentifyCommand.' '.$this->nick);
-		$this->Server->flushSendQueue();
+		$this->Server->NickServ->privmsg($this->Server->nickservIdentifyCommand.' '.$this->nick, true);
 		
 		$c = 100;
 		while(true) {
