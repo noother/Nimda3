@@ -223,7 +223,6 @@ final class IRC_Server {
 				$data['kick_message'] = $kick_message;
 			break;
 			case 'MODE':
-				var_dump($parsed);
 				if(sizeof($parsed['params']) >= 3) {
 					// Sent if a mode for a user in a channel is changed
 					// TODO: Many modes with 1 command
