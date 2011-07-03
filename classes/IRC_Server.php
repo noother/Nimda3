@@ -46,7 +46,7 @@ final class IRC_Server {
 		fputs($this->socket, $string."\n");
 	}
 	
-	public function getUser($nick) {
+	private function getUser($nick) {
 		$id = strtolower($nick);
 		if(!isset($this->users[$id])) $this->addUser($nick);
 	return $this->users[$id];
@@ -57,7 +57,7 @@ final class IRC_Server {
 		$this->users[$User->id] = $User;
 	}
 	
-	public function getChannel($channel) {
+	private function getChannel($channel) {
 		$id = strtolower($channel);
 		if(!isset($this->channels[$id])) $this->addChannel($channel);
 	return $this->channels[$id];
