@@ -2,7 +2,7 @@
 
 class Plugin_WeChall extends Plugin {
 	
-	public $triggers = array('!wechall', '!wc', '!wcc');
+	public $triggers = array('!wechall', '!wc');
 	private $usage = 'Usage: %s <nick>';
 
 
@@ -10,22 +10,9 @@ class Plugin_WeChall extends Plugin {
 		if(isset($this->data['text'])) $target = $this->data['text'];
 		else $target = $this->User->name;
 		
-		switch($this->data['trigger']) {
-			case '!wcc':
-				$result = libHTTP::GET('www.wechall.net', '/wechallchalls.php?username='.urlencode($target));
-				$tmp = $result['content'][0];
-			
-				$this->reply($tmp);
-			break;
-			default:
-				if($target{0} == '!' && strstr($target, ' ') === false) $target.= ' '.$this->User->name;
-				$result = libHTTP::GET('www.wechall.net','/wechall.php?username='.urlencode($target));
-				$tmp = $result['content'][0];
-
-				$this->reply($tmp);
-			break;
-		}
-		
+		if($target{0} == '!' && strstr($target, ' ') === false) $target.= ' '.$this->User->name;
+		$result = libHTTP::GET('www.wechall.net','/wechall.php?username='.urlencode($target));
+		$this->reply($result['content'][0]);
 	}
 	
 }
