@@ -5,7 +5,6 @@
 	require_once('functions.php');
 	
 	require_once('libs/libArray.php');
-	require_once('libs/libChallenges.php');
 	require_once('libs/libConvert.php');
 	require_once('libs/libCrypt.php');
 	require_once('libs/libFile.php');
