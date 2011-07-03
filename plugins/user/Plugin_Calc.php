@@ -35,7 +35,7 @@ class Plugin_Calc extends Plugin {
 
 		$result = preg_replace("/<sup>/",'^',$matches[1][0]);
 
-		$this->reply(html_entity_decode(strip_tags($result)));
+		$this->reply(utf8_encode(html_entity_decode(strip_tags($result))));
 	}
 	
 }
