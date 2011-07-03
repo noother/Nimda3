@@ -46,7 +46,7 @@ final class IRC_Server {
 		fputs($this->socket, $string."\n");
 	}
 	
-	private function getUser($nick) {
+	public function getUser($nick) {
 		$id = strtolower($nick);
 		if(!isset($this->users[$id])) $this->addUser($nick);
 	return $this->users[$id];
@@ -57,7 +57,7 @@ final class IRC_Server {
 		$this->users[$User->id] = $User;
 	}
 	
-	private function getChannel($channel) {
+	public function getChannel($channel) {
 		$id = strtolower($channel);
 		if(!isset($this->channels[$id])) $this->addChannel($channel);
 	return $this->channels[$id];
@@ -348,7 +348,8 @@ final class IRC_Server {
 			break;
 			case 'PRIVMSG':
 				// Sent when a user sends a message to a channel where the bot is in, or to the bot itself
-				$data['User'] = $this->getUser($parsed['nick']);
+				if(!isset($this->users[strtolower($parsed['nick'])])) $this->sendWhois($parsed['nick']);
+				$data['User'] = $this->getUser($parsed['nick']);;
 				
 				// TODO: fail with todo at parseIRCMessage
 				$data['text'] = isset($parsed['params'][1]) ? $parsed['params'][1] : '';
