@@ -13,7 +13,12 @@ class Plugin_TinyURL extends Plugin {
 		}
 		
 		$res = libHTTP::GET('tinyurl.com', '/api-create.php?url='.urlencode($this->data['text']));
-		$this->reply($res['raw']);
+		if(strlen($res['raw']) <= strlen($this->data['text'])) {
+			$this->reply($res['raw']);
+		} else {
+			$this->reply($res['raw'].' - Now your URL is even longer than before - good job!');
+		}
+		
 	}
 	
 }
