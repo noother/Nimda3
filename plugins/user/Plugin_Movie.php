@@ -2,7 +2,7 @@
 
 class Plugin_Movie extends Plugin {
 	
-	public $triggers = array('!movie', '!tmdb');
+	public $triggers = array('!movie', '!tmdb', '!film');
 	
 	private $api_key  = '9fc8c3894a459cac8c75e3284b712dfc'; // shamelessly stolen from gcstar
 	private $language = 'de';
