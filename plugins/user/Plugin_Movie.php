@@ -31,6 +31,7 @@ class Plugin_Movie extends Plugin {
 		if(!empty($Movie->released))              $text.= " | \x02Released:\x02 ".$Movie->released;
 		if($Movie->rating != '0.0')               $text.= " | \x02Press Rating:\x02 ".$Movie->rating.'/10';
 		if(!empty($Movie->certification))         $text.= " | \x02Rated:\x02 ".$Movie->certification;
+		$text.= ' ('.$Movie->url.')';
 		
 		$this->reply($text);
 		$this->reply($Movie->overview);
