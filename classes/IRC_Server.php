@@ -168,7 +168,9 @@ final class IRC_Server {
 				$data['welcome_message'] = $parsed['params'][1];
 				
 				$this->Me       = new IRC_User($data['my_nick'], $this);
+				$this->users[$this->Me->id] = $this->Me;
 				$this->NickServ = new IRC_User('NickServ', $this);
+				$this->users[$this->NickServ] = $this->NickServ;
 				$this->sendWhois($this->Me->nick);
 				$this->NickServ->privmsg('ACC '.$this->Me->nick);
 				$this->NickServ->privmsg('STATUS '.$this->Me->nick);
@@ -180,7 +182,6 @@ final class IRC_Server {
 				$User->host     = $parsed['params'][3];
 				$User->realname = $parsed['params'][5];
 				$User->banmask  = $User->nick.'!'.$User->user.'@'.$User->host;
-				
 				$data['User'] = $User;
 			break;
 			case '315':
