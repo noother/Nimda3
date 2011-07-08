@@ -20,7 +20,11 @@ class Plugin_PHP extends Plugin {
 	}
 	
 	private function fetchFunctionDescription($func) {
-		$res = libHTTP::GET($this->language.'.php.net', '/'.$func, 'LAST_LANG='.$this->language);
+		$res = libHTTP::GET($this->language.'.php.net', '/'.$func, 'LAST_LANG='.$this->language, 2);
+		if(!$res) {
+			$this->reply('Timeout on contacting '.$this->language.'.php.net');
+			return;
+		}
 	
 		if (preg_match('/<span class=\"refname\">(.*?)<\/span> &mdash; <span class=\"dc\-title\">(.*?)<\/span>/si', $res['raw'], $match)) {
 			$match[2] = str_replace(array("\n", "\r"), ' ', strip_tags($match[2]));
