@@ -4,10 +4,12 @@ This is far from complete - not for productive use.
 
 Install:
 
-1) Create new MySQL-Database and import SQL/nimda3.sql into it
+1) Create new MySQL-Database and add a user for the bot to it.
 2) Change database auth in nimda.conf
 3) Start Nimda with ./nimda
 
 The bot will connect to irc.freenode.net, channel #nimda by default
+
+SQL is autoupdated if there are any changes.
 
 If you want to code for it - please only touch the plugins/user/ directory - everything else is under construction exclusively by me for now.
