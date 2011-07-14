@@ -93,5 +93,7 @@
 -- [5]
 	ALTER TABLE `memory` ADD `is_array` BOOLEAN NOT NULL DEFAULT '0' AFTER `value`;
 	UPDATE `memory` SET `is_array` = 1 WHERE value LIKE 'a:%';
+	
+	UPDATE `version` SET `version` = '5';
 -- [/5]
 
