@@ -14,7 +14,7 @@ class Plugin_ChallengeObserver extends Plugin {
 		
 		/*
 		$sites = $this->getSites();
-		$sites['WC']['challs']--;
+		$sites['HS']['challs']-=2;
 		$this->saveVar('sites', $sites);
 		*/
 	}
@@ -106,18 +106,32 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getHappySecurityChalls($count) {
-		$res = libHTTP::GET('www.happy-security.de', '/', null, 2);
+		$res = libHTTP::GET('www.happy-security.de', '/index.php?modul=hacking-zone', null, 2);
 		if(!$res) return;
 		
-		if(!preg_match_all('#http://happy-security.de/images/next.gif.*?<a href="(.*?)".*?>(.*?)<.*?\[ (.*?) \].*?>(.*?)<#', $res['raw'], $arr)) {
+		if(!preg_match_all('#<td valign=top nowrap colspan=8> &nbsp;&raquo; <b>(.+?)</b>(.+?)</tr></table>#s', $res['raw'], $categories)) {
 			return;
 		}
 		
-		for($i=0;$i<$count&&$i<sizeof($arr[0]);$i++) {
-			$url      = html_entity_decode($arr[1][$i]);
-			$chall    = html_entity_decode($arr[2][$i]);
-			$category = html_entity_decode($arr[3][$i]);
-			$author   = html_entity_decode($arr[4][$i]);
+		$challs = array();
+		
+		for($i=0;$i<sizeof($categories[1]);$i++) {
+			if(!preg_match_all('#<a href="?/?\?modul=hacking-zone&action=showhackit&level_id=(\d+?)"?>(.+?)</b>.+?<b>(.+?)</b>#s', $categories[2][$i], $arr)) {
+				continue;
+			}
+			
+			for($j=0;$j<sizeof($arr[1]);$j++) {
+				$challs[] = array('id' => (int)$arr[1][$j], 'name' => $arr[2][$j], 'category' => $categories[1][$i], 'author' => $arr[3][$j]);
+			}
+		}
+		
+		usort($challs, array('self', 'cmpHappySecurityChalls'));
+		
+		for($i=0;$i<$count&&$i<sizeof($challs);$i++) {
+			$url      = 'http://www.happy-security.de/index.php?modul=hacking-zone&action=showhackit&level_id='.$challs[$i]['id'];
+			$chall    = $challs[$i]['name'];
+			$category = $challs[$i]['category'];
+			$author   = $challs[$i]['author'];
 			
 			$text = sprintf("\x02%s\x02 in \x02%s\x02 by \x02%s\x02 (%s)",
 				$chall,
@@ -130,6 +144,12 @@ class Plugin_ChallengeObserver extends Plugin {
 			$this->addLatestChall('Happy Security', $text);
 		}
 	}
+	
+	private function cmpHappySecurityChalls($a, $b) {
+		return $a['id'] > $b['id'] ? -1 : 1;
+	}
+	
+	
 	
 	private function getWeChallChalls($count) {
 		$res = libHTTP::GET('www.wechall.net', '/challs/by/chall_date/DESC/page-1', null, 2);
