@@ -26,7 +26,7 @@ class Plugin_ChannelPeak extends Plugin {
 				if(!isset($this->data['text'])) {
 					$this->reply(sprintf('The peakshow for %s on %s is %s.',
 						$this->Channel->name,
-						$this->Server->host,
+						$this->Server->id,
 						$this->Channel->getVar('peakshow_enabled') ? 'enabled' : 'disabled'
 					));
 					return;
