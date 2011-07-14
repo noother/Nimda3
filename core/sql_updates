@@ -84,3 +84,9 @@
 	UPDATE `version` SET `version` = '3';
 -- [/3]
 
+-- [4]
+	DROP TABLE `channelpeaks`;
+	
+	UPDATE `version` SET `version` = '4';
+-- [/4]
+
