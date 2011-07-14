@@ -190,7 +190,7 @@ class Nimda {
 	
 	public function savePermanent($name, $value, $type='bot', $target='me') {
 		
-		if($this->getPermanent($name, $type, $target)) {
+		if(false !== $this->getPermanent($name, $type, $target)) {
 			$sql = "
 				UPDATE
 					`memory`
