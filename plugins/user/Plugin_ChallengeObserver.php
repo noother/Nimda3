@@ -3,18 +3,33 @@
 class Plugin_ChallengeObserver extends Plugin {
 	
 	public $interval = 60;
+	public $triggers = array('!latest', '!recent', '!latest_challs', '!recent_challs', '!new_challs');
 	
 	private $channel = '#nimda';
 	private $ChallChannel;
 	
 	function onLoad() {
 		if(!$this->getVar('sites')) $this->saveVar('sites', serialize($this->getSites()));
+		if(!$this->getVar('latest')) $this->saveVar('latest', serialize(array()));
 		
 		/*
 		$sites = $this->getSites();
 		$sites['WC']['challs']--;
 		$this->saveVar('sites', serialize($sites));
 		*/
+	}
+	
+	function isTriggered() {
+		$latest = unserialize($this->getVar('latest'));
+		if(empty($latest)) {
+			$this->reply('No challenges have been collected yet.');
+			return;
+		}
+		
+		$this->reply('Most recent '.sizeof($latest).' challs:');
+		foreach($latest as $chall) {
+			$this->reply("\x02".$chall['site']."\x02 - ".$chall['text']);
+		}
 	}
 	
 	function onInterval() {
@@ -88,6 +103,15 @@ class Plugin_ChallengeObserver extends Plugin {
 		}
 	}
 	
+	private function addLatestChall($site, $text) {
+		$latest = unserialize($this->getVar('latest'));
+		
+		if(sizeof($latest) >= 5) array_pop($latest);
+		array_unshift($latest, array('site' => $site, 'text' => $text));
+		
+		$this->saveVar('latest', serialize($latest));
+	}
+	
 	private function getHappySecurityChalls($count) {
 		$res = libHTTP::GET('www.happy-security.de', '/', null, 2);
 		if(!$res) return;
@@ -102,13 +126,15 @@ class Plugin_ChallengeObserver extends Plugin {
 			$category = html_entity_decode($arr[3][$i]);
 			$author   = html_entity_decode($arr[4][$i]);
 			
-			
-			$this->Channel->privmsg(sprintf("\x02%s\x02 in \x02%s\x02 by \x02%s\x02 (%s)",
+			$text = sprintf("\x02%s\x02 in \x02%s\x02 by \x02%s\x02 (%s)",
 				$chall,
 				$category,
 				$author,
 				$url
-			));
+			);
+			
+			$this->ChallChannel->privmsg($text);
+			$this->addLatestChall('Happy Security', $text);
 		}
 	}
 	
@@ -125,13 +151,17 @@ class Plugin_ChallengeObserver extends Plugin {
 			$chall = html_entity_decode($arr[2][$i]);
 			$author = html_entity_decode($arr[3][$i]);
 			
-			$this->Channel->privmsg(sprintf("\x02%s\x02 by \x02%s\x02 (%s)",
+			$text = sprintf("\x02%s\x02 by \x02%s\x02 (%s)",
 				$chall,
 				$author,
 				$url
-			));
+			);
+			
+			$this->ChallChannel->privmsg($text);
+			
+			$this->addLatestChall('WeChall', $text);
 		}
-	}	
+	}
 	
 }
 
