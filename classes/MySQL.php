@@ -1,160 +1,98 @@
 <?php
 
 class MySQL {
-
+	
 	
 	private $host;
 	private $user;
 	private $password;
 	private $db;
-	private $query_log;
-	private $memcache;
-	private $useMemcache=false;
+	private $port;
 	
-	private $instance=false;
-
-	function MySQL($host, $user, $password, $db, $useMemcache=false, $memcache=false) {
-		$this->host = $host;
-		$this->user = $user;
+	private $Instance=false;
+	
+	function __construct($host, $user, $password, $db, $port=3306) {
+		$this->host     = $host;
+		$this->user     = $user;
 		$this->password = $password;
-		$this->db = $db;
-		$this->query_log = array();
-		
-		if($useMemcache) {
-			$this->useMemcache = true;
-			$this->memcache = $memcache;
-		}
+		$this->db       = $db;
+		$this->port     = $port;
 	}
-
+	
 	private function connect() {
-		$this->instance = new mysqli($this->host,$this->user,$this->password,$this->db);
-		if($this->instance->connect_error) die($this->instance->connect_error);
+		$this->Instance = new mysqli($this->host,$this->user,$this->password,$this->db);
+		if($this->Instance->connect_error) die($this->Instance->connect_error);
 		$this->query("set character set utf8");
 	}
 	
-	public function query($sql,$memcache=false,$memcache_timeout=false) {
-		/**
-		 *   $sql =>
-		 *   	Das SQL-Statement
-		 *   $memcache =>
-		 *   	Der Name, nach dem im Memcache geschaut werden soll. Existiert ein Eintrag mit
-		 *   	diesem Namen, wird sofort das Ergebnis zurückgegeben, ansonsten wird das
-		 *   	SQL-Statement ausgeführt, das Ergebnis im Memcache gespeichert und das Resultat
-		 *   	zurückgegeben
-		 *   $memcache_timeout =>
-		 *   	Nach x Sekunden, läuft der Eintrag im Memcache automatisch ab, was den gleichen
-		 *   	Effekt erzielt, als würde man es mit $this->MySQL->memcacheDelete() löschen
-		**/
-		
-		if(!$this->useMemcache) $memcache = false;
-		
-		$start	= libSystem::getMicrotime();
-		
-		$memcache_check = false;
-		if($memcache) {
-			$result = $this->memcache->get($memcache,null,true);
-			if($result) $memcache_check = true;
+	public function query($sql, $mode='assoc') {
+		if(!$this->Instance) {
+			$this->connect();
 		}
 		
-		if(!$memcache_check) {
-			if(!$this->instance) {
+		if(false === $Result = $this->Instance->query($sql)) {
+			if($this->Instance->error == 'MySQL server has gone away') {
 				$this->connect();
-			}
-			$result = $this->instance->query($sql);
-		}
-		
-		$end = libSystem::getMicrotime();
-		
-		if(!$result) {
-			if($this->instance->error == 'MySQL server has gone away') {
-				$this->connect();
-				return $this->query($sql, $memcache, $memcache_timeout);
+				return $this->query($sql);
 			} else {
-				die("MySQL Error: ".$this->instance->error."\n");
+				die("\nMySQL Error: ".$this->Instance->error."\n");
 			}
 		}
 		
-		/*
-		$log = array();
-		$log['query']	= $sql;
-		$log['time']	= number_format(round(($end-$start)*1000,4),4);
-		if($memcache) {
-			if($memcache_check) $log['memcache'] = 'get';
-			else $log['memcache'] = 'add';
-		} else $log['memcache'] = false;
+		preg_match('/^(\w+)/', strtoupper($sql), $arr);
 		
-		array_push($this->query_log,$log);
-		*/
-		
-		if($memcache_check) return $result;
-		
-		if(strtoupper(substr(trim($sql),0,6)) == "SELECT") {
-			$return_array           = array();
-			$return_array['result'] = array();
-			$return_array['count']  = $result->num_rows;
-			
-			while($row = $result->fetch_assoc()) {
-				array_push($return_array['result'],$row);
-			}
-			
-			if($memcache) $this->memcache->add($memcache,$return_array,false,$memcache_timeout?$memcache_timeout:0,true);
-			
-			return $return_array;
-		} elseif(strtoupper(substr(trim($sql),0,6)) == "INSERT") {
-			return $this->instance->insert_id;
-		} elseif(strtoupper(substr(trim($sql),0,6)) == "UPDATE") {
-			return $this->instance->affected_rows;
-		} else {
-			return true;
-		}
-	}
-	
-	public function fetchColumn($sql,$memcache=null,$memcache_timeout=null) {
-		$res = $this->query($sql,$memcache,$memcache_timeout);
-		if(!$res['count']) return false;
-		
-	return current($res['result'][0]);
-	}
-	
-	public function fetchRow($sql,$memcache=null,$memcache_timeout=null) {
-		$res = $this->query($sql,$memcache,$memcache_timeout);
-		if(!$res['count']) return false;
-		
-	return $res['result'][0];
-	}
-	
-	
-	function debugOutput() {
-		/*
-			Wird nur ausgeführt, wenn in config/core.conf debug=1 ist
-		*/
-		echo '<table cellspacing="5" width="990" style="border:1px solid gray;">';
-		echo '<tr><th colspan="3" align="center">MySQL</th></tr>';
-		echo '<tr><th>Num</th><th width="800">Query</th><th>Time</th></tr>';
-		$c = 1;
-		$sum = 0;
-		foreach($this->query_log as $query) {
-			$sum+=$query['time'];
-			echo '<tr>';
-			echo '<td align="center">'.$c++.'</td>';
-			echo '<td>'.htmlspecialchars($query['query']).'</td>';
-			echo '<td align="right">'.$query['time'].' ms';
-			if($query['memcache']) {
-				switch($query['memcache']) {
-					case 'add':
-						echo ' mca';
-						break;
-					case 'get':
-						echo ' mcg';
-						break;
+		switch($arr[1]) {
+			case 'SELECT': case 'SHOW':
+				$return = array();
+				
+				switch($mode) {
+					case 'assoc':
+						while($row = $Result->fetch_assoc()) $return[] = $row;
+					break;
+					case 'numeric':
+						while($row = $Result->fetch_row()) $return[] = $row;
+					break;
+					case 'both':
+						while($row = $Result->fetch_array()) $return[] = $row;
+					break;
 				}
-			}
-			echo '</td>';
-			echo '</tr>';
+			break;
+			case 'INSERT':
+				$return = $this->Instance->insert_id;
+			break;
+			case 'UPDATE':
+				$return = $this->Instance->affected_rows;
+			break;
+			default:
+				$return = true;
+			break;
 		}
-		echo '<tr><td colspan="3">Total query time: <strong>'.$sum.' ms</strong></td></tr>';
-		echo '</table>';
-		echo '<br />';
+		
+	return $return;
+	}
+	
+	public function multiQuery($sql) {
+		$this->Instance->multi_query($sql);
+		do {
+			if($this->Instance->error) die("\nMySQL Error: ".$this->Instance->error."\n");
+			if(false !== $Result = $this->Instance->use_result()) $Result->close();
+		} while($this->Instance->more_results() && $this->Instance->next_result());
+		
+	return true;
+	}
+	
+	public function fetchColumn($sql) {
+		$res = $this->query($sql);
+		if(empty($res)) return false;
+		
+	return current($res[0]);
+	}
+	
+	public function fetchRow($sql, $mode='assoc') {
+		$res = $this->query($sql, $mode);
+		if(empty($res)) return false;
+		
+	return $res[0];
 	}
 	
 }

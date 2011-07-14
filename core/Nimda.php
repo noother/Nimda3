@@ -54,15 +54,40 @@ class Nimda {
 			$this->CONFIG['mysql_db']
 		);
 		
+		$this->autoUpdateSQL();
+		
 		$this->initPlugins();
 		$this->initServers();
 		$this->timersLastTriggered = time()+10; // Give him some time to do the connecting before triggering the timers
 	}
 	
+	private function autoUpdateSQL() {
+		echo "Checking for updates..\n";
+		$tmp = $this->MySQL->query('SHOW TABLES LIKE "version"');
+		if(empty($tmp)) $current_version = 0;
+		else $current_version = $this->MySQL->fetchColumn("SELECT `version` FROM `version`");
+		if($current_version === false) die("Error: Table version exists but has no entry.\n");
+		
+		preg_match_all('/\[{3}(\d+?)\]{3}(.*?)\[{3}\/\1\]{3}/s', file_get_contents('core/sql_updates'), $updates);
+		
+		$latest_version = max($updates[1]);
+		if($current_version >= $latest_version) return;
+		
+		echo 'Autoupdating from version '.$current_version.' to '.$latest_version."..\n";
+		
+		for($i=$current_version+1;$i<=$latest_version;$i++) {
+			echo 'Applying update '.$i.'.. ';
+			$sql = $updates[2][$i-1];
+			$this->MySQL->multiQuery($sql);
+			$this->MySQL->query("UPDATE version SET `version` = '".$i."'");
+			echo "done\n";
+		}
+	}
+	
 	private function initServers() {
 		$servers = $this->MySQL->query('SELECT * FROM servers WHERE active=1');
-		if(!$servers['count']) die('Error: No servers defined (check mysql table `servers`)'."\n");
-		foreach($servers['result'] as $data) {
+		if(empty($servers)) die('Error: No servers defined (check mysql table `servers`)'."\n");
+		foreach($servers as $data) {
 			$this->connectServer($data);
 		}
 	}
