@@ -9,8 +9,6 @@ abstract class IRC_Target {
 	public  $name = '';
 	public  $id;
 	
-	public $data = array(); // This unused property is meant for plugins to write to
-	
 	abstract public function remove();
 	
 	public final function privmsg($message, $bypass_queue=false) {

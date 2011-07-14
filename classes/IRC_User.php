@@ -16,11 +16,14 @@ final class IRC_User extends IRC_Target {
 	
 	public $channels = array();
 	
+	private $Bot;
+	
 	public function __construct($nick, $Server) {
 		$this->id      = strtolower($nick);
 		$this->Server  = $Server;
 		$this->name    = $nick;
 		$this->nick    = $nick;
+		$this->Bot     = $Server->Bot;
 	}
 	
 	public function answerCTCP($message, $bypass_queue=false) {
@@ -96,6 +99,19 @@ final class IRC_User extends IRC_Target {
 		
 		unset($this->Server->users[$this->id]);
 	}
+	
+	public function saveVar($name, $value) {
+		$this->Bot->savePermanent($name, $value, 'user', $this->id);
+	}
+	
+	public function getVar($name) {
+		return $this->Bot->getPermanent($name, 'user', $this->id);
+	}
+	
+	public function removeVar($name) {
+		$this->Bot->removePermanent($name, 'user', $this->id);
+	}
+	
 	
 }
 

@@ -11,6 +11,7 @@ final class IRC_Server {
 	private $queueRead = array();
 	private $queueSend = array();
 	
+	public $Bot;
 	public $id;
 	public $channels  = array();
 	public $users     = array();
@@ -22,10 +23,11 @@ final class IRC_Server {
 	public $lastLifeSign = 0;
 	public $nickservIdentifyCommand = false;
 	
-	public function __construct($name, $host, $port, $ssl=false) {
+	public function __construct($Bot, $name, $host, $port, $ssl=false) {
 		$this->socket = fsockopen(($ssl?'ssl://':'').$host, $port);
 		stream_set_blocking($this->socket, 0);
 		
+		$this->Bot          = $Bot;
 		$this->id           = $name;
 		$this->host         = $host;
 		$this->port         = $port;
@@ -174,8 +176,13 @@ final class IRC_Server {
 				$this->NickServ = new IRC_User('NickServ', $this);
 				$this->users[$this->NickServ->id] = $this->NickServ;
 				$this->sendWhois($this->Me->nick);
-				$this->NickServ->privmsg('ACC '.$this->Me->nick);
-				$this->NickServ->privmsg('STATUS '.$this->Me->nick);
+				
+				if(false !== $var = $this->getVar('nickserv_identify_command')) {
+					$this->nickservIdentifyCommand = $var;
+				} else {
+					$this->NickServ->privmsg('ACC '.$this->Me->nick);
+					$this->NickServ->privmsg('STATUS '.$this->Me->nick);
+				}
 			break;
 			case '311':
 				// WHOIS reply
@@ -308,8 +315,10 @@ final class IRC_Server {
 						$tmp = explode(' ', $parsed['params'][1]);
 						if($tmp[0] == $this->Me->nick && $tmp[1] == 'ACC') {
 							$this->nickservIdentifyCommand = 'ACC';
+							$this->saveVar('nickserv_identify_command', 'ACC');
 						} elseif($tmp[0] == 'STATUS' && $tmp[1] == $this->Me->nick) {
 							$this->nickservIdentifyCommand = 'STATUS';
+							$this->saveVar('nickserv_identify_command', 'STATUS');
 						}
 						
 						$id = false;
@@ -416,6 +425,18 @@ final class IRC_Server {
 	public function quit($message=null, $bypass_queue=true) {
 		if(isset($message)) $this->sendRaw('QUIT :'.$message, $bypass_queue);
 		else                $this->sendRaw('QUIT', $bypass_queue);
+	}
+	
+	public function saveVar($name, $value) {
+		$this->Bot->savePermanent($name, $value, 'server', $this->id);
+	}
+	
+	public function getVar($name) {
+		return $this->Bot->getPermanent($name, 'server', $this->id);
+	}
+	
+	public function removeVar($name) {
+		$this->Bot->removePermanent($name, 'server', $this->id);
 	}
 	
 	public function __destruct() {

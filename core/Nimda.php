@@ -16,6 +16,7 @@ class Nimda {
 	private $CONFIG = array();
 	private $MySQL;
 	private $timersLastTriggered;
+	private $permanentVars = array();
 	
 	function __construct() {
 		$this->initBot();
@@ -94,7 +95,7 @@ class Nimda {
 	
 	public function connectServer($data) {
 		// Expects 1 full row of mysql table `servers`
-		$Server = new IRC_Server($data['id'], $data['host'], $data['port'], $data['ssl']);
+		$Server = new IRC_Server($this, $data['id'], $data['host'], $data['port'], $data['ssl']);
 		if(!empty($data['password'])) $Server->setPass($data['password']);
 		$Server->setUser(
 			$data['my_username'],
@@ -125,9 +126,10 @@ class Nimda {
 			echo 'Loading '.($file['isCore']?'core':'user').' plugin '.$plugin_name.'..'."\n";
 			
 			require_once('plugins/'.($file['isCore']?'core/':'user/').$file['filename']);
-			$Plugin = new $classname($this, $this->MySQL);
+			list($crap, $plugin_name) = explode('_', $classname, 2);
+			$Plugin = new $classname($plugin_name, $this, $this->MySQL);
 			$Plugin->onLoad();
-			$this->plugins[] = $Plugin;
+			$this->plugins[$Plugin->id] = $Plugin;
 		}
 	}
 	
@@ -185,6 +187,80 @@ class Nimda {
 				case 'QUIT':    $Plugin->onQuit(); break;
 			}
 		}
+	}
+	
+	public function savePermanent($name, $value, $type='bot', $target='me') {
+		
+		if($this->getPermanent($name, $type, $target)) {
+			$sql = "
+				UPDATE
+					`memory`
+				SET
+					`value` = '".addslashes($value)."',
+					`modified` = NOW()
+				WHERE
+					`type`   = '".addslashes($type)."' AND
+					`target` = '".addslashes($target)."' AND
+					`name`   = '".addslashes($name)."'
+			";
+		} else {
+			$sql = "
+				INSERT INTO
+					`memory` (`name`, `type`, `target`, `value`, `created`, `modified`)
+				VALUES (
+					'".addslashes($name)."',
+					'".addslashes($type)."',
+					'".addslashes($target)."',
+					'".addslashes($value)."',
+					NOW(),
+					NOW()
+			)";
+		}
+		
+		$this->MySQL->query($sql);
+		
+		$this->permanentVars[$type][$target][$name] = $value;
+	}
+	
+	public function getPermanent($name, $type='bot', $target='me') {
+		if(isset($this->permanentVars[$type][$target][$name])) {
+			return $this->permanentVars[$type][$target][$name];
+		}
+		
+		$value = $this->MySQL->fetchColumn("
+			SELECT
+				`value`
+			FROM
+				`memory`
+			WHERE
+				`type`   = '".addslashes($type)."' AND
+				`target` = '".addslashes($target)."' AND
+				`name`   = '".addslashes($name)."'
+		");
+		
+		$this->permanentVars[$type][$target][$name] = $value;
+		
+	return $value;
+	}
+	
+	public function removePermanent($name, $type='bot', $target='me') {
+		if(isset($this->permanentVars[$type][$target][$name])) {
+			unset($this->permanentVars[$type][$target][$name]);
+		}
+		
+		$sql = "
+			DELETE FROM
+				`memory`
+			WHERE
+				`type`   = '".addslashes($type)."' AND
+				`target` = '".addslashes($target)."' AND
+				`name`   = '".addslashes($name)."'
+		";
+		
+		$res = $this->MySQL->query($sql);
+		if(!$res) return false; // nothing deleted
+		
+	return true;
 	}
 	
 }

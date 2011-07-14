@@ -8,10 +8,13 @@ final class IRC_Channel extends IRC_Target {
 	public $topic = '';
 	public $users = array();
 	
+	private $Bot;
+	
 	public function __construct($name, $Server) {
 		$this->id     = strtolower($name);
 		$this->Server = $Server;
 		$this->name   = $name;
+		$this->Bot    = $Server->Bot;
 		
 		$this->sendWho();
 	}
@@ -115,6 +118,18 @@ final class IRC_Channel extends IRC_Target {
 			unset($this->users[$User->id]);
 			unset($User->channels[$this->id]);
 		}
+	}
+	
+	public function saveVar($name, $value) {
+		$this->Bot->savePermanent($name, $value, 'channel', $this->Server->id.':'.$this->id);
+	}
+	
+	public function getVar($name) {
+		return $this->Bot->getPermanent($name, 'channel', $this->Server->id.':'.$this->id);
+	}
+	
+	public function removeVar($name) {
+		$this->Bot->removePermanent($name, 'channel', $this->Server->id.':'.$this->id);
 	}
 	
 }

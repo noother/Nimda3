@@ -2,6 +2,7 @@
 
 abstract class Plugin {
 	
+	public $id;
 	public $Bot;
 	public $Server;
 	public $Channel;
@@ -20,7 +21,8 @@ abstract class Plugin {
 	
 	
 	
-	public final function __construct($Bot, $MySQL) {
+	public final function __construct($name, $Bot, $MySQL) {
+		$this->id           = strtolower($name);
 		$this->Bot          = $Bot;
 		$this->MySQL        = $MySQL;
 		$this->lastInterval = time();
@@ -46,6 +48,18 @@ abstract class Plugin {
 				echo 'Error - No reply-rule set for '.$this->command."\n";
 			break;
 		}
+	}
+	
+	public final function saveVar($name, $value) {
+		$this->Bot->savePermanent($name, $value, 'plugin', $this->id);
+	}
+	
+	public final function getVar($name) {
+		return $this->Bot->getPermanent($name, 'plugin', $this->id);
+	}
+	
+	public final function removeVar($name) {
+		$this->Bot->removePermanent($name, 'plugin', $this->id);
 	}
 	
 	// Events

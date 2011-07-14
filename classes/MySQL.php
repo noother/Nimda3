@@ -26,6 +26,7 @@ class MySQL {
 	}
 	
 	public function query($sql, $mode='assoc') {
+		echo "\n\n".$sql."\n\n";
 		if(!$this->Instance) {
 			$this->connect();
 		}
@@ -39,7 +40,7 @@ class MySQL {
 			}
 		}
 		
-		preg_match('/^(\w+)/', strtoupper($sql), $arr);
+		preg_match('/^\s*(\w+)/', strtoupper($sql), $arr);
 		
 		switch($arr[1]) {
 			case 'SELECT': case 'SHOW':
