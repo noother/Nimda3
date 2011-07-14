@@ -47,7 +47,7 @@ class Plugin_ChannelPeak extends Plugin {
 						$this->Channel->saveVar('peakshow_enabled', true);
 						$this->reply(sprintf('The peakshow for %s on %s has been enabled',
 							$this->Channel->name,
-							$this->Server->host
+							$this->Server->id
 						));
 					break;
 					case 'disable':
@@ -64,7 +64,7 @@ class Plugin_ChannelPeak extends Plugin {
 						$this->Channel->saveVar('peakshow_enabled', false);
 						$this->reply(sprintf('The peakshow for %s on %s has been disabled',
 							$this->Channel->name,
-							$this->Server->host
+							$this->Server->id
 						));
 					break;
 					default:
