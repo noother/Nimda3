@@ -67,7 +67,7 @@
 -- [/2]
 
 -- [3]
-	CREATE TABLE IF NOT EXISTS `memory` (
+	CREATE TABLE `memory` (
 		`id` int(11) NOT NULL AUTO_INCREMENT,
 		`name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
 		`type` enum('bot','plugin','server','channel','user') COLLATE utf8_unicode_ci NOT NULL,
