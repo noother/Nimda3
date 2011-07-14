@@ -14,7 +14,7 @@ class Plugin_ChallengeObserver extends Plugin {
 		
 		/*
 		$sites = $this->getSites();
-		$sites['HS']['challs']-=2;
+		$sites['Mic']['challs']-=2;
 		$this->saveVar('sites', $sites);
 		*/
 	}
@@ -93,6 +93,9 @@ class Plugin_ChallengeObserver extends Plugin {
 			case 'WeChall':
 				$this->getWeChallChalls($challcount);
 			break;
+			case 'µContest':
+				$this->getMicrocontestChalls($challcount);
+			break;
 		}
 	}
 	
@@ -121,11 +124,16 @@ class Plugin_ChallengeObserver extends Plugin {
 			}
 			
 			for($j=0;$j<sizeof($arr[1]);$j++) {
-				$challs[] = array('id' => (int)$arr[1][$j], 'name' => $arr[2][$j], 'category' => $categories[1][$i], 'author' => $arr[3][$j]);
+				$challs[] = array(
+					'id'       => (int)$arr[1][$j],
+					'name'     => $arr[2][$j],
+					'category' => $categories[1][$i],
+					'author'   => $arr[3][$j]
+				);
 			}
 		}
 		
-		usort($challs, array('self', 'cmpHappySecurityChalls'));
+		usort($challs, array('self', 'sortByID'));
 		
 		for($i=0;$i<$count&&$i<sizeof($challs);$i++) {
 			$url      = 'http://www.happy-security.de/index.php?modul=hacking-zone&action=showhackit&level_id='.$challs[$i]['id'];
@@ -145,12 +153,6 @@ class Plugin_ChallengeObserver extends Plugin {
 		}
 	}
 	
-	private function cmpHappySecurityChalls($a, $b) {
-		return $a['id'] > $b['id'] ? -1 : 1;
-	}
-	
-	
-	
 	private function getWeChallChalls($count) {
 		$res = libHTTP::GET('www.wechall.net', '/challs/by/chall_date/DESC/page-1', null, 2);
 		if(!$res) return;
@@ -160,8 +162,8 @@ class Plugin_ChallengeObserver extends Plugin {
 		}
 		
 		for($i=0;$i<$count&&$i<sizeof($arr[0]);$i++) {
-			$url = 'https://www.wechall.net'.html_entity_decode($arr[1][$i]);
-			$chall = html_entity_decode($arr[2][$i]);
+			$url    = 'https://www.wechall.net'.html_entity_decode($arr[1][$i]);
+			$chall  = html_entity_decode($arr[2][$i]);
 			$author = html_entity_decode($arr[3][$i]);
 			
 			$text = sprintf("\x02%s\x02 by \x02%s\x02 (%s)",
@@ -174,6 +176,49 @@ class Plugin_ChallengeObserver extends Plugin {
 			
 			$this->addLatestChall('WeChall', $text);
 		}
+	}
+	
+	private function getMicrocontestChalls($count) {
+		$res = libHTTP::GET('www.microcontest.com','/contests.php?id=-1');
+		
+		if(!preg_match_all('#<a href="contest.php\?id=(\d+?)">(.+?) \(\d+\)</a>.*?<a href="contests.php.+?>(.*?)</a>.*?<td.+?>(\d+?)</td>#s', $res['raw'], $arr)) {
+			return;
+		}
+		
+		$challs = array();
+		for($i=0;$i<sizeof($arr[1]);$i++) {
+				$challs[] = array(
+					'id'       => (int)$arr[1][$i],
+					'name'     => $arr[2][$i],
+					'category' => $arr[3][$i],
+					'points'   => $arr[4][$i]
+				);
+		}
+		
+		usort($challs, array('self', 'sortByID'));
+		
+		for($i=0;$i<$count&&$i<sizeof($challs);$i++) {
+			$url      = 'http://www.microcontest.com/contest.php?id='.$challs[$i]['id'];
+			$chall    = $challs[$i]['name'];
+			$category = $challs[$i]['category'];
+			$points   = $challs[$i]['points'];
+			
+			$text = sprintf("\x02%s\x02 in category \x02%s\x02 worth %d points (%s)",
+				$chall,
+				$category,
+				$points,
+				$url
+			);
+			
+			$this->ChallChannel->privmsg($text);
+			
+			$this->addLatestChall('µContest', $text);
+		}
+		
+	}
+	
+	private function sortByID($a, $b) {
+		return $a['id'] > $b['id'] ? -1 : 1;
 	}
 	
 }
