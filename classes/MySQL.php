@@ -26,7 +26,6 @@ class MySQL {
 	}
 	
 	public function query($sql, $mode='assoc') {
-		echo "\n\n".$sql."\n\n";
 		if(!$this->Instance) {
 			$this->connect();
 		}

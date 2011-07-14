@@ -65,3 +65,20 @@
 	
 	UPDATE `version` SET `version` = '2';
 -- [/2]
+
+-- [3]
+	CREATE TABLE IF NOT EXISTS `memory` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+		`type` enum('bot','plugin','server','channel','user') COLLATE utf8_unicode_ci NOT NULL,
+		`target` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+		`value` text COLLATE utf8_unicode_ci NOT NULL,
+		`created` datetime NOT NULL,
+		`modified` datetime NOT NULL,
+		PRIMARY KEY (`id`),
+		KEY `type` (`type`),
+		KEY `name` (`name`),
+		KEY `target` (`target`)
+	) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+-- [/3]
+
