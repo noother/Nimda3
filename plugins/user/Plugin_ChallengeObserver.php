@@ -179,7 +179,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getMicrocontestChalls($count) {
-		$res = libHTTP::GET('www.microcontest.com','/contests.php?id=-1');
+		$res = libHTTP::GET('www.microcontest.com', '/contests.php?id=-1', null, 2);
 		
 		if(!preg_match_all('#<a href="contest.php\?id=(\d+?)">(.+?) \(\d+\)</a>.*?<a href="contests.php.+?>(.*?)</a>.*?<td.+?>(\d+?)</td>#s', $res['raw'], $arr)) {
 			return;
