@@ -193,9 +193,10 @@ class Nimda {
 		if($this->getPermanent($name, $type, $target) === $value) return;
 		
 		if(is_array($value)) {
-			$value = serialize($value);
+			$sql_value = serialize($value);
 			$is_array = true;
 		} else {
+			$sql_value = $value;
 			$is_array = false;
 		}
 		
@@ -204,7 +205,7 @@ class Nimda {
 				UPDATE
 					`memory`
 				SET
-					`value` = '".addslashes($value)."',
+					`value` = '".addslashes($sql_value)."',
 					`is_array` = '".$is_array."',
 					`modified` = NOW()
 				WHERE
@@ -220,7 +221,7 @@ class Nimda {
 					'".addslashes($name)."',
 					'".addslashes($type)."',
 					'".addslashes($target)."',
-					'".addslashes($value)."',
+					'".addslashes($sql_value)."',
 					'".$is_array."',
 					NOW(),
 					NOW()
@@ -247,6 +248,11 @@ class Nimda {
 				`target` = '".addslashes($target)."' AND
 				`name`   = '".addslashes($name)."'
 		");
+		
+		if(!$row) {
+			$this->permanentVars[$type][$target][$name] = false;
+			return false;
+		}
 		
 		if($row['is_array']) $value = unserialize($row['value']);
 		else $value = $row['value'];

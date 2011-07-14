@@ -9,7 +9,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	private $ChallChannel;
 	
 	function onLoad() {
-		if(!$this->getVar('sites')) $this->saveVar('sites', $this->getSites());
+		if(!$this->getVar('sites'))  $this->saveVar('sites', $this->getSites());
 		if(!$this->getVar('latest')) $this->saveVar('latest', array());
 		
 		/*
@@ -41,26 +41,19 @@ class Plugin_ChallengeObserver extends Plugin {
 		$Channel = $this->Bot->servers['freenode']->channels[$this->channel];
 		
 		foreach($new_sites as $site => $data) {
-			
 			if(!isset($old_sites[$site])) {
 				$Channel->privmsg(sprintf("\x02[Challenges]\x02 A new challenge site just spawned! Checkout \x02%s\x02 at %s. They currently have \x02%d\x02 challenges.",
 					$data['name'],
 					$data['url'],
 					$data['challs']
 				));
-				continue;
-			}
-			
-			if($data['challs'] < $old_sites[$site]['challs']) {
+			} elseif($data['challs'] < $old_sites[$site]['challs']) {
 				$Channel->privmsg(sprintf("\x02[Challenges]\x02 \x02%s\x02 (%s) just deleted \x02%d\x02 of their challenges.",
 					$data['name'],
 					$data['url'],
-					$old_sites['challs']-$data['challs']
+					$old_sites[$site]['challs']-$data['challs']
 				));
-				continue;
-			}
-			
-			if($data['challs'] > $old_sites[$site]['challs']) {
+			} elseif($data['challs'] > $old_sites[$site]['challs']) {
 				$new_challs = $data['challs']-$old_sites[$site]['challs'];
 				$Channel->privmsg(sprintf("\x02[Challenges]\x02 There %s \x02%d\x02 new %s at \x02%s\x02 (%s)",
 					$new_challs == 1 ? 'is' : 'are',
