@@ -192,12 +192,20 @@ class Nimda {
 	public function savePermanent($name, $value, $type='bot', $target='me') {
 		if($this->getPermanent($name, $type, $target) === $value) return;
 		
+		if(is_array($value)) {
+			$value = serialize($value);
+			$is_array = true;
+		} else {
+			$is_array = false;
+		}
+		
 		if(false !== $this->getPermanent($name, $type, $target)) {
 			$sql = "
 				UPDATE
 					`memory`
 				SET
 					`value` = '".addslashes($value)."',
+					`is_array` = '".$is_array."',
 					`modified` = NOW()
 				WHERE
 					`type`   = '".addslashes($type)."' AND
@@ -207,12 +215,13 @@ class Nimda {
 		} else {
 			$sql = "
 				INSERT INTO
-					`memory` (`name`, `type`, `target`, `value`, `created`, `modified`)
+					`memory` (`name`, `type`, `target`, `value`, `is_array`, `created`, `modified`)
 				VALUES (
 					'".addslashes($name)."',
 					'".addslashes($type)."',
 					'".addslashes($target)."',
 					'".addslashes($value)."',
+					'".$is_array."',
 					NOW(),
 					NOW()
 			)";
@@ -228,9 +237,9 @@ class Nimda {
 			return $this->permanentVars[$type][$target][$name];
 		}
 		
-		$value = $this->MySQL->fetchColumn("
+		$row = $this->MySQL->fetchRow("
 			SELECT
-				`value`
+				`value`, `is_array`
 			FROM
 				`memory`
 			WHERE
@@ -238,6 +247,9 @@ class Nimda {
 				`target` = '".addslashes($target)."' AND
 				`name`   = '".addslashes($name)."'
 		");
+		
+		if($row['is_array']) $value = unserialize($row['value']);
+		else $value = $row['value'];
 		
 		$this->permanentVars[$type][$target][$name] = $value;
 		

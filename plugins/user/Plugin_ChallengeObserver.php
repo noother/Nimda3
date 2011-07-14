@@ -9,18 +9,18 @@ class Plugin_ChallengeObserver extends Plugin {
 	private $ChallChannel;
 	
 	function onLoad() {
-		if(!$this->getVar('sites')) $this->saveVar('sites', serialize($this->getSites()));
-		if(!$this->getVar('latest')) $this->saveVar('latest', serialize(array()));
+		if(!$this->getVar('sites')) $this->saveVar('sites', $this->getSites());
+		if(!$this->getVar('latest')) $this->saveVar('latest', array());
 		
 		/*
 		$sites = $this->getSites();
 		$sites['WC']['challs']--;
-		$this->saveVar('sites', serialize($sites));
+		$this->saveVar('sites', $sites);
 		*/
 	}
 	
 	function isTriggered() {
-		$latest = unserialize($this->getVar('latest'));
+		$latest = $this->getVar('latest');
 		if(empty($latest)) {
 			$this->reply('No challenges have been collected yet.');
 			return;
@@ -36,7 +36,7 @@ class Plugin_ChallengeObserver extends Plugin {
 		$new_sites = $this->getSites();
 		if(!$new_sites) return;
 		
-		$old_sites = unserialize($this->getVar('sites'));
+		$old_sites = $this->getVar('sites');
 		
 		$Channel = $this->Bot->servers['freenode']->channels[$this->channel];
 		
@@ -75,7 +75,7 @@ class Plugin_ChallengeObserver extends Plugin {
 			}
 		}
 		
-		$this->saveVar('sites', serialize($new_sites));
+		$this->saveVar('sites', $new_sites);
 	}
 	
 	private function getSites() {
@@ -104,12 +104,12 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function addLatestChall($site, $text) {
-		$latest = unserialize($this->getVar('latest'));
+		$latest = $this->getVar('latest');
 		
 		if(sizeof($latest) >= 5) array_pop($latest);
 		array_unshift($latest, array('site' => $site, 'text' => $text));
 		
-		$this->saveVar('latest', serialize($latest));
+		$this->saveVar('latest', $latest);
 	}
 	
 	private function getHappySecurityChalls($count) {
