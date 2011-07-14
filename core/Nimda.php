@@ -80,7 +80,6 @@ class Nimda {
 			echo 'Applying update '.$i.'.. ';
 			$sql = $updates[2][$i-1];
 			$this->MySQL->multiQuery($sql);
-			$this->MySQL->query("UPDATE version SET `version` = '".$i."'");
 			echo "done\n";
 		}
 	}

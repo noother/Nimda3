@@ -80,5 +80,7 @@
 		KEY `name` (`name`),
 		KEY `target` (`target`)
 	) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+	
+	UPDATE `version` SET `version` = '3';
 -- [/3]
 
