@@ -11,6 +11,7 @@ final class IRC_Server {
 	private $queueRead = array();
 	private $queueSend = array();
 	
+	public $id;
 	public $channels  = array();
 	public $users     = array();
 	public $host         = '';
@@ -21,10 +22,11 @@ final class IRC_Server {
 	public $lastLifeSign = 0;
 	public $nickservIdentifyCommand = false;
 	
-	public function __construct($host, $port, $ssl=false) {
+	public function __construct($name, $host, $port, $ssl=false) {
 		$this->socket = fsockopen(($ssl?'ssl://':'').$host, $port);
 		stream_set_blocking($this->socket, 0);
 		
+		$this->id           = $name;
 		$this->host         = $host;
 		$this->port         = $port;
 		$this->isSSL        = $ssl;

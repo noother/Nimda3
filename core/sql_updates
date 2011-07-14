@@ -1,4 +1,4 @@
-[[[1]]]
+-- [1]
 	CREATE TABLE `version` (
 		`version` int(11) NOT NULL,
 		PRIMARY KEY (`version`)
@@ -51,4 +51,17 @@
 		PRIMARY KEY (`id`),
 		KEY `server` (`server`)
 	) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-[[[/1]]]
+	
+	UPDATE `version` SET `version` = '1';
+-- [/1]
+
+-- [2]
+	ALTER TABLE `servers` CHANGE `id` `id` VARCHAR( 255 ) NOT NULL;
+	UPDATE `servers` SET `id` = 'freenode' WHERE `id` = '1';
+	RENAME TABLE `autojoin` TO `server_channels`;
+	ALTER TABLE `server_channels` CHANGE `server` `server_id` VARCHAR( 255 ) NOT NULL;
+	ALTER TABLE `server_channels` DROP INDEX `server`, ADD INDEX `server_id` ( `server_id` );
+	UPDATE `server_channels` SET `server_id` = 'freenode' WHERE `id` = '1';
+	
+	UPDATE `version` SET `version` = '2';
+-- [/2]

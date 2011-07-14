@@ -68,7 +68,7 @@ class Nimda {
 		else $current_version = $this->MySQL->fetchColumn("SELECT `version` FROM `version`");
 		if($current_version === false) die("Error: Table version exists but has no entry.\n");
 		
-		preg_match_all('/\[{3}(\d+?)\]{3}(.*?)\[{3}\/\1\]{3}/s', file_get_contents('core/sql_updates'), $updates);
+		preg_match_all('/-- \[(\d+?)\](.*?)-- \[\/\1\]/s', file_get_contents('core/sql_updates'), $updates);
 		
 		$latest_version = max($updates[1]);
 		if($current_version >= $latest_version) return;
@@ -94,7 +94,7 @@ class Nimda {
 	
 	public function connectServer($data) {
 		// Expects 1 full row of mysql table `servers`
-		$Server = new IRC_Server($data['host'], $data['port'], $data['ssl']);
+		$Server = new IRC_Server($data['id'], $data['host'], $data['port'], $data['ssl']);
 		if(!empty($data['password'])) $Server->setPass($data['password']);
 		$Server->setUser(
 			$data['my_username'],
@@ -104,7 +104,7 @@ class Nimda {
 		);
 		$Server->setNick($data['my_username']);
 		
-		$this->servers[$Server->host] = $Server;
+		$this->servers[$Server->id] = $Server;
 	}
 	
 	private function initPlugins() {
