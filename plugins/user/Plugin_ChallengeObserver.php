@@ -5,13 +5,19 @@ class Plugin_ChallengeObserver extends Plugin {
 	public $interval = 60;
 	
 	private $channel = '#nimda';
+	private $ChallChannel;
 	
 	function onLoad() {
 		if(!$this->getVar('sites')) $this->saveVar('sites', serialize($this->getSites()));
+		
+		/*
+		$sites = $this->getSites();
+		$sites['WC']['challs']--;
+		$this->saveVar('sites', serialize($sites));
+		*/
 	}
 	
 	function onInterval() {
-		echo "getting new challs\n";
 		$new_sites = $this->getSites();
 		if(!$new_sites) return;
 		
@@ -49,6 +55,7 @@ class Plugin_ChallengeObserver extends Plugin {
 					$data['url']
 				));
 				
+				$this->ChallChannel = $Channel;
 				$this->getLatestChalls($data, $new_challs);
 			}
 		}
@@ -73,14 +80,17 @@ class Plugin_ChallengeObserver extends Plugin {
 	private function getLatestChalls($site, $challcount) {
 		switch($site['name']) {
 			case 'Happy-Security':
-				return $this->getHappySecurityChalls($challcount);
+				$this->getHappySecurityChalls($challcount);
+			break;
+			case 'WeChall':
+				$this->getWeChallChalls($challcount);
 			break;
 		}
 	}
 	
 	private function getHappySecurityChalls($count) {
 		$res = libHTTP::GET('www.happy-security.de', '/', null, 2);
-		if(!$res) return false;
+		if(!$res) return;
 		
 		if(!preg_match_all('#http://happy-security.de/images/next.gif.*?<a href="(.*?)".*?>(.*?)<.*?\[ (.*?) \].*?>(.*?)<#', $res['raw'], $arr)) {
 			return;
@@ -93,7 +103,7 @@ class Plugin_ChallengeObserver extends Plugin {
 			$author   = html_entity_decode($arr[4][$i]);
 			
 			
-			$this->reply(sprintf("\x02%s\x02 in \x02%s\x02 by \x02%s\x02 (%s)",
+			$this->Channel->privmsg(sprintf("\x02%s\x02 in \x02%s\x02 by \x02%s\x02 (%s)",
 				$chall,
 				$category,
 				$author,
@@ -101,6 +111,27 @@ class Plugin_ChallengeObserver extends Plugin {
 			));
 		}
 	}
+	
+	private function getWeChallChalls($count) {
+		$res = libHTTP::GET('www.wechall.net', '/challs/by/chall_date/DESC/page-1', null, 2);
+		if(!$res) return;
+		
+		if(!preg_match_all('#<a href="(/challenge/.*?)".*?>(.*?)<.*?href=.*?>(.*?)<#', $res['raw'], $arr)) {
+			return;
+		}
+		
+		for($i=0;$i<$count&&$i<sizeof($arr[0]);$i++) {
+			$url = 'https://www.wechall.net'.html_entity_decode($arr[1][$i]);
+			$chall = html_entity_decode($arr[2][$i]);
+			$author = html_entity_decode($arr[3][$i]);
+			
+			$this->Channel->privmsg(sprintf("\x02%s\x02 by \x02%s\x02 (%s)",
+				$chall,
+				$author,
+				$url
+			));
+		}
+	}	
 	
 }
 
