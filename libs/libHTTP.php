@@ -3,7 +3,7 @@
 class libHTTP {
 
 	static function GET($host,$get,$cookie=null,$timeout=30,$port=80) {
-		$fp     = fsockopen($host,$port,$timeout);
+		$fp     = fsockopen($host, $port, $errno, $errstr, $timeout);
 		if(!$fp) return false;
 		
 		$header = "GET ".$get." HTTP/1.0\r\n";
@@ -12,6 +12,7 @@ class libHTTP {
 		if(isset($cookie)) $header.= "Cookie: ".$cookie."\r\n";
 		
 		fputs($fp,$header."\r\n");
+		stream_set_timeout($fp, $timeout);
 		
 		$headersCheck = true;
 		$output = array();
@@ -34,7 +35,9 @@ class libHTTP {
 			
 		}
 		
+		$info = stream_get_meta_data($fp);
 		fclose($fp);
+		if($info['timed_out']) return false;
 		
 		// TODO: Ugly follow
 		if(isset($output['header']['Location'])) {
@@ -49,7 +52,7 @@ class libHTTP {
 	}
 	
 	static function POST($host,$get,$post,$cookie=null,$timeout=30,$port=80) {
-		$fp = fsockopen($host,$port,$timeout);
+		$fp = fsockopen($host, $port, $errno, $errstr, $timeout);
 		if(!$fp) return false;
 		
 		$header = "POST ".$get." HTTP/1.0\r\n";
@@ -64,6 +67,7 @@ class libHTTP {
 		$header.= $post."\r\n";
 		
 		fputs($fp,$header."\r\n");
+		stream_set_timeout($fp, $timeout);
 		
 		$headersCheck = true;
 		$output = array();
@@ -84,7 +88,11 @@ class libHTTP {
 			}
 			
 		}
+		
+		$info = stream_get_meta_data($fp);
 		fclose($fp);
+		if($info['timed_out']) return false;
+		
 		
 		// TODO: Ugly follow
 		if(isset($output['header']['Location'])) {
