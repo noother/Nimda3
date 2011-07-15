@@ -26,8 +26,8 @@ class Plugin_UrbanDictionary extends Plugin {
 		
 		preg_match('#<div class="definition">(.+?)</div>.*?<div class="example">(.+?)</div>#s', $res['raw'], $arr);
 		
-		$definition = trim(html_entity_decode(strip_tags($arr[1])));
-		$example    = trim(html_entity_decode(strip_tags($arr[2])));
+		$definition = trim(html_entity_decode(strip_tags(br2nl($arr[1]))));
+		$example    = trim(html_entity_decode(strip_tags(br2nl($arr[2]))));
 		
 		$definition = strtr($definition, array("\r" => ' ', "\n" => ' '));
 		while(false !== strstr($definition, '  ')) $definition = str_replace('  ', ' ', $definition);
