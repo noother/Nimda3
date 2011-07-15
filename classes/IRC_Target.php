@@ -12,6 +12,7 @@ abstract class IRC_Target {
 	abstract public function remove();
 	
 	public final function privmsg($message, $bypass_queue=false) {
+		$message = strtr($message, array("\r" => ' ', "\n" => ' '));
 		/*
 			irc max message length is 512 bytes including CRLF
 			The irc message received by clients counts - NOT what we send
@@ -26,15 +27,23 @@ abstract class IRC_Target {
 				- 2 (CRLF)
 		*/
 		
-		$max_length = 498 - strlen($this->Server->Me->banmask) - strlen($this->name); 
+		$max_length = 498 - strlen($this->Server->Me->banmask) - strlen($this->name);
 		
-		while(!empty($message)) {
-			$to_send = substr($message, 0, $max_length);
-			$this->Server->sendRaw('PRIVMSG '.$this->name.' :'.$to_send, $bypass_queue);
-			
-			$message = substr($message, $max_length);
+		$len = strlen($message);
+		$message_length = ceil($len / ceil($len/$max_length));
+		if($message_length <= $max_length - 10) {
+			$message_length+= 10; // some margin for the wordwrap
+		} else {
+			$message_length = $max_length;
 		}
 		
+		$messages = explode("\n", wordwrap($message, $message_length, "\n"));
+		
+		foreach($messages as $message) {
+			$message = trim($message);
+			if(empty($message)) continue;
+			$this->Server->sendRaw('PRIVMSG '.$this->name.' :'.$message, $bypass_queue);
+		}
 	}
 	
 	public final function sendCTCP($message, $bypass_queue=false) {
