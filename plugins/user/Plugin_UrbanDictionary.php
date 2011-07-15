@@ -13,7 +13,11 @@ class Plugin_UrbanDictionary extends Plugin {
 		
 		$term = $this->data['text'];
 		
-		$res = libHTTP::GET('www.urbandictionary.com', '/define.php?term='.urlencode($term));
+		$res = libHTTP::GET('www.urbandictionary.com', '/define.php?term='.urlencode($term), null, 2);
+		if(!$res) {
+			$this->reply('Timeout on contacting urbandictionary.com');
+			return;
+		}
 		
 		if(strstr($res['raw'], "isn't defined <a href")) {
 			$this->reply($term.' has no definition. Feel free to add one at http://www.urbandictionary.com/add.php?word='.$term);
