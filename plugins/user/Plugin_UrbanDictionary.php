@@ -2,7 +2,7 @@
 
 class Plugin_UrbanDictionary extends Plugin {
 	
-	public $triggers = array('!define', '!urban', '!ud', '!urban-dictionary');
+	public $triggers = array('!define', '!wtf', '!urban', '!ud', '!urban-dictionary');
 	private $usage = 'Usage: %s <term>';
 	
 	function isTriggered() {
