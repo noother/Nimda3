@@ -24,22 +24,20 @@ class Plugin_UrbanDictionary extends Plugin {
 			return;
 		}
 		
-		preg_match('#<div class="definition">(.+?)</div>.*?<div class="example">(.+?)</div>#s', $res['raw'], $arr);
+		preg_match('#<div class="definition">(.+?)</div>.*?<div class="example">(.*?)</div>#s', $res['raw'], $arr);
 		
 		$definition = trim(html_entity_decode(strip_tags(br2nl($arr[1]))));
-		$example    = trim(html_entity_decode(strip_tags(br2nl($arr[2]))));
-		
 		$definition = strtr($definition, array("\r" => ' ', "\n" => ' '));
 		while(false !== strstr($definition, '  ')) $definition = str_replace('  ', ' ', $definition);
-		
-		$example = strtr($example, array("\r" => ' | ', "\n" => ' | '));
-		while(false !== strstr($example, ' |  | ')) $example = str_replace(' |  | ', ' | ', $example);
-		while(false !== strstr($example, '  '))     $example = str_replace('  ', ' ', $example);
-		
 		$this->reply($definition);
-		$this->reply("\x02Example:\x02 ".$example);
 		
-		
+		if(!empty($arr[2])) {
+			$example = trim(html_entity_decode(strip_tags(br2nl($arr[2]))));
+			$example = strtr($example, array("\r" => ' | ', "\n" => ' | '));
+			while(false !== strstr($example, ' |  | ')) $example = str_replace(' |  | ', ' | ', $example);
+			while(false !== strstr($example, '  '))     $example = str_replace('  ', ' ', $example);
+			$this->reply("\x02Example:\x02 ".$example);
+		}
 	}
 }
 
