@@ -37,7 +37,7 @@ abstract class IRC_Target {
 			$message_length = $max_length;
 		}
 		
-		$messages = explode("\n", wordwrap($message, $message_length, "\n"));
+		$messages = explode("\n", wordwrap($message, $message_length, "\n", true));
 		
 		foreach($messages as $message) {
 			$message = trim($message);
