@@ -11,4 +11,8 @@ function mb_strrev($text) {
 return $output;
 }
 
+function br2nl($text) {
+	return preg_replace('#<\s*?br\s*?/?\s*?>#', "\n", $text);
+}
+
 ?>
