@@ -96,6 +96,9 @@ class Plugin_ChallengeObserver extends Plugin {
 			case 'µContest':
 				$this->getMicrocontestChalls($challcount);
 			break;
+			case 'SPOJ':
+				$this->getSpojChalls($challcount);
+			break;
 		}
 	}
 	
@@ -215,6 +218,40 @@ class Plugin_ChallengeObserver extends Plugin {
 			$this->addLatestChall('µContest', $text);
 		}
 		
+	}
+	
+	private function getSpojChalls($count) {
+		$res = libHTTP::GET('feeds.feedburner.com', '/SphereOnlineJudge?format=xml', null, 2);
+		if(!$res) return;
+		
+		$XML = simplexml_load_string($res['raw']);
+		if($XML === false) return;
+		
+		$items = $XML->xpath('channel/item/description');
+		
+		for($i=0;$i<$count&&$i<sizeof($items);$i++) {
+			$html = (string)$items[$i];
+			preg_match('#Problem (.+?) \((\d+)\. (.+?)\) added by (.+?) is now available in the (.+?) problemset#', $html, $arr);
+			
+			$code     = $arr[1];
+			$id       = $arr[2];
+			$name     = $arr[3];
+			$author   = $arr[4];
+			$category = $arr[5];
+			$url      = 'http://www.spoj.pl/problems/'.$code.'/';
+			
+			$text = sprintf("\x02%s\x02 by \x02%s\x02 in the \x02%s\x02 problemset (%s)",
+				$name,
+				$author,
+				$category,
+				$url
+			);
+			
+			$this->ChallChannel->privmsg($text);
+			
+			// Intentionally not adding to the latest challs, because
+			// they have just too many and it would flood the normal challs
+		}
 	}
 	
 	private function sortByID($a, $b) {
