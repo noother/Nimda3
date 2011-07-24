@@ -96,6 +96,9 @@ class Plugin_ChallengeObserver extends Plugin {
 			case 'µContest':
 				$this->getMicrocontestChalls($challcount);
 			break;
+			case 'Rankk':
+				$this->getRankkChalls($challcount);
+			break;
 			case 'SPOJ':
 				$this->getSpojChalls($challcount);
 			break;
@@ -251,6 +254,36 @@ class Plugin_ChallengeObserver extends Plugin {
 			
 			// Intentionally not adding to the latest challs, because
 			// they have just too many and it would flood the normal challs
+		}
+	}
+	
+	private function getRankkChalls($count) {
+		$res = libHTTP::GET('twitter.com', '/statuses/user_timeline/315747759.rss', null, 5);
+		if(!$res) return;
+	
+		$XML = simplexml_load_string($res['raw']);
+		if($XML === false) return;
+	
+		$items = $XML->xpath('channel/item/title');
+	
+		for($i=0,$j=0;$i<$count&&$j<sizeof($items);$j++) {
+			$string = (string)$items[$j];
+		
+			if(preg_match('/^rankk_org: Added Challenge (\d+?): (.+?) (.+)$/', $string, $arr)) {
+				$i++;
+				$num  = $arr[1];
+				$id   = $arr[2];
+				$name = $arr[3];
+			
+				$text = sprintf("Challenge %d: \x02%s\x02 \x02%s\x02",
+					$num,
+					$id,
+					$name
+				);
+			
+				$this->ChallChannel->privmsg($text);
+				$this->addLatestChall('Rankk', $text);
+			}
 		}
 	}
 	
