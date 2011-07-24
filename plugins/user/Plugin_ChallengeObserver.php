@@ -142,7 +142,7 @@ class Plugin_ChallengeObserver extends Plugin {
 		usort($challs, array('self', 'sortByID'));
 		
 		for($i=0;$i<$count&&$i<sizeof($challs);$i++) {
-			$url      = 'http://www.happy-security.de/index.php?modul=hacking-zone&action=showhackit&level_id='.$challs[$i]['id'];
+			$url      = 'http://happy-security.de/c/?x='.$challs[$i]['id'];
 			$chall    = $challs[$i]['name'];
 			$category = $challs[$i]['category'];
 			$author   = $challs[$i]['author'];
