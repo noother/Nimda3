@@ -55,7 +55,7 @@ class Plugin_Translate extends Plugin {
 		$get  = '/ajax/services/language/translate?v=1.0&q='.rawurlencode($text).'&langpair='.rawurlencode($from.'|'.$to);
 		
 		$result = libHTTP::GET($host, $get);
-		preg_match('/{"translatedText":"(.*?)"(,"detectedSourceLanguage":"([a-z]+)")?}/i', $result['content'][0], $matches);
+		preg_match('/{"translatedText":"(.*?)"(,"detectedSourceLanguage":"([a-z-]+)")?}/i', $result['content'][0], $matches);
 
 		if (empty($matches)) 
 			return false;
