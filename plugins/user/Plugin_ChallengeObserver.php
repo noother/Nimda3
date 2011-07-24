@@ -275,8 +275,7 @@ class Plugin_ChallengeObserver extends Plugin {
 				$id   = $arr[2];
 				$name = $arr[3];
 			
-				$text = sprintf("Challenge %d: \x02%s\x02 \x02%s\x02",
-					$num,
+				$text = sprintf("Challenge %s: \x02%s\x02",
 					$id,
 					$name
 				);
