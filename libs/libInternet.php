@@ -74,6 +74,11 @@ class libInternet {
 	return $data;
 	}
 	
+	static function tinyURL($longurl) {
+		$res = libHTTP::GET('tinyurl.com', '/api-create.php?url='.urlencode($longurl));
+	return $res['raw'];
+	}
+	
 }
 
 ?>

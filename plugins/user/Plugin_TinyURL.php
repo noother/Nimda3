@@ -12,11 +12,12 @@ class Plugin_TinyURL extends Plugin {
 			return;
 		}
 		
-		$res = libHTTP::GET('tinyurl.com', '/api-create.php?url='.urlencode($this->data['text']));
-		if(strlen($res['raw']) <= strlen($this->data['text'])) {
-			$this->reply($res['raw']);
+		$tinyurl = libInternet::tinyURL($this->data['text']);
+		
+		if(strlen($tinyurl) <= strlen($this->data['text'])) {
+			$this->reply($tinyurl);
 		} else {
-			$this->reply($res['raw'].' - Now your URL is even longer than before - Good job!');
+			$this->reply($tinyurl.' - Now your URL is even longer than before - Good job!');
 		}
 		
 	}
