@@ -17,7 +17,7 @@ class Plugin_HappyHardcore extends Plugin {
 	private function trackTime($seconds) {
 		$minutes = (int)($seconds/60);
 		$seconds_remain = $seconds % ($minutes*60);
-	return $minutes.':'.$seconds_remain;
+	return $minutes.':'.str_pad($seconds_remain, 2, '0', STR_PAD_LEFT);
 	}
 	
 	private function getHappyHardcoreStats() {
