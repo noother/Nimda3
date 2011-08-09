@@ -12,6 +12,8 @@ abstract class IRC_Target {
 	abstract public function remove();
 	
 	public final function privmsg($message, $bypass_queue=false) {
+		if(strlen($message) == 0) return false;
+		
 		$message = strtr($message, array("\r" => ' ', "\n" => ' '));
 		/*
 			irc max message length is 512 bytes including CRLF
