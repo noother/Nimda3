@@ -38,6 +38,7 @@ class Plugin_ChallengeObserver extends Plugin {
 		
 		$old_sites = $this->getVar('sites');
 		
+		if(!isset($this->Bot->servers['freenode']->channels[$this->channel])) return;
 		$Channel = $this->Bot->servers['freenode']->channels[$this->channel];
 		
 		foreach($new_sites as $site => $data) {
