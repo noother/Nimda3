@@ -10,6 +10,7 @@ final class IRC_Server {
 	private $socket;
 	private $queueRead = array();
 	private $queueSend = array();
+	private $lastMessageSend = 0;
 	
 	public $Bot;
 	public $id;
@@ -48,6 +49,7 @@ final class IRC_Server {
 	private function write($string) {
 		echo '<< '.$string."\n";
 		fputs($this->socket, $string."\n");
+		$this->lastMessageSend = libSystem::getMicrotime();
 	}
 	
 	private function getUser($nick) {
@@ -146,14 +148,11 @@ final class IRC_Server {
 	}
 	
 	public function sendQueue() {
-		// TODO: Flood protection
-		$check = false;
-		while($message = array_shift($this->queueSend)) {
-			$check = true;
-			$this->write($message);
+		if(libSystem::getMicrotime() - $this->lastMessageSend > 1 && !empty($this->queueSend)) {
+			$this->write(array_shift($this->queueSend));
+			return true;
 		}
-		
-	return $check;
+	return false;
 	}
 
 	public function getData() {
