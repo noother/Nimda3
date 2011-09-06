@@ -29,6 +29,7 @@ class Plugin_UrbanDictionary extends Plugin {
 		$definition = trim(html_entity_decode(strip_tags(br2nl($arr[1]))));
 		$definition = strtr($definition, array("\r" => ' ', "\n" => ' '));
 		while(false !== strstr($definition, '  ')) $definition = str_replace('  ', ' ', $definition);
+		if(strlen($definition) > 800) $definition = substr($definition, 0 ,800).'...';
 		$this->reply($definition);
 		
 		if(!empty($arr[2])) {
@@ -36,6 +37,7 @@ class Plugin_UrbanDictionary extends Plugin {
 			$example = strtr($example, array("\r" => ' | ', "\n" => ' | '));
 			while(false !== strstr($example, ' |  | ')) $example = str_replace(' |  | ', ' | ', $example);
 			while(false !== strstr($example, '  '))     $example = str_replace('  ', ' ', $example);
+			if(strlen($example) > 800) $example = substr($example, 0, 800).'...';
 			$this->reply("\x02Example:\x02 ".$example);
 		}
 	}
