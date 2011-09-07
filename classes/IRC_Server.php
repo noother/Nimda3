@@ -121,14 +121,13 @@ final class IRC_Server {
 	}
 	
 	public function tick() {
+		$this->sendQueue();
+		
 		$check = false;
 		
 		if(false !== $data = $this->getData()) {
 			$this->queueRead[] = $data;
-			$check = true;
 		}
-		
-		if($this->sendQueue()) $check = true;
 		
 		if(false !== $data = $this->readQueue()) $check = $data;
 		
