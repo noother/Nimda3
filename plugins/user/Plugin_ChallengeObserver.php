@@ -56,7 +56,7 @@ class Plugin_ChallengeObserver extends Plugin {
 				));
 			} elseif($data['challs'] > $old_sites[$site]['challs']) {
 				$new_challs = $data['challs']-$old_sites[$site]['challs'];
-				$Channel->privmsg(sprintf("\x02[Challenges]\x02 There %s \x02%d\x02 new %s at \x02%s\x02 (%s)",
+				$Channel->privmsg(sprintf("\x02[Challenges]\x02 There %s \x02%d\x02 new %s at \x02%s\x02 ( %s )",
 					$new_challs == 1 ? 'is' : 'are',
 					$new_challs,
 					$new_challs == 1 ? 'challenge' : 'challenges',
