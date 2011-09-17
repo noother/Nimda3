@@ -23,13 +23,22 @@ class Plugin_Movie extends Plugin {
 		}
 		
 		$res = libHTTP::GET('api.themoviedb.org', '/2.1/Movie.search/'.$this->getConfig('language').'/xml/'.$this->api_key.'/'.urlencode($this->data['text']));
-		$XML = new SimpleXMLElement($res['raw']);
+		$XML = simplexml_load_string($res['raw']);
+		if(!$XML) {
+			$this->reply('Error on contacting themoviedb.org');
+			return;
+		}
+		
 		$tmp = $XML->xpath('opensearch:totalResults');
 		$results = (int)$tmp[0];
 		if(!$results) {
 			if($this->getConfig('language') != 'en') {
 				$res = libHTTP::GET('api.themoviedb.org', '/2.1/Movie.search/en/xml/'.$this->api_key.'/'.urlencode($this->data['text']));
 				$XML = new SimpleXMLElement($res['raw']);
+				if(!$XML) {
+					$this->reply('Error on contacting themoviedb.org');
+					return;
+				}
 				$tmp = $XML->xpath('opensearch:totalResults');
 				$results = (int)$tmp[0];
 			}
