@@ -9,7 +9,7 @@ class Plugin_Movie extends Plugin {
 			'type' => 'enum',
 			'options' => array('de', 'en'),
 			'default' => 'en',
-			'description' => 'Movie decription will get displayed in this language'
+			'description' => 'Movie description will get displayed in this language'
 		)
 	);
 	
