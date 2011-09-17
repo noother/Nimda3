@@ -14,8 +14,8 @@ abstract class Plugin {
 	
 	private $messageIsQuery;
 	
-	
 	// You can override the following properties in plugins
+	protected $config = array();
 	public $triggers = array();
 	public $interval = 0;
 	
@@ -60,6 +60,74 @@ abstract class Plugin {
 	
 	public final function removeVar($name) {
 		$this->Bot->removePermanent($name, 'plugin', $this->id);
+	}
+	
+	public final function getConfigList() {
+		$config = array();
+		foreach($this->config as $name => $def) {
+			$config[$name] = $def;
+			$config[$name]['value'] = $this->getConfig($name);
+		}
+		
+	return $config;
+	}
+	
+	public final function getConfig($name) {
+		if(!isset($this->config[$name])) return false;
+		
+		if($this->Channel === false) {
+			$Target = $this->User;
+		} else {
+			$Target = $this->Channel;
+		}
+		
+		
+		$config = $Target->getVar('config_'.$this->id.'_'.$name);
+		
+		if($config === false) {
+			$config = $this->config[$name]['default'];
+		}
+		
+	return $config;
+	}
+	
+	public final function setConfig($name, $value) {
+		if(!isset($this->config[$name])) return false;
+		
+		if($this->Channel === false) {
+			$Target = $this->User;
+		} else {
+			$Target = $this->Channel;
+		}
+		
+		$identifier = 'config_'.$this->id.'_'.$name;
+		$def = $this->config[$name];
+		
+		switch($def['type']) {
+			case 'bool':
+				switch($value) {
+					case 'true': case '1':
+						$Target->saveVar($identifier, true);
+					break;
+					case 'false': case '0':
+						$Target->saveVar($identifier, false);
+					break;
+					default:
+						return false;
+					break;
+				}
+			break;
+			
+			case 'enum':
+				if(array_search($value, $def['options']) !== false) {
+					$Target->saveVar($identifier, $value);
+				} else {
+					return false;
+				}
+			break;
+		}
+		
+	return true;
 	}
 	
 	// Events

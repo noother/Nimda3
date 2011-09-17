@@ -2,11 +2,19 @@
 
 class Plugin_Translate extends Plugin {
 	
+	protected $config = array(
+		'language' => array(
+			'type' => 'enum',
+			'options' => array('de', 'en'),
+			'default' => 'en',
+			'description' => 'Determines to which language !translate should auto-translate'
+		)
+	);
+	
 	public $triggers = array('!translate', '!de-en', '!de-fr', '!de-it', '!de-nl', '!de-pl', '!de-sv', '!de-es', '!de-no', '!en-de',
 						'!fr-de', '!it-de', '!nl-de', '!pl-de', '!sv-de', '!es-de', '!no-de', '!en-fr', '!en-it', '!en-nl',
 						'!en-pl', '!en-sv', '!en-es', '!en-no', '!fr-en', '!it-en', '!nl-en', '!pl-en', '!sv-en', '!es-en',
 						'!no-en');
-	private $defaultTargetLang = 'de';
 
 	
 	function isTriggered() {
@@ -17,7 +25,7 @@ class Plugin_Translate extends Plugin {
 
 		if ($this->data['trigger'] == '!translate') {
 			$sl = '';
-			$tl = $this->defaultTargetLang;
+			$tl = $this->getConfig('language');
 		} else {
 			$trigger = substr($this->data['trigger'],1);
 			$tmp = explode("-",$trigger);

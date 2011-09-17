@@ -2,9 +2,17 @@
 
 class Plugin_PHP extends Plugin {
 	
+	protected $config = array(
+		'language' => array(
+			'type' => 'enum',
+			'options' => array('de', 'en'),
+			'default' => 'en',
+			'description' => 'Function decription will get displayed in this language'
+		)
+	);
+	
 	public $triggers = array('!php', '!phpmanual');
 	private $redirects;
-	private $language = 'de';
 	private $notfoundtext = 'Nothing matches your query, try search:';
 
 	
@@ -20,9 +28,11 @@ class Plugin_PHP extends Plugin {
 	}
 	
 	private function fetchFunctionDescription($func) {
-		$res = libHTTP::GET($this->language.'.php.net', '/'.$func, 'LAST_LANG='.$this->language, 2);
+		if($this->getConfig('language') == 'de') $host = 'de.php.net';
+		else $host = 'php.net';
+		$res = libHTTP::GET($host, '/'.$func, 'LAST_LANG='.$this->getConfig('language'), 2);
 		if(!$res) {
-			$this->reply('Timeout on contacting '.$this->language.'.php.net');
+			$this->reply('Timeout on contacting '.$host);
 			return;
 		}
 	
@@ -34,7 +44,7 @@ class Plugin_PHP extends Plugin {
 			$decl = isset($descmatch[1])?strip_tags($descmatch[1]):$match[1];
 			$decl = html_entity_decode(str_replace(array("\n", "\r"), ' ', $decl));
 			$decl = str_replace($func, "\x02".$func."\x02", $decl);
-			$output =  $decl.' - '.html_entity_decode($match[2]).' ( http://'.$this->language.'.php.net/'.$func.' )';
+			$output =  $decl.' - '.html_entity_decode($match[2]).' ( http://'.$host.'/'.$func.' )';
 			
 			$this->reply(libString::isUTF8($output)?$output:utf8_encode($output));
 		} else {    // if several possibilities
@@ -44,10 +54,10 @@ class Plugin_PHP extends Plugin {
 				if ($this->redirects++ < 2)
 					$this->fetchFunctionDescription($matches[0][1]);
 				else 
-					$this->reply($this->notfoundtext.' http://'.$this->language.'.php.net/search.php?show=wholesite&pattern='.$this->data['text']);
+					$this->reply($this->notfoundtext.' http://'.$host.'/search.php?show=wholesite&pattern='.$this->data['text']);
 				return;
 			} else
-				$output = $this->notfoundtext.' http://'.$this->language.'.php.net/search.php?show=wholesite&pattern='.$func;
+				$output = $this->notfoundtext.' http://'.$host.'/search.php?show=wholesite&pattern='.$func;
 
 			$this->reply(libString::isUTF8($output)?$output:utf8_encode($output));
 		}

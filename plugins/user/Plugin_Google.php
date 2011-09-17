@@ -3,7 +3,15 @@
 class Plugin_Google extends Plugin {
 	
 	public $triggers = array('!google');
-    private $lang = 'de';
+	
+	protected $config = array(
+		'language' => array(
+			'type' => 'enum',
+			'options' => array('de', 'en'),
+			'default' => 'en',
+			'description' => 'The google language to use'
+		)
+	);
 	
 	function isTriggered() {
 		if(!isset($this->data['text'])) {
@@ -11,7 +19,7 @@ class Plugin_Google extends Plugin {
 			return;
 		}
 
-        $link = "http://www.google.com/search?q=".urlencode($this->data['text'])."&hl=".$this->lang."&safe=off";
+        $link = "http://www.google.com/search?q=".urlencode($this->data['text'])."&hl=".$this->getConfig('language')."&safe=off";
 
         $results = number_format(libInternet::googleResults($this->data['text']),0,',','.');
 

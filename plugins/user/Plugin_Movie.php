@@ -4,8 +4,16 @@ class Plugin_Movie extends Plugin {
 	
 	public $triggers = array('!movie', '!tmdb', '!film');
 	
+	protected $config = array(
+		'language' => array(
+			'type' => 'enum',
+			'options' => array('de', 'en'),
+			'default' => 'en',
+			'description' => 'Movie decription will get displayed in this language'
+		)
+	);
+	
 	private $api_key  = '9fc8c3894a459cac8c75e3284b712dfc'; // shamelessly stolen from gcstar
-	private $language = 'de';
 	private $usage    = 'Usage: %s <movie>';
 	
 	function isTriggered() {
@@ -14,10 +22,19 @@ class Plugin_Movie extends Plugin {
 			return;
 		}
 		
-		$res = libHTTP::GET('api.themoviedb.org', '/2.1/Movie.search/'.$this->language.'/xml/'.$this->api_key.'/'.urlencode($this->data['text']));
+		$res = libHTTP::GET('api.themoviedb.org', '/2.1/Movie.search/'.$this->getConfig('language').'/xml/'.$this->api_key.'/'.urlencode($this->data['text']));
 		$XML = new SimpleXMLElement($res['raw']);
 		$tmp = $XML->xpath('opensearch:totalResults');
 		$results = (int)$tmp[0];
+		if(!$results) {
+			if($this->getConfig('language') != 'en') {
+				$res = libHTTP::GET('api.themoviedb.org', '/2.1/Movie.search/en/xml/'.$this->api_key.'/'.urlencode($this->data['text']));
+				$XML = new SimpleXMLElement($res['raw']);
+				$tmp = $XML->xpath('opensearch:totalResults');
+				$results = (int)$tmp[0];
+			}
+		}
+		
 		if(!$results) {
 			$this->reply('There is no information available about this movie.');
 			return;

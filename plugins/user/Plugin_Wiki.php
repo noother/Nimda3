@@ -2,9 +2,17 @@
 
 class Plugin_Wiki extends Plugin {
 	
-	public $triggers = array('!wiki', '!wikipedia', '!wiki-en', '!stupi');
-	private $wikiServer = 'de.wikipedia.org';
-	private $wikiAltServer = 'en.wikipedia.org';
+	public $triggers = array('!wiki', '!wikipedia', '!wiki-en', '!wiki-de', '!stupi');
+	
+	protected $config = array(
+		'language' => array(
+			'type' => 'enum',
+			'options' => array('de', 'en'),
+			'default' => 'en',
+			'description' => 'Determines the language to use with the !wiki command.'
+		)
+	);
+	
 	private $maxlength = 433;
 	private $notfoundText = 'Your term doesn\'t exist at this Wikipedia Database.';
 	
@@ -19,16 +27,23 @@ class Plugin_Wiki extends Plugin {
 		switch($this->data['trigger']) {
 			case "!wiki":
 			case "!wikipedia":
-				$output = $this->getWikiText($term,$this->wikiServer,"/wiki/","Diese Seite existiert nicht");
-				if(!$output) {
-					$output = $this->getWikiText($term,$this->wikiAltServer,"/wiki/","Wikipedia does not have an article with this exact name");
+				switch($this->getConfig('language')) {
+					case 'de':
+						$output = $this->getWikiText($term, 'de.wikipedia.org', '/wiki/', 'Diese Seite existiert nicht');
+						if($output !== false) break;
+					case 'en':
+						$output = $this->getWikiText($term, 'en.wikipedia.org', '/wiki/', 'Wikipedia does not have an article with this exact name');
+					break;
 				}
 				break;
+			case '!wiki-de':
+				$output = $this->getWikiText($term, 'de.wikipedia.org', '/wiki/', 'Diese Seite existiert nicht');
+				break;
 			case "!wiki-en":
-				$output = $this->getWikiText($term,$this->wikiAltServer,"/wiki/","Wikipedia does not have an article with this exact name");
+				$output = $this->getWikiText($term, 'en.wikipedia.org', '/wiki/', 'Wikipedia does not have an article with this exact name');
 				break;
 			case "!stupi":
-				$output = $this->getWikiText($term,"www.stupidedia.org","/stupi/","Der Artikel kann nicht angezeigt werden");
+				$output = $this->getWikiText($term, 'www.stupidedia.org', '/stupi/', 'Der Artikel kann nicht angezeigt werden');
 				break;
 		}
 
@@ -51,11 +66,6 @@ class Plugin_Wiki extends Plugin {
 		$result = libHTTP::GET($server,$path.str_replace("%23","#",urlencode($term)));
 		$header = $result['header'];
 
-		/*if(isset($header['Location'])) {
-			preg_match("#".$path."(.*)#",$header['Location'],$arr);
-			return $this->getWikiText(urldecode($arr[1]),$server,$path,$notfound);
-		}*/
-
 		$content = implode(" ",$result['content']);
 
 		if(stristr($content,$notfound)) {
@@ -73,7 +83,6 @@ class Plugin_Wiki extends Plugin {
 		foreach($arr[2] as $row) {
 			$row = trim(strip_tags($row));
 			if(empty($row)) continue;
-			var_dump($content);
 			$content.= $row." ";
 		}
 
