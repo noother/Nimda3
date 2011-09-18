@@ -13,7 +13,12 @@ class CorePlugin_Botstats extends Plugin {
 			$usercount+= sizeof($Server->users);
 		}
 		
-		$this->reply('Currently I\'m online on '.$servercount.' server(s) and '.$channelcount.' channel(s), seeing '.$usercount.' user(s).');
+		$this->reply(sprintf(
+			"Currently I'm online on %s and %s, seeing %s.",
+				libString::plural('server', $servercount),
+				libString::plural('channel', $channelcount),
+				libString::plural('user', $usercount)
+		));
 	}
 	
 }

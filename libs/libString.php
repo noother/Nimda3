@@ -59,5 +59,22 @@ class libString {
 	static function startsWith($needle, $haystack) {
 		return substr($haystack, 0, strlen($needle)) == $needle;
 	}
+	
+	static function plural($word, $num) {
+		$num = (int)($num);
+		
+		if($word == 'time') {
+			switch($num) {
+				case 1: return 'once';
+				case 2: return 'twice';
+				case 3: return 'thrice';
+				return $word.'s';
+			}
+		}
+		
+		if($num != 1) $word.= 's';
+		
+	return $num.' '.$word;
+	}
 }
 ?>
