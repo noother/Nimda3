@@ -97,3 +97,19 @@
 	UPDATE `version` SET `version` = '5';
 -- [/5]
 
+-- [6]
+	CREATE TABLE `roulette` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`serverchannel` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+		`nick` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+		`played` int(11) NOT NULL DEFAULT '0',
+		`started` int(11) NOT NULL DEFAULT '0',
+		`lost` int(11) NOT NULL DEFAULT '0',
+		`clicks` int(11) NOT NULL DEFAULT '0',
+		`last_played` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+		PRIMARY KEY (`id`),
+		KEY `serverchannel` (`serverchannel`)
+	) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+	
+	UPDATE `version` SET `version` = '6';
+-- [/6]
