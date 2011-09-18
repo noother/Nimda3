@@ -165,7 +165,7 @@ class Plugin_Roulette extends Plugin {
 					`roulette`
 				WHERE
 					`serverchannel` = '".$serverchannel."'
-					
+					AND `played` >= 10
 				GROUP BY
 					`nick`
 				ORDER BY
