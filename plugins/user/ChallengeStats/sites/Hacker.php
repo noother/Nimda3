@@ -4,17 +4,21 @@ class Hacker extends ChallengeStats {
 	
 	public $triggers = array('!hacker');
 	
-	protected $url = 'http://hacker.org/';
+	protected $url = 'http://hacker.org';
 	protected $statsText = '{username} solved {challs} challenges and has a score of {score} points at {url}{extra}';
 	
 	function getStats($username) {
-		// TODO cache following page!!
-		$res = libHTTP::GET('www.hacker.org', '/challenge/top.php');
+		$top = $this->getCache();
+		if($top === false) {
+			$res = libHTTP::GET('www.hacker.org', '/challenge/top.php');
+			$top = $res['raw'];
+			$this->putCache($top);
+		}
 
-		if (!preg_match('#a href="/forum/profile\.php\?mode=viewprofile&u=([0-9]+)">'.$username.'</a></td> <td>(.*?)</td><td>(.*?)</td>#i', $res['raw'], $arr))
+		if (!preg_match('#a href="/forum/profile\.php\?mode=viewprofile&u=([0-9]+)">'.$username.'</a></td> <td>(.*?)</td><td>(.*?)</td>#i', $top, $arr))
 			return false;
 
-		$score = $arr[2];
+		$score  = $arr[2];
 		$solved = $arr[3];
 
 		$extra = array();
@@ -40,7 +44,7 @@ class Hacker extends ChallengeStats {
 			'username'  => $username,
 			'challs' 	=> $solved,
 			'score'		=> $score,
-			'extra'		=> count($extra)?' Puzzle Highs: '.implode(', ',$extra):''
+			'extra'		=> count($extra)?' - '.$username."'s puzzle scores: ".implode(', ',$extra):''
 		);
 		
 	return $data;

@@ -4,7 +4,7 @@ class RightAnswer extends ChallengeStats {
 	
 	public $triggers = array('!ra', '!rightanswer');
 	
-	protected $url = 'http://www.right-answer.net/';
+	protected $url = 'http://www.right-answer.net';
 
 	
 	function getStats($username) {

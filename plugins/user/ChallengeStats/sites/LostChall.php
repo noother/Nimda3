@@ -4,7 +4,7 @@ class LostChall extends ChallengeStats {
 	
 	public $triggers = array('!lost', '!lostchall');
 	
-	protected $url = 'http://lost-chall.org/';
+	protected $url = 'http://lost-chall.org';
 	protected $statsText = '{username} solved {challs} (of {challs_total}) challenges and is on rank {rank} with {points} points at {url}';
 	
 	function getStats($username) {

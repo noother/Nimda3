@@ -35,6 +35,21 @@ abstract class ChallengeStats {
 	return $text;
 	}
 	
+	protected final function getCache($lifetime=86400) {
+		$path = 'plugins/user/ChallengeStats/cache/'.get_class($this).'.cache';
+		if(file_exists($path) && time() - filemtime($path) < $lifetime) {
+			return file_get_contents($path);
+		}
+		
+	return false;
+	}
+	
+	protected final function putCache($data) {
+		$path = 'plugins/user/ChallengeStats/cache/'.get_class($this).'.cache';
+		file_put_contents($path, $data);
+		clearstatcache();
+	}
+	
 }
 
 ?>

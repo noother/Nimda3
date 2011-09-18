@@ -4,7 +4,7 @@ class Rankk extends ChallengeStats {
 	
 	public $triggers = array('!rk', '!rankk', '!pyramid');
 	
-	protected $url = 'http://www.rankk.org/';
+	protected $url = 'http://www.rankk.org';
 	protected $statsText = '{username} is a {user_title} rankked with {score} points and {challs} challenges solved. {username} is at level {level} at {url}';
 	
 	function getStats($username) {

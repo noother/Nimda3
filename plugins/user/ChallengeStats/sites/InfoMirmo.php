@@ -4,7 +4,7 @@ class InfoMirmo extends ChallengeStats {
 	
 	public $triggers = array('!im', '!infomirmo');
 	
-	protected $url = 'http://www.infomirmo.fr/';
+	protected $url = 'http://www.infomirmo.fr';
 	protected $statsText = '{username} solved {challs_solved} (of {challs_total}) challenges and is on rank {rank} (of {users_total}) with {points} (of {points_total}) points at {url}';
 	
 	function getStats($username) {

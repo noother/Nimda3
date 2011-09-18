@@ -4,8 +4,7 @@ class DYM extends ChallengeStats {
 	
 	public $triggers = array('!dym', '!dareyourmind');
 	
-	protected $url = 'http://www.dareyourmind.net/';
-	//protected $statsText = '{username} solved {challs_solved} (of {challs_total}) challenges and is on rank {rank} (of {users_total}) with {score} (of {score_total}) points at {url}';
+	protected $url = 'http://www.dareyourmind.net';
 	
 	function getStats($username) {
 		$res = libHTTP::GET('www.dareyourmind.net', '/userscore.php?username='.urlencode($username));

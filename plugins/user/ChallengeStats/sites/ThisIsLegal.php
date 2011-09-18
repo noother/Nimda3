@@ -4,7 +4,7 @@ class ThisIsLegal extends ChallengeStats {
 	
 	public $triggers = array('!til', '!thisislegal');
 	
-	protected $url = 'http://thisislegal.com/';
+	protected $url = 'http://thisislegal.com';
 	protected $statsText = '{username} solved {challs_solved} (of {challs_total}) challenges and is on rank {rank} (of {users_total}) with {score} (of {score_total}) points at {url}';
 	
 	function getStats($username) {

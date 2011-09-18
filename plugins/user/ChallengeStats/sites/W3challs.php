@@ -4,7 +4,7 @@ class W3challs extends ChallengeStats {
 	
 	public $triggers = array('!w3c', '!w3challs');
 	
-	protected $url = 'http://w3challs.com/';
+	protected $url = 'http://w3challs.com';
 	protected $statsText    = '{username} solved {challs_solved} (of {challs_total}) challenges and is on rank {rank} (of {users_total}) with {points} (of {points_total}) points at {url}';
 
 	

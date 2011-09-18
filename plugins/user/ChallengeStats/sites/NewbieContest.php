@@ -4,7 +4,7 @@ class NewbieContest extends ChallengeStats {
 	
 	public $triggers = array('!nbc', '!newbiecontest');
 	
-	protected $url = 'http://www.newbiecontest.org/';
+	protected $url = 'http://www.newbiecontest.org';
 	protected $statsText = '{username} solved {challs_solved} (of {challs_total}) challenges and is on rank {rank} (of {users_total}) with {score} (of {score_total}) points at {url}';
 	
 	function getStats($username) {

@@ -4,7 +4,7 @@ class Hackquest extends ChallengeStats {
 	
 	public $triggers = array('!hq', '!hackquest');
 	
-	protected $url = 'http://hackquest.com/';
+	protected $url = 'http://hackquest.com';
 	protected $statsText = '{username} is a {user_title} at Hackquest with {challs} challenges solved and {score} rankpoints. {username} visited {url} {visits} times and spent a total of {time} there. {username} was last online {last_online}.';
 	
 	function getStats($username) {
