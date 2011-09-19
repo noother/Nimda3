@@ -52,8 +52,14 @@ class CorePlugin_Config extends Plugin {
 		}
 		
 		$config = $Plugin->getConfigList();
-		
 		list($crap, $plugin_name) = explode('_', get_class($Plugin), 2);
+		
+		if(empty($config)) {
+			$this->reply('Plugin '.$plugin_name.' doesn\'t have any config variables');
+			return;
+		}
+		
+		
 		$this->reply('Available config variables for plugin '.$plugin_name.':');
 		
 		foreach($config as $name => $def) {
@@ -71,7 +77,7 @@ class CorePlugin_Config extends Plugin {
 					$options = 'true, false';
 				break;
 			}
-			var_dump($def['value']);
+			
 			$this->reply(sprintf($output,
 				$name,
 				(is_bool($def['value']) ? ($def['value'] ? 'true' : 'false') : $def['value']),
