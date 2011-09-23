@@ -7,7 +7,7 @@ class Plugin_PHP extends Plugin {
 			'type' => 'enum',
 			'options' => array('de', 'en'),
 			'default' => 'en',
-			'description' => 'Function decription will get displayed in this language'
+			'description' => 'Function description will get displayed in this language'
 		)
 	);
 	
