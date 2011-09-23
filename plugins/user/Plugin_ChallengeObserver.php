@@ -148,7 +148,7 @@ class Plugin_ChallengeObserver extends Plugin {
 			$category = $challs[$i]['category'];
 			$author   = $challs[$i]['author'];
 			
-			$text = sprintf("\x02%s\x02 in \x02%s\x02 by \x02%s\x02 (%s)",
+			$text = sprintf("\x02%s\x02 in \x02%s\x02 by \x02%s\x02 ( %s )",
 				$chall,
 				$category,
 				$author,
@@ -173,7 +173,7 @@ class Plugin_ChallengeObserver extends Plugin {
 			$chall  = html_entity_decode($arr[2][$i]);
 			$author = html_entity_decode($arr[3][$i]);
 			
-			$text = sprintf("\x02%s\x02 by \x02%s\x02 (%s)",
+			$text = sprintf("\x02%s\x02 by \x02%s\x02 ( %s )",
 				$chall,
 				$author,
 				$url
@@ -210,7 +210,7 @@ class Plugin_ChallengeObserver extends Plugin {
 			$category = $challs[$i]['category'];
 			$points   = $challs[$i]['points'];
 			
-			$text = sprintf("\x02%s\x02 in category \x02%s\x02 worth %d points (%s)",
+			$text = sprintf("\x02%s\x02 in category \x02%s\x02 worth %d points ( %s )",
 				$chall,
 				$category,
 				$points,
@@ -244,7 +244,7 @@ class Plugin_ChallengeObserver extends Plugin {
 			$category = $arr[5];
 			$url      = 'http://www.spoj.pl/problems/'.$code.'/';
 			
-			$text = sprintf("\x02%s\x02 by \x02%s\x02 in the \x02%s\x02 problemset (%s)",
+			$text = sprintf("\x02%s\x02 by \x02%s\x02 in the \x02%s\x02 problemset ( %s )",
 				$name,
 				$author,
 				$category,
