@@ -16,40 +16,19 @@ class Plugin_Youtube extends Plugin {
 	function onChannelMessage() {
 		//if(!$this->getConfig('active')) return;
 		
-		if(!preg_match("#(www\.)?youtube\.com/.*?(\?|&)v=([a-zA-Z0-9_-]{11})#", $this->data['text'], $videoIdArray)) {
-			return;
-		}
-		$videoId = $videoIdArray[3];
+		if(false === $id = libInternet::youtubeID($this->data['text'])) return;
 		
-		if (!$this->validYoutubeId($videoId)) return;
+		$data = libInternet::getYoutubeData($id);
 		
-		$res = libHTTP::GET('gdata.youtube.com','/feeds/api/videos/'.$videoId);
-		$file = $res['raw'];
 		
-		$file = utf8_encode($file);
-		$xml = simplexml_load_string($file);
-		if(!$xml) return;
+		$this->reply(sprintf(
+			"\x02[YouTube]\x02 \x02Title:\x02 %s | \x02Category:\x02 %s | \x02Rating:\x02 %.2f/5.00 | \x02Views:\x02 %s",
+				$data['title'],
+				$data['category'],
+				$data['rating'],
+				number_format($data['views'])
+		));
 		
-		$xml_rates = $xml->children('http://schemas.google.com/g/2005');
-		$xml_views = $xml->children('http://gdata.youtube.com/schemas/2007');
-		
-		$avgRating = number_format((float)$xml->children('http://schemas.google.com/g/2005')->rating->attributes()->average, 2);
-		$views = number_format((int)$xml->children('http://gdata.youtube.com/schemas/2007')->statistics->attributes()->viewCount);
-		$title = utf8_decode($xml->title);
-		
-		$this->reply("\x02[YouTube]\x02 |\x02 Title: \x02".$title. "\x02 \x02|\x02 Rate: \x02". + $avgRating."/5.00\x02 \x02|\x02 Views: \x02".$views);
-		
-	}
-	
-	function validYoutubeId($id) {
-		if ($id == "") return false;
-		
-		$res = libHTTP::GET('gdata.youtube.com','/feeds/api/videos/'.$id);
-		$data = $res['raw'];
-		if (!$data) return false;
-		if ($data == "Invalid id") return false;
-		
-		return true;
 	}
 	
 }
