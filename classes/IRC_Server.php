@@ -11,6 +11,9 @@ final class IRC_Server {
 	private $queueRead = array();
 	private $queueSend = array();
 	private $lastMessageSend = 0;
+	private $waitingForPong = false;
+	
+	private $myData = array();
 	
 	public $Bot;
 	public $id;
@@ -25,15 +28,49 @@ final class IRC_Server {
 	public $nickservIdentifyCommand = false;
 	
 	public function __construct($Bot, $name, $host, $port, $ssl=false) {
-		$this->socket = fsockopen(($ssl?'ssl://':'').$host, $port);
-		stream_set_blocking($this->socket, 0);
-		
 		$this->Bot          = $Bot;
 		$this->id           = $name;
 		$this->host         = $host;
 		$this->port         = $port;
 		$this->isSSL        = $ssl;
+		
+		$this->connect();
+	}
+	
+	private function connect() {
+		$this->socket = fsockopen(($this->isSSL?'ssl://':'').$this->host, $this->port);
+		stream_set_blocking($this->socket, 0);
+		
 		$this->lastLifeSign = libSystem::getMicrotime();
+	}
+	
+	private function reconnect() {
+		$channels = array();
+		foreach($this->channels as $channel => $crap) {
+			$channels[] = $channel;
+		}
+		
+		$this->quit('Connection lost - Reconnecting');
+		fclose($this->socket);
+		$this->channels = array();
+		$this->users    = array();
+		
+		$this->connect();
+		
+		if(isset($this->myData['pass'])) $this->setPass($this->myData['pass']);
+		
+		$this->setUser(
+			$this->myData['username'],
+			$this->myData['hostname'],
+			$this->myData['servername'],
+			$this->myData['realname']
+		);
+		
+		$this->setNick($this->myData['nick']);
+		
+		foreach($channels as $channel) {
+			$this->joinChannel($channel);
+		}
 	}
 	
 	private function read() {
@@ -127,6 +164,15 @@ final class IRC_Server {
 		
 		if(false !== $data = $this->getData()) {
 			$this->queueRead[] = $data;
+		} else {
+			$idle_time = libSystem::getMicrotime() - $this->lastLifeSign;
+			if($idle_time > 320) {
+				$this->reconnect();
+				$this->waitingForPong = false;
+			} elseif(!$this->waitingForPong && $idle_time > 300) {
+				$this->sendPing('are_you_still_there?_:)');
+				$this->waitingForPong = true;
+			}
 		}
 		
 		if(false !== $data = $this->readQueue()) $check = $data;
@@ -235,6 +281,7 @@ final class IRC_Server {
 			break;
 			case 'ERROR':
 				// Sent when the bot quitted the server
+				// TODO: notrly
 				foreach($this->channels as $Channel) {
 					$Channel->remove();
 				}
@@ -356,6 +403,12 @@ final class IRC_Server {
 				$data['challenge'] = $parsed['params'][0];
 				$this->sendPong($data['challenge']);
 			break;
+			case 'PONG':
+				// Message sent by the server after we issued a PING
+				$data['server']    = $parsed['params'][0];
+				$data['challenge'] = $parsed['params'][1];
+				$this->waitingForPong = false;
+			break;
 			case 'PRIVMSG':
 				// Sent when a user sends a message to a channel where the bot is in, or to the bot itself
 				if(!isset($this->users[strtolower($parsed['nick'])])) $this->sendWhois($parsed['nick']);
@@ -396,6 +449,10 @@ final class IRC_Server {
 		else $this->queueSend[] = $string;
 	}
 	
+	public function sendPing($challenge=null) {
+		$this->sendRaw('PING '.(isset($challenge) ? $challenge : $this->host));
+	}
+	
 	public function sendPong($string, $bypass_queue=true) {
 		$this->sendRaw('PONG :'.$string, $bypass_queue);
 	}
@@ -405,14 +462,23 @@ final class IRC_Server {
 	}
 	
 	public function setPass($pass, $bypass_queue=true) {
+		$this->myData['pass'] = $pass;
+		
 		$this->sendRaw('PASS '.$pass, $bypass_queue);
 	}
 	
 	public function setUser($username, $hostname, $servername, $realname, $bypass_queue=true) {
+		$this->myData['username']   = $username;
+		$this->myData['hostname']   = $hostname;
+		$this->myData['servername'] = $servername;
+		$this->myData['realname']   = $realname;
+		
 		$this->sendRaw('USER '.$username.' '.$hostname.' '.$servername.' :'.$realname, $bypass_queue);
 	}
 	
 	public function setNick($nick, $bypass_queue=false) {
+		$this->myData['nick'] = $nick;
+		
 		$this->sendRaw('NICK '.$nick, $bypass_queue);
 	}
 	
@@ -435,10 +501,6 @@ final class IRC_Server {
 	
 	public function removeVar($name) {
 		$this->Bot->removePermanent($name, 'server', $this->id);
-	}
-	
-	public function __destruct() {
-		fclose($this->socket);
 	}
 	
 }
