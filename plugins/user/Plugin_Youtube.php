@@ -22,9 +22,8 @@ class Plugin_Youtube extends Plugin {
 		
 		
 		$this->reply(sprintf(
-			"\x02[YouTube]\x02 \x02Title:\x02 %s | \x02Category:\x02 %s | \x02Rating:\x02 %.2f/5.00 | \x02Views:\x02 %s",
+			"\x02[YouTube]\x02 \x02Title:\x02 %s | \x02Rating:\x02 %.2f/5.00 | \x02Views:\x02 %s",
 				$data['title'],
-				$data['category'],
 				$data['rating'],
 				number_format($data['views'])
 		));
