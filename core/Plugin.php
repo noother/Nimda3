@@ -84,7 +84,7 @@ abstract class Plugin {
 		
 		$config = $Target->getVar('config_'.$this->id.'_'.$name);
 		
-		if($config === false) {
+		if(is_null($config)) {
 			$config = $this->config[$name]['default'];
 		}
 		

@@ -113,3 +113,8 @@
 	
 	UPDATE `version` SET `version` = '6';
 -- [/6]
+
+-- [7]
+	ALTER TABLE `memory` DROP `is_array`;
+	UPDATE `version` SET `version` = '7';
+-- [/7]

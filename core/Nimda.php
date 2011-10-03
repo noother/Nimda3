@@ -79,6 +79,24 @@ class Nimda {
 		
 		for($i=$current_version+1;$i<=$latest_version;$i++) {
 			echo 'Applying update '.$i.'.. ';
+			
+			switch($i) {
+				case 7:
+					$res = $this->MySQL->query("SELECT `id`, `value` FROM `memory` WHERE is_array = 0");
+					foreach($res as $row) {
+						if(preg_match('/^[0-9]+$/', $row['value'])) {
+							$new_value = (int)$row['value'];
+						} elseif(preg_match('/^[0-9\.]+$/', $row['value'])) {
+							$new_value = (float)$row['value'];
+						} else {
+							$new_value = $row['value'];
+						}
+						
+						$this->MySQL->query("UPDATE `memory` SET `value` = '".addslashes(serialize($new_value))."' WHERE id='".$row['id']."'");
+					}
+				break;
+			}
+			
 			$sql = $updates[2][$i-1];
 			$this->MySQL->multiQuery($sql);
 			echo "done\n";
@@ -192,21 +210,14 @@ class Nimda {
 	public function savePermanent($name, $value, $type='bot', $target='me') {
 		if($this->getPermanent($name, $type, $target) === $value) return;
 		
-		if(is_array($value)) {
-			$sql_value = serialize($value);
-			$is_array = true;
-		} else {
-			$sql_value = $value;
-			$is_array = false;
-		}
+		$sql_value = serialize($value);
 		
-		if(false !== $this->getPermanent($name, $type, $target)) {
+		if(!is_null($this->getPermanent($name, $type, $target))) {
 			$sql = "
 				UPDATE
 					`memory`
 				SET
 					`value` = '".addslashes($sql_value)."',
-					`is_array` = '".$is_array."',
 					`modified` = NOW()
 				WHERE
 					`type`   = '".addslashes($type)."' AND
@@ -216,13 +227,12 @@ class Nimda {
 		} else {
 			$sql = "
 				INSERT INTO
-					`memory` (`name`, `type`, `target`, `value`, `is_array`, `created`, `modified`)
+					`memory` (`name`, `type`, `target`, `value`, `created`, `modified`)
 				VALUES (
 					'".addslashes($name)."',
 					'".addslashes($type)."',
 					'".addslashes($target)."',
 					'".addslashes($sql_value)."',
-					'".$is_array."',
 					NOW(),
 					NOW()
 			)";
@@ -238,9 +248,9 @@ class Nimda {
 			return $this->permanentVars[$type][$target][$name];
 		}
 		
-		$row = $this->MySQL->fetchRow("
+		$value = $this->MySQL->fetchColumn("
 			SELECT
-				`value`, `is_array`
+				`value`
 			FROM
 				`memory`
 			WHERE
@@ -249,13 +259,12 @@ class Nimda {
 				`name`   = '".addslashes($name)."'
 		");
 		
-		if(!$row) {
-			$this->permanentVars[$type][$target][$name] = false;
-			return false;
+		if($value === false) {
+			$this->permanentVars[$type][$target][$name] = null;
+			return null;
 		}
 		
-		if($row['is_array']) $value = unserialize($row['value']);
-		else $value = $row['value'];
+		$value = unserialize($value);
 		
 		$this->permanentVars[$type][$target][$name] = $value;
 		
