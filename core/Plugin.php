@@ -32,7 +32,7 @@ abstract class Plugin {
 			'type'        => 'enum',
 			'options'     => array('yes', 'no'),
 			'default'     => $this->enabledByDefault ? 'yes' : 'no',
-			'description' => 'Determines if this Plugin is enabled in this channel / for this user'
+			'description' => 'Determines if this Plugin is enabled for this channel / for this user'
 		);
 	}
 	
