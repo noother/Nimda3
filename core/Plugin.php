@@ -16,6 +16,7 @@ abstract class Plugin {
 	
 	// You can override the following properties in plugins
 	protected $config = array();
+	protected $enabledByDefault = true;
 	public $triggers = array();
 	public $interval = 0;
 	
@@ -26,6 +27,13 @@ abstract class Plugin {
 		$this->Bot          = $Bot;
 		$this->MySQL        = $MySQL;
 		$this->lastInterval = time();
+		
+		$this->config['enabled'] = array(
+			'type'        => 'enum',
+			'options'     => array('yes', 'no'),
+			'default'     => $this->enabledByDefault ? 'yes' : 'no',
+			'description' => 'Determines if this Plugin is enabled in this channel / for this user'
+		);
 	}
 	
 	protected final function reply($string) {
@@ -84,7 +92,7 @@ abstract class Plugin {
 		
 		$config = $Target->getVar('config_'.$this->id.'_'.$name);
 		
-		if(is_null($config)) {
+		if($config === false) {
 			$config = $this->config[$name]['default'];
 		}
 		
@@ -104,20 +112,6 @@ abstract class Plugin {
 		$def = $this->config[$name];
 		
 		switch($def['type']) {
-			case 'bool':
-				switch($value) {
-					case 'true': case '1':
-						$Target->saveVar($identifier, true);
-					break;
-					case 'false': case '0':
-						$Target->saveVar($identifier, false);
-					break;
-					default:
-						return false;
-					break;
-				}
-			break;
-			
 			case 'enum':
 				if(array_search($value, $def['options']) !== false) {
 					$Target->saveVar($identifier, $value);
@@ -128,6 +122,27 @@ abstract class Plugin {
 		}
 		
 	return true;
+	}
+	
+	public final function getEnabledChannels() {
+		$channels = array();
+		
+		foreach($this->Bot->servers as $Server) {
+			foreach($Server->channels as $Channel) {
+				if($Channel->getVar('config_'.$this->id.'_enabled') === 'yes') {
+					$channels[] = $Channel;
+				}
+			}
+		}
+	
+	return $channels;
+	}
+	
+	public final function sendToEnabledChannels($message) {
+		$channels = $this->getEnabledChannels();
+		foreach($channels as $Channel) {
+			$Channel->privmsg($message);
+		}
 	}
 	
 	// Events

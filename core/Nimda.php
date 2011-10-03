@@ -188,6 +188,8 @@ class Nimda {
 			$Plugin->data    = $data;
 			$Plugin->command = $command;
 			
+			if(($Plugin->Channel || $Plugin->User) && $Plugin->getConfig('enabled') === 'no') continue;
+			
 			switch($command) {
 				case '001':     $Plugin->onConnect(); break;
 				case '311':     $Plugin->onWhoisReply(); break;
@@ -212,7 +214,7 @@ class Nimda {
 		
 		$sql_value = serialize($value);
 		
-		if(!is_null($this->getPermanent($name, $type, $target))) {
+		if(false !== $this->getPermanent($name, $type, $target)) {
 			$sql = "
 				UPDATE
 					`memory`
@@ -260,8 +262,8 @@ class Nimda {
 		");
 		
 		if($value === false) {
-			$this->permanentVars[$type][$target][$name] = null;
-			return null;
+			$this->permanentVars[$type][$target][$name] = false;
+			return false;
 		}
 		
 		$value = unserialize($value);

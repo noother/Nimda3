@@ -1,21 +1,10 @@
 <?php
 
 class Plugin_Youtube extends Plugin {
-	/*
-	protected $config = array(
-		'active' => array(
-			'type' => 'bool',
-			'default' => true,
-			'description' => 'If activated, information about Youtube-Links will be fetched and displayed in the channel'
-		)
-	);
 	
 	public $triggers = array('!youtube');
-	*/
 	
 	function onChannelMessage() {
-		//if(!$this->getConfig('active')) return;
-		
 		if(false === $id = libInternet::youtubeID($this->data['text'])) return;
 		
 		$data = libInternet::getYoutubeData($id);

@@ -5,8 +5,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	public $interval = 60;
 	public $triggers = array('!latest', '!recent', '!latest_challs', '!recent_challs', '!new_challs');
 	
-	private $channel = '#nimda';
-	private $ChallChannel;
+	protected $enabledByDefault = false;
 	
 	function onLoad() {
 		if(!$this->getVar('sites'))  $this->saveVar('sites', $this->getSites());
@@ -33,30 +32,36 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	function onInterval() {
+		$channels = $this->getEnabledChannels();
+		if(empty($channels)) return;
+		
 		$new_sites = $this->getSites();
 		if(!$new_sites) return;
 		
 		$old_sites = $this->getVar('sites');
 		
-		if(!isset($this->Bot->servers['freenode']->channels[$this->channel])) return;
-		$Channel = $this->Bot->servers['freenode']->channels[$this->channel];
-		
 		foreach($new_sites as $site => $data) {
 			if(!isset($old_sites[$site])) {
-				$Channel->privmsg(sprintf("\x02[Challenges]\x02 A new challenge site just spawned! Checkout \x02%s\x02 at %s. They currently have \x02%d\x02 challenges.",
+				$text = sprintf("\x02[Challenges]\x02 A new challenge site just spawned! Checkout \x02%s\x02 at %s.",
 					$data['name'],
-					$data['url'],
-					$data['challs']
-				));
+					$data['url']
+				);
+				
+				if($data['challs']) {
+					$text.= sprintf(" They currently have \x02%d\x02 challenges.",
+						$data['challs']
+					);
+				}
+				$this->sendToEnabledChannels($text);
 			} elseif($data['challs'] < $old_sites[$site]['challs']) {
-				$Channel->privmsg(sprintf("\x02[Challenges]\x02 \x02%s\x02 (%s) just deleted \x02%d\x02 of their challenges.",
+				$this->sendToEnabledChannels(sprintf("\x02[Challenges]\x02 \x02%s\x02 (%s) just deleted \x02%d\x02 of their challenges.",
 					$data['name'],
 					$data['url'],
 					$old_sites[$site]['challs']-$data['challs']
 				));
 			} elseif($data['challs'] > $old_sites[$site]['challs']) {
 				$new_challs = $data['challs']-$old_sites[$site]['challs'];
-				$Channel->privmsg(sprintf("\x02[Challenges]\x02 There %s \x02%d\x02 new %s at \x02%s\x02 ( %s )",
+				$this->sendToEnabledChannels(sprintf("\x02[Challenges]\x02 There %s \x02%d\x02 new %s at \x02%s\x02 ( %s )",
 					$new_challs == 1 ? 'is' : 'are',
 					$new_challs,
 					$new_challs == 1 ? 'challenge' : 'challenges',
@@ -64,7 +69,6 @@ class Plugin_ChallengeObserver extends Plugin {
 					$data['url']
 				));
 				
-				$this->ChallChannel = $Channel;
 				$this->getLatestChalls($data, $new_challs);
 			}
 		}
@@ -155,7 +159,7 @@ class Plugin_ChallengeObserver extends Plugin {
 				$url
 			);
 			
-			$this->ChallChannel->privmsg($text);
+			$this->sendToEnabledChannels($text);
 			$this->addLatestChall('Happy Security', $text);
 		}
 	}
@@ -179,7 +183,7 @@ class Plugin_ChallengeObserver extends Plugin {
 				$url
 			);
 			
-			$this->ChallChannel->privmsg($text);
+			$this->sendToEnabledChannels($text);
 			
 			$this->addLatestChall('WeChall', $text);
 		}
@@ -217,7 +221,7 @@ class Plugin_ChallengeObserver extends Plugin {
 				$url
 			);
 			
-			$this->ChallChannel->privmsg($text);
+			$this->sendToEnabledChannels($text);
 			
 			$this->addLatestChall('µContest', $text);
 		}
@@ -251,7 +255,7 @@ class Plugin_ChallengeObserver extends Plugin {
 				$url
 			);
 			
-			$this->ChallChannel->privmsg($text);
+			$this->sendToEnabledChannels($text);
 			
 			// Intentionally not adding to the latest challs, because
 			// they have just too many and it would flood the normal challs
@@ -281,7 +285,7 @@ class Plugin_ChallengeObserver extends Plugin {
 					$name
 				);
 			
-				$this->ChallChannel->privmsg($text);
+				$this->sendToEnabledChannels($text);
 				$this->addLatestChall('Rankk', $text);
 			}
 		}
