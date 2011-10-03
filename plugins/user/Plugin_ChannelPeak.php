@@ -6,8 +6,9 @@ class Plugin_ChannelPeak extends Plugin {
 	
 	protected $config = array(
 		'peakshow' => array(
-			'type' => 'bool',
-			'default' => false,
+			'type' => 'enum',
+			'options' => array('yes', 'no')
+			'default' => 'no',
 			'description' => 'Determines wherever or not new channel peaks should be announced in the channel'
 		)
 	);
@@ -31,7 +32,7 @@ class Plugin_ChannelPeak extends Plugin {
 		$user_count = sizeof($this->Channel->users);
 		
 		if($user_count > $this->Channel->getVar('peak')) {
-			if($this->getConfig('peakshow')) {
+			if($this->getConfig('peakshow') === 'yes') {
 				$this->reply(sprintf(
 					"New channel peak for \x02%s\x02: %d users online. Old one was %d users online at %s (%s ago)",
 						$this->Channel->name,
