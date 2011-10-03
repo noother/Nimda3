@@ -7,7 +7,7 @@ class Plugin_ChannelPeak extends Plugin {
 	protected $config = array(
 		'peakshow' => array(
 			'type' => 'enum',
-			'options' => array('yes', 'no')
+			'options' => array('yes', 'no'),
 			'default' => 'no',
 			'description' => 'Determines wherever or not new channel peaks should be announced in the channel'
 		)
