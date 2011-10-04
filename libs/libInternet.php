@@ -38,10 +38,9 @@ class libInternet {
 	static function getYoutubeData($youtube_id) {
 		if(empty($youtube_id)) return false;
 		$res = libHTTP::GET('gdata.youtube.com','/feeds/api/videos/'.$youtube_id);
-		if($res['raw'] == 'Invalid id') return false;
 		
 		$xml = simplexml_load_string($res['raw']);
-		
+		if($xml === false) return false;
 		$data = array();
 		
 		$media = $xml->children('http://search.yahoo.com/mrss/');
