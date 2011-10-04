@@ -16,11 +16,11 @@ class Plugin_Roulette extends Plugin {
 		if(isset($this->data['text'])) {
 			$parts = explode(' ', $this->data['text'], 2);
 			switch($parts[0]) {
-				case 'stats':
+				case 'stats': case 'globalstats':
 					if(sizeof($parts) == 1) {
-						$this->printStats();
+						$this->printStats($parts[0] == 'globalstats');
 					} else {
-						$this->printPlayerStats($parts[1]);
+						$this->printPlayerStats($parts[1], $parts[0] == 'globalstats');
 					}
 				break;
 				default:
@@ -33,7 +33,7 @@ class Plugin_Roulette extends Plugin {
 	}
 	
 	private function printUsage() {
-		$this->reply('Usage: '.$this->data['trigger'].' [stats [nick]]');
+		$this->reply('Usage: '.$this->data['trigger'].' [[global]stats [nick]]');
 	}
 	
 	private function initGame() {
@@ -138,7 +138,7 @@ class Plugin_Roulette extends Plugin {
 		}
 	}
 	
-	private function printStats() {
+	private function printStats($global=false) {
 		$serverchannel = addslashes($this->Server->id.':'.$this->Channel->id);
 		
 		$sql = "
@@ -148,9 +148,13 @@ class Plugin_Roulette extends Plugin {
 				COUNT(*) AS `playercount`
 			FROM
 				`roulette`
-			WHERE
-				`serverchannel` = '".$serverchannel."'
 		";
+		if(!$global) {
+			$sql.= "
+				WHERE
+					`serverchannel` = '".$serverchannel."'
+			";
+		}
 		
 		$stats = $this->MySQL->fetchRow($sql);
 		if(!$stats['playercount']) {
@@ -164,8 +168,9 @@ class Plugin_Roulette extends Plugin {
 				FROM
 					`roulette`
 				WHERE
-					`serverchannel` = '".$serverchannel."'
-					AND `played` >= 10
+			";
+		if(!$global) $sql.= "`serverchannel` = '".$serverchannel."' AND ";
+		$sql.= "`played` >= 10
 				GROUP BY
 					`nick`
 				ORDER BY
@@ -182,7 +187,8 @@ class Plugin_Roulette extends Plugin {
 		}
 		
 		$this->reply(sprintf(
-			"\x02Roulette stats:\x02 %s completed, %s fired at %s. Luckiest: %s (%.2f%% clicks). Unluckiest: %s (%.2f%% clicks).",
+			"\x02Roulette %sstats:\x02 %s completed, %s fired at %s. Luckiest: %s (%.2f%% clicks). Unluckiest: %s (%.2f%% clicks).",
+				$global ? "global" : "",
 				libString::plural('game', $stats['played']),
 				libString::plural('shot', $stats['shots']),
 				libString::plural('player', $stats['playercount']),
@@ -191,18 +197,36 @@ class Plugin_Roulette extends Plugin {
 				$unluckiest['nick'],
 				$unluckiest['percentage']
 		));
-		
-		
-		
-		
-		
-		
 	}
 	
-	private function printPlayerStats($nick) {
+	private function printPlayerStats($nick, $global=false) {
 		$serverchannel = $this->Server->id.':'.$this->Channel->id;
 		
-		$data = $this->MySQL->fetchRow("SELECT * FROM `roulette` WHERE serverchannel ='".addslashes($serverchannel)."' AND `nick` = '".addslashes($nick)."'");
+		if($global) {
+			$sql = "
+				SELECT
+					`nick`, SUM(`played`) AS `played`, SUM(`started`) AS `started`, SUM(`lost`) AS `lost`, SUM(`clicks`) AS `clicks`
+				FROM
+					`roulette`
+				WHERE
+					`nick` = '".addslashes($nick)."'
+			";
+		} else {
+			$sql = "
+				SELECT
+					*
+				FROM
+					`roulette`
+				WHERE
+					`serverchannel` ='".addslashes($serverchannel)."'
+					AND `nick` = '".addslashes($nick)."'
+			";
+		}
+		
+		
+		
+		
+		$data = $this->MySQL->fetchRow($sql);
 		if(!$data) {
 			$this->reply($nick.' has never played roulette.');
 			return;
