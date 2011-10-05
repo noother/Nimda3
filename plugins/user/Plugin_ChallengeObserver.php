@@ -104,6 +104,9 @@ class Plugin_ChallengeObserver extends Plugin {
 			case 'Rankk':
 				$this->getRankkChalls($challcount);
 			break;
+			case 'Right-Answer':
+				$this->getRightAnswerChalls($challcount);
+			break;
 			case 'SPOJ':
 				$this->getSpojChalls($challcount);
 			break;
@@ -291,6 +294,24 @@ class Plugin_ChallengeObserver extends Plugin {
 				$this->sendToEnabledChannels($text);
 				$this->addLatestChall('Rankk', $text);
 			}
+		}
+	}
+	
+	private function getRightAnswerChalls($count) {
+		$res = libHTTP::GET('www.right-answer.net', '/index.php', null, 5);
+		if(!$res) return;
+		file_put_contents('test.html', $res['raw']);
+		
+		preg_match_all('#Rapporte (\d+?) XP.+?href="epreuves.php\?nom=(.+?)">(.+?)</a>#s', $res['raw'], $arr);
+		
+		for($i=0;$i<$count&&$i<sizeof($arr[1]);$i++) {
+			$text = sprintf("\x02%s\x02 worth %d XP ( %s )",
+				utf8_encode($arr[3][$i]),
+				$arr[1][$i],
+				'http://www.right-answer.net/epreuves.php?nom='.urlencode($arr[2][$i])
+			);
+			$this->sendToEnabledChannels($text);
+			$this->addLatestChall('Right-Answer', $text);
 		}
 	}
 	
