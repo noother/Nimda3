@@ -12,6 +12,7 @@
 	require_once('libs/libFilesystem.php');
 	require_once('libs/libHTTP.php');
 	require_once('libs/libInternet.php');
+	require_once('libs/libIRC.php');
 	require_once('libs/libHTTP.php');
 	require_once('libs/libMath.php');
 	require_once('libs/libString.php');
