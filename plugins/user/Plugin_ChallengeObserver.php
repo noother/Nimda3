@@ -239,7 +239,10 @@ class Plugin_ChallengeObserver extends Plugin {
 		
 		for($i=0;$i<$count&&$i<sizeof($items);$i++) {
 			$html = (string)$items[$i];
-			preg_match('#Problem (.+?) \((\d+)\. (.+?)\) added by (.+?) is now available in the (.+?) problemset#', $html, $arr);
+			if(!preg_match('#Problem (.+?) \((\d+)\. (.+?)\) added by (.+?) is now available in the (.+?) problemset#', $html, $arr)) {
+				$count++;
+				continue;
+			}
 			
 			$code     = $arr[1];
 			$id       = $arr[2];
