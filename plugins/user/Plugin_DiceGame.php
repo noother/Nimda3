@@ -72,7 +72,7 @@ class Plugin_DiceGame extends Plugin {
 				}
 			break;
 			case 'rules':
-				$this->reply("\x02[Dice game rules]\x02 Be the first to get 50 or more points on your permanent score by \x02roll\x02ing as many dice as you want one at a time. If you roll 1-5, the points get added to your temporary score. If you roll a 6 you lose all points on your temporary score. You can \x02stand\x02 any time, which adds your temporary score to your permanent score and your opponent gets the turn. If a player gets 50 or more points and stands, the other player has still one chance and can roll dice, trying to beat the score. ");
+				$this->reply("\x02[Dice Game]\x02 Rules: Be the first to get 50 or more points on your permanent score by \x02roll\x02ing as many dice as you want one at a time. If you roll 1-5, the points get added to your temporary score. If you roll a 6 you lose all points on your temporary score. You can \x02stand\x02 any time, which adds your temporary score to your permanent score and your opponent gets the turn. If a player gets 50 or more points and stands, the other player has still one chance and can roll dice, trying to beat the score. ");
 			break;
 			default:
 				$this->printUsage();
