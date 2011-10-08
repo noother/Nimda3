@@ -178,7 +178,7 @@ class Plugin_DiceGame extends Plugin {
 				$this->reply('You beat your opponent. Congratulations!');
 				$this->game['state'] = 'finished';
 			} else {
-				$text.= 'Permanent score: '.$data['points'].', Temporary score: '.$data['temp_points'].', Cummulative score: '.($data['points']+$data['temp_points']).". \x02roll\x02 again or \x02stand\x02?";
+				$text.= 'Points: '.$data['points'].' + '.$data['temp_points'].' => '.($data['points']+$data['temp_points'])." - \x02roll\x02 again or \x02stand\x02?";
 				$this->reply($text);
 			}
 		} else {
