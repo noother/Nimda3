@@ -155,7 +155,7 @@ class Plugin_DiceGame extends Plugin {
 		}
 		
 		$this->reply(sprintf(
-			"\x02[Dice game]\x02 %s won with %d points against %s who only had %d points.",
+			"\x02[Dice Game]\x02 %s won with %d points against %s who only had %d points.",
 				$winner['nick'],
 				$winner['points'],
 				$loser['nick'],
