@@ -175,7 +175,7 @@ class Plugin_DiceGame extends Plugin {
 			$data['temp_points']+= $dice;
 			if($this->game['state'] == 'lastturn' && $data['points']+$data['temp_points'] > $this->game['final_points']) {
 				$data['points']+= $data['temp_points'];
-				$this->reply('You beat your opponent. Congratulations!');
+				$this->reply($text.'You beat your opponent. Congratulations!');
 				$this->game['state'] = 'finished';
 			} else {
 				$text.= 'Points: '.$data['points'].' + '.$data['temp_points'].' => '.($data['points']+$data['temp_points'])." - \x02roll\x02 again or \x02stand\x02?";
