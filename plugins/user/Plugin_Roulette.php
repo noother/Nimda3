@@ -192,9 +192,9 @@ class Plugin_Roulette extends Plugin {
 				libString::plural('game', $stats['played']),
 				libString::plural('shot', $stats['shots']),
 				libString::plural('player', $stats['playercount']),
-				$luckiest['nick'],
+				libIRC::noHighlight($luckiest['nick']),
 				$luckiest['percentage'],
-				$unluckiest['nick'],
+				libIRC::noHighlight($unluckiest['nick']),
 				$unluckiest['percentage']
 		));
 	}
