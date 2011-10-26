@@ -50,8 +50,10 @@ final class IRC_Server {
 			$channels[] = $channel;
 		}
 		
-		$this->quit('Connection lost - Reconnecting');
-		fclose($this->socket);
+		if($this->socket) {
+			$this->quit('Connection lost - Reconnecting');
+			fclose($this->socket);
+		}
 		$this->channels = array();
 		$this->users    = array();
 		
