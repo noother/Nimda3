@@ -121,6 +121,7 @@ class HTTP {
 		fputs($this->socket, $header);
 		
 		list($header, $content_length) = $this->_getHeader();
+		
 		$body = $this->_getBody(
 			$content_length,
 			(isset($header['Transfer-Encoding']) && $header['Transfer-Encoding'] == 'chunked')
