@@ -12,7 +12,7 @@ class Plugin_ChallengeStats extends Plugin {
 			require_once('ChallengeStats/sites/'.$file);
 			
 			$classname = substr($file, 0, -4);
-			$Class     = new $classname;
+			$Class     = new $classname($this);
 			foreach($Class->triggers as $trigger) {
 				$this->triggers[]      = $trigger;
 				$this->links[$trigger] = $Class;
