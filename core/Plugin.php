@@ -59,7 +59,7 @@ abstract class Plugin {
 		}
 	}
 	
-	public final function addJob($callback, $data) {
+	public final function addJob($callback, $data=null) {
 		$filename = $this->id.'_'.
 		            $this->Server->id.'_'.
 		            ($this->Channel ? $this->Channel->id : 'none').'_'.
@@ -188,7 +188,8 @@ abstract class Plugin {
 			object User
 			
 			array data [
-				mixed result => The data doJob() returned
+				mixed result    => The data the callback of addJob() returned
+				string callback => The callback function from where this data got returned
 			]
 		*/
 	}

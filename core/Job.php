@@ -15,7 +15,8 @@ class Job {
 		$this->datafile = $datafile;
 		$this->loadData();
 		$this->loadPlugin();
-		$this->processData();
+		$result = $this->processData();
+		$this->writeJobDone($result);
 		$this->removeDatafile();
 	}
 	
@@ -33,7 +34,17 @@ class Job {
 	
 	private function processData() {
 		$callback = $this->data['callback'];
-		$data = $this->Plugin->$callback($this->data['data']);
+		if(is_null($this->data['data'])) {
+			$result = $this->Plugin->$callback();
+		} else {
+			$result = $this->Plugin->$callback($this->data['data']);
+		}
+		
+	return $result;
+	}
+	
+	private function writeJobDone($result) {
+		$data = array('callback' => $this->data['callback'], 'result' => $result);
 		file_put_contents($this->data['job_done_filename'], serialize($data));
 	}
 	

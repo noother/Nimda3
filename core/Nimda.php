@@ -218,7 +218,7 @@ class Nimda {
 				$Plugin->Channel = $Channel;
 				$Plugin->User    = $User;
 				
-				$Plugin->data = array('result' => unserialize($content));
+				$Plugin->data = unserialize($content);
 				
 				$Plugin->onJobDone();
 			}
