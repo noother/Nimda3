@@ -59,15 +59,16 @@ abstract class Plugin {
 		}
 	}
 	
-	public final function addJob($data) {
+	public final function addJob($callback, $data) {
 		$filename = $this->id.'_'.
 		            $this->Server->id.'_'.
 		            ($this->Channel ? $this->Channel->id : 'none').'_'.
-		            $this->User->id.'_'.
+		            ($this->User ? $this->User->id : 'none').'_'.
 		            libCrypt::getRandomHash();
 		
 		$data = array(
 			'classname'         => get_class($this),
+			'callback'          => $callback,
 			'plugin_path'       => 'plugins/'.(libString::startsWith('CorePlugin', get_class($this))?'core':'user').'/'.get_class($this).'.php',
 			'job_done_filename' => $this->Bot->getTempDir().'/jobs_done/'.$filename,
 			'data'              => $data

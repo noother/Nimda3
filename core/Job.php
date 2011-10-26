@@ -32,7 +32,8 @@ class Job {
 	}
 	
 	private function processData() {
-		$data = $this->Plugin->doJob($this->data['data']);
+		$callback = $this->data['callback'];
+		$data = $this->Plugin->$callback($this->data['data']);
 		file_put_contents($this->data['job_done_filename'], serialize($data));
 	}
 	
