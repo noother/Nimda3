@@ -20,14 +20,14 @@ class Plugin_Calc extends Plugin {
 			return;
 		}
 
-		$google = libHTTP::GET('www.google.com','/search?q='.urlencode($this->data['text']).'&hl=de&safe=off');
+		$google = libHTTP::GET('http://www.google.com/search?q='.urlencode($this->data['text']).'&hl=de&safe=off');
         
 		if($google === false) {
 			$this->reply($this->connection_error);
 			return;
 		}
 		
-		$result = preg_match_all("@<h2 class=r style=\"font-size:138%\"><b>(.*)</b></h2>@",$google['raw'],$matches);
+		$result = preg_match_all("@<h2 class=r style=\"font-size:138%\"><b>(.*)</b></h2>@", $google, $matches);
 		if($result == 0 || $result == false) {
 			$this->reply($this->parse_error);
 			return;

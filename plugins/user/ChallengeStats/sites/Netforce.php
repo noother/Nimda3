@@ -4,13 +4,13 @@ class Netforce extends ChallengeStats {
 	
 	public $triggers = array('!nf', '!netforce', '!net-force');
 	
-	protected $url = 'http://net-force.nl';
+	protected $url        = 'http://net-force.nl';
+	protected $profileUrl = 'http://net-force.nl/wechall/userscore.php?username=%s';
 	
-	function getStats($username) {
-		$res = libHTTP::GET('net-force.nl', '/wechall/userscore.php?username='.urlencode($username));
-		if(libString::startsWith('::', $res['raw'])) return false;
+	function getStats($username, $html) {
+		if(libString::startsWith('::', $html)) return false;
 		
-		$tmp = explode(':', $res['raw']);
+		$tmp = explode(':', $html);
 		
 		$data = array(
 			'username'      => $username,

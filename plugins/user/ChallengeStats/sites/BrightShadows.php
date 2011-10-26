@@ -4,13 +4,14 @@ class BrightShadows extends ChallengeStats {
 	
 	public $triggers = array('!tbs', '!theblacksheep', '!bs', '!bright-shadows', '!brightshadows', '!blacksheep');
 	
-	protected $url = 'http://bright-shadows.net';
+	protected $url        = 'http://bright-shadows.net';
+	protected $profileUrl = 'http://bright-shadows.net/userdata.php?username=%s';
 	
-	function getStats($username) {
-		$res = libHTTP::GET('bright-shadows.net', '/userdata.php?username='.urlencode($username));
-		if($res['raw'] == 'Unknown User') return false;
+	
+	function getStats($username, $html) {
+		if($html == 'Unknown User') return false;
 		
-		$tmp = explode(':', $res['raw']);
+		$tmp = explode(':', $html);
 		$data = array(
 			'username'      => $tmp[0],
 			'rank'          => $tmp[1],

@@ -11,8 +11,9 @@ class Plugin_WeChall extends Plugin {
 		else $target = $this->User->name;
 		
 		if($target{0} == '!' && strstr($target, ' ') === false) $target.= ' '.$this->User->name;
-		$result = libHTTP::GET('www.wechall.net','/wechall.php?username='.urlencode($target));
-		$this->reply($result['content'][0]);
+		$html = libHTTP::GET('http://www.wechall.net/wechall.php?username='.urlencode($target));
+		
+		$this->reply($html);
 	}
 	
 }

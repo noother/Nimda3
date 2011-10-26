@@ -4,14 +4,14 @@ class NewbieContest extends ChallengeStats {
 	
 	public $triggers = array('!nbc', '!newbiecontest');
 	
-	protected $url = 'http://www.newbiecontest.org';
-	protected $statsText = '{username} solved {challs_solved} (of {challs_total}) challenges and is on rank {rank} (of {users_total}) with {score} (of {score_total}) points at {url}';
+	protected $url        = 'http://www.newbiecontest.org';
+	protected $profileUrl = 'http://www.newbiecontest.org/userscore.php?username=%s';
+	protected $statsText  = '{username} solved {challs_solved} (of {challs_total}) challenges and is on rank {rank} (of {users_total}) with {score} (of {score_total}) points at {url}';
 	
-	function getStats($username) {
-		$res = libHTTP::GET('www.newbiecontest.org', '/userscore.php?username='.urlencode($username));
-		if($res['raw'] == 'Member : unknown') return false;
+	function getStats($username, $html) {
+		if($html == 'Member : unknown') return false;
 
-		if(!preg_match('#Member : (.*?)<br>Ranking : (.*?)/(.*?)<br>Points : (.*?)/(.*?)<br>Challenges solved : (.*?)/(.*?)<br>#',$res['raw'],$arr))
+		if(!preg_match('#Member : (.*?)<br>Ranking : (.*?)/(.*?)<br>Points : (.*?)/(.*?)<br>Challenges solved : (.*?)/(.*?)<br>#',$html,$arr))
 			return false;
 		
 		$data = array(

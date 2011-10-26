@@ -78,10 +78,13 @@ class Plugin_ChallengeObserver extends Plugin {
 	
 	private function getSites() {
 		$sites = array();
-		$res = libHTTP::GET('www.wechall.net','/index.php?mo=WeChall&me=API_Site&no_session=1', null, 2);
-		if(!$res) return false;
+		$html = libHTTP::GET('http://www.wechall.net/index.php?mo=WeChall&me=API_Site&no_session=1');
+		if($html === false) return false;
 		
-		foreach($res['content'] as $line) {
+		$lines = explode("\n", $html);
+		
+		foreach($lines as $line) {
+			$line = trim($line);
 			$data = explode('::',$line);
 			if(sizeof($data) < 11) return false;
 			$sites[$data[1]] = array('name' => str_replace('\:',':',$data[0]), 'url' => str_replace('\:',':',$data[3]), 'challs' => $data[7]);
@@ -123,10 +126,10 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getHappySecurityChalls($count) {
-		$res = libHTTP::GET('www.happy-security.de', '/index.php?modul=hacking-zone', null, 2);
-		if(!$res) return;
+		$html = libHTTP::GET('http://www.happy-security.de/index.php?modul=hacking-zone');
+		if($html === false) return;
 		
-		if(!preg_match_all('#<td valign=top nowrap colspan=8> &nbsp;&raquo; <b>(.+?)</b>(.+?)</tr></table>#s', $res['raw'], $categories)) {
+		if(!preg_match_all('#<td valign=top nowrap colspan=8> &nbsp;&raquo; <b>(.+?)</b>(.+?)</tr></table>#s', $html, $categories)) {
 			return;
 		}
 		
@@ -168,10 +171,10 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getWeChallChalls($count) {
-		$res = libHTTP::GET('www.wechall.net', '/challs/by/chall_date/DESC/page-1', null, 2);
-		if(!$res) return;
+		$html = libHTTP::GET('http://www.wechall.net/challs/by/chall_date/DESC/page-1');
+		if($html === false) return;
 		
-		if(!preg_match_all('#<a href="(/challenge/.*?)".*?>(.*?)<.*?href=.*?>(.*?)<#', $res['raw'], $arr)) {
+		if(!preg_match_all('#<a href="(/challenge/.*?)".*?>(.*?)<.*?href=.*?>(.*?)<#', $html, $arr)) {
 			return;
 		}
 		
@@ -193,9 +196,9 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getMicrocontestChalls($count) {
-		$res = libHTTP::GET('www.microcontest.com', '/contests.php?id=-1', null, 2);
+		$html = libHTTP::GET('http://www.microcontest.com/contests.php?id=-1');
 		
-		if(!preg_match_all('#<a href="contest.php\?id=(\d+?)">(.+?) \(\d+\)</a>.*?<a href="contests.php.+?>(.*?)</a>.*?<td.+?>(\d+?)</td>#s', $res['raw'], $arr)) {
+		if(!preg_match_all('#<a href="contest.php\?id=(\d+?)">(.+?) \(\d+\)</a>.*?<a href="contests.php.+?>(.*?)</a>.*?<td.+?>(\d+?)</td>#s', $html, $arr)) {
 			return;
 		}
 		
@@ -232,10 +235,10 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getSpojChalls($count) {
-		$res = libHTTP::GET('feeds.feedburner.com', '/SphereOnlineJudge?format=xml', null, 2);
-		if(!$res) return;
+		$html = libHTTP::GET('http://feeds.feedburner.com/SphereOnlineJudge?format=xml');
+		if($html === false) return;
 		
-		$XML = simplexml_load_string($res['raw']);
+		$XML = simplexml_load_string($html);
 		if($XML === false) return;
 		
 		$items = $XML->xpath('channel/item/description');
@@ -269,10 +272,10 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getRankkChalls($count) {
-		$res = libHTTP::GET('twitter.com', '/statuses/user_timeline/315747759.rss', null, 5);
-		if(!$res) return;
+		$html = libHTTP::GET('http://twitter.com/statuses/user_timeline/315747759.rss');
+		if($html === false) return;
 	
-		$XML = simplexml_load_string($res['raw']);
+		$XML = simplexml_load_string($html);
 		if($XML === false) return;
 	
 		$items = $XML->xpath('channel/item/title');
@@ -298,11 +301,10 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getRightAnswerChalls($count) {
-		$res = libHTTP::GET('www.right-answer.net', '/index.php', null, 5);
-		if(!$res) return;
-		file_put_contents('test.html', $res['raw']);
+		$html = libHTTP::GET('http://www.right-answer.net/index.php');
+		if(!$html) return;
 		
-		preg_match_all('#Rapporte (\d+?) XP.+?href="epreuves.php\?nom=(.+?)">(.+?)</a>#s', $res['raw'], $arr);
+		preg_match_all('#Rapporte (\d+?) XP.+?href="epreuves.php\?nom=(.+?)">(.+?)</a>#s', $html, $arr);
 		
 		for($i=0;$i<$count&&$i<sizeof($arr[1]);$i++) {
 			$text = sprintf("\x02%s\x02 worth %d XP ( %s )",

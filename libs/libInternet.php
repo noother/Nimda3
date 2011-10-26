@@ -1,27 +1,25 @@
 <?php
 
+require_once('libs/libHTTP.php');
+
+
 class libInternet {
 	
 	static function googleResults($string) {
-		$host   = "www.google.com";
-		$lang	= "de";
-		$get    = "/search?q=".urlencode($string)."&hl=".$lang."&safe=off";
-		$result = libHTTP::GET($host,$get);
-		
-		$result = implode($result['content'],"\n");
-		
-		preg_match('#Ungef.hr (.*?) Ergebnisse#',$result,$arr);
+		$html = libHTTP::GET('http://www.google.com/search?q='.urlencode($string).'&hl=en&safe=off');
+		preg_match('#About ([\d\,]+?) results#s', $html, $arr);
 		
 		if(empty($arr)) return 0;
-	return str_replace('.','',$arr[1]);
+		
+	return str_replace(',', '', $arr[1]);
 	}
 	
 	static function googleTranslate($text, $from='', $to = 'de') {
 		$host = 'ajax.googleapis.com';
 		$get  = '/ajax/services/language/translate?v=1.0&q='.rawurlencode($text).'&langpair='.rawurlencode($from.'|'.$to);
 		
-		$result = libHTTP::GET($host, $get);
-		preg_match('/{"translatedText":"(.*?)"}/i', $result['content'][0], $matches);
+		$raw = libHTTP::GET('http://'.$host.$get);
+		preg_match('/{"translatedText":"(.*?)"}/i', $raw, $matches);
 
 		if (empty($matches)) return false;
 	return $matches[1];
@@ -37,10 +35,11 @@ class libInternet {
 	
 	static function getYoutubeData($youtube_id) {
 		if(empty($youtube_id)) return false;
-		$res = libHTTP::GET('gdata.youtube.com','/feeds/api/videos/'.$youtube_id);
 		
-		$xml = simplexml_load_string($res['raw']);
+		$html = libHTTP::GET('http://gdata.youtube.com/feeds/api/videos/'.$youtube_id);
+		$xml = simplexml_load_string($html);
 		if($xml === false) return false;
+		
 		$data = array();
 		
 		$media = $xml->children('http://search.yahoo.com/mrss/');
@@ -74,8 +73,7 @@ class libInternet {
 	}
 	
 	static function tinyURL($longurl) {
-		$res = libHTTP::GET('tinyurl.com', '/api-create.php?url='.urlencode($longurl));
-	return $res['raw'];
+		return libHTTP::GET('http://tinyurl.com/api-create.php?url='.urlencode($longurl));
 	}
 	
 }

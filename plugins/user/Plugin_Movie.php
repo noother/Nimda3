@@ -22,8 +22,10 @@ class Plugin_Movie extends Plugin {
 			return;
 		}
 		
-		$res = libHTTP::GET('api.themoviedb.org', '/2.1/Movie.search/'.$this->getConfig('language').'/xml/'.$this->api_key.'/'.urlencode($this->data['text']));
-		$XML = simplexml_load_string($res['raw']);
+		$HTTP = new HTTP('api.themoviedb.org');
+		
+		$html = $HTTP->GET('/2.1/Movie.search/'.$this->getConfig('language').'/xml/'.$this->api_key.'/'.urlencode($this->data['text']));
+		$XML = simplexml_load_string($html);
 		if(!$XML) {
 			$this->reply('Error on contacting themoviedb.org');
 			return;
@@ -33,8 +35,8 @@ class Plugin_Movie extends Plugin {
 		$results = (int)$tmp[0];
 		if(!$results) {
 			if($this->getConfig('language') != 'en') {
-				$res = libHTTP::GET('api.themoviedb.org', '/2.1/Movie.search/en/xml/'.$this->api_key.'/'.urlencode($this->data['text']));
-				$XML = new SimpleXMLElement($res['raw']);
+				$html = $HTTP->GET('/2.1/Movie.search/en/xml/'.$this->api_key.'/'.urlencode($this->data['text']));
+				$XML = new SimpleXMLElement($html);
 				if(!$XML) {
 					$this->reply('Error on contacting themoviedb.org');
 					return;

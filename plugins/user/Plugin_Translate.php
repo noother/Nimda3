@@ -62,8 +62,11 @@ class Plugin_Translate extends Plugin {
 		$host = 'ajax.googleapis.com';
 		$get  = '/ajax/services/language/translate?v=1.0&q='.rawurlencode($text).'&langpair='.rawurlencode($from.'|'.$to);
 		
-		$result = libHTTP::GET($host, $get);
-		preg_match('/{"translatedText":"(.*?)"(,"detectedSourceLanguage":"([a-z-]+)")?}/i', $result['content'][0], $matches);
+		$HTTP = new HTTP($host);
+		$HTTP->set('useragent', 'Nimda'); // Google wants a User-Agent - else it will give an error about service abuse
+		$html = $HTTP->GET($get);
+		
+		preg_match('/{"translatedText":"(.*?)"(,"detectedSourceLanguage":"([a-z-]+)")?}/i', $html, $matches);
 
 		if (empty($matches)) 
 			return false;

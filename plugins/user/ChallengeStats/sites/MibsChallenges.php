@@ -4,13 +4,13 @@ class MibsChallenges extends ChallengeStats {
 	
 	public $triggers = array('!mbc', '!mib', '!mibs-challenges');
 	
-	protected $url = 'http://mibs-challenges.de';
+	protected $url        = 'http://mibs-challenges.de';
+	protected $profileUrl = 'http://mibs-challenges.de/userinfo.php?profile=%s';
 	
-	function getStats($username) {
-		$res = libHTTP::GET("mibs-challenges.de","/userinfo.php?profile=".urlencode($username));
-		if(libString::startsWith('This user doesn\'t exist!', $res['raw'])) return false;
+	function getStats($username, $html) {
+		if(libString::startsWith('This user doesn\'t exist!', $html)) return false;
 		
-		preg_match('/^(.+?) has solved (\d+) out of (\d+) challenges.(?: He is at position (\d+?) out of (\d+)!)?$/', $res['raw'], $arr);
+		preg_match('/^(.+?) has solved (\d+) out of (\d+) challenges.(?: He is at position (\d+?) out of (\d+)!)?$/', $html, $arr);
 	
 		$data = array(
 			'username'      => $arr[1],

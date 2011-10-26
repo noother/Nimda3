@@ -1,109 +1,55 @@
 <?php
 
+require_once("classes/HTTP.php");
+
 class libHTTP {
 
-	static function GET($host,$get,$cookie=null,$timeout=30,$port=80) {
-		$fp     = fsockopen($host, $port, $errno, $errstr, $timeout);
-		if(!$fp) return false;
-		
-		$header = "GET ".$get." HTTP/1.0\r\n";
-		$header.= "Host: ".$host."\r\n";
-		$header.= "User-Agent: Noothwork\r\n";
-		if(isset($cookie)) $header.= "Cookie: ".$cookie."\r\n";
-		
-		fputs($fp,$header."\r\n");
-		stream_set_timeout($fp, $timeout);
-		
-		$headersCheck = true;
-		$output = array();
-		$output['content'] = array();
-		
-		while(false !== $row = fgets($fp)) {
-			$row = trim($row);
-			
-			if($headersCheck && empty($row)) {
-				$headersCheck = false;
-				continue;
-			}
-			
-			if($headersCheck) {
-				$tmp = explode(": ",$row,2);
-				$output['header'][$tmp[0]] = isset($tmp[1]) ? $tmp[1] : true;
-			} else {
-				array_push($output['content'],$row);
-			}
-			
-		}
-		
-		$info = stream_get_meta_data($fp);
-		fclose($fp);
-		if($info['timed_out']) return false;
-		
-		// TODO: Ugly follow
-		if(isset($output['header']['Location'])) {
-			$data = parse_url($output['header']['Location']);
-			$path = $data['path'];
-			if(isset($data['query'])) $path.='?'.$data['query'];
-			return self::GET($data['host'], $path, $cookie, $timeout, $port);
-		}
-		
-		$output['raw'] = implode("\n",$output['content']);
-	return $output;
+	static function GET($url) {
+		return self::_execute($url, 'GET');
 	}
 	
-	static function POST($host,$get,$post,$cookie=null,$timeout=30,$port=80) {
-		$fp = fsockopen($host, $port, $errno, $errstr, $timeout);
-		if(!$fp) return false;
+	static function POST($url, $post=array()) {
+		return self::_execute($url, 'POST', $post);
+	}
+	
+	static private function _execute($url, $method, $post=null) {
+		$data = parse_url($url);
 		
-		$header = "POST ".$get." HTTP/1.0\r\n";
-		$header.= "Host: ".$host."\r\n";
-		$header.= "User-Agent: Noothwork\r\n";
-		if(isset($cookie)) {
-			$header.= "Cookie: ".$cookie."\r\n";
-		}
-		$header.= "Content-Type: application/x-www-form-urlencoded\r\n";
-		$header.= "Content-Length: ".strlen($post)."\r\n";
-		$header.= "\r\n";
-		$header.= $post."\r\n";
-		
-		fputs($fp,$header."\r\n");
-		stream_set_timeout($fp, $timeout);
-		
-		$headersCheck = true;
-		$output = array();
-		$output['content'] = array();
-		while(false !== $row = fgets($fp)) {
-			$row = trim($row);
-			
-			if($headersCheck && empty($row)) {
-				$headersCheck = false;
-				continue;
-			}
-			
-			if($headersCheck) {
-				$tmp = explode(": ",$row,2);
-				$output['header'][$tmp[0]] = isset($tmp[1]) ? $tmp[1] : true;
-			} else {
-				array_push($output['content'],$row);
-			}
-			
+		if(isset($data['user']) || isset($data['pass']) || $data['scheme'] == 'https') {
+			// TODO: not yet implemented
+			return false;
 		}
 		
-		$info = stream_get_meta_data($fp);
-		fclose($fp);
-		if($info['timed_out']) return false;
-		
-		
-		// TODO: Ugly follow
-		if(isset($output['header']['Location'])) {
-			$data = parse_url($output['header']['Location']);
-			$path = $data['path'];
-			if(isset($data['query'])) $path.='?'.$data['query'];
-			return self::POST($data['host'], $path, $post, $cookie, $timeout, $port);
+		if(isset($data['query'])) {
+			$data['fullpath'] = $data['path'].'?'.$data['query'];
+		} else {
+			$data['fullpath'] = $data['path'];
 		}
 		
-		$output['raw'] = implode("\n",$output['content']);
-	return $output;
+		switch($data['scheme']) {
+			case 'http':
+				$HTTP = new HTTP($data['host'], (isset($data['port']) ? $data['port'] : 80));
+			break;
+			case 'https':
+				// TODO: not yet implemented
+				return false;
+			break;
+			default:
+				return false;
+			break;
+		}
+		
+		switch($method) {
+			case 'GET':
+				return $HTTP->GET($data['fullpath']);
+			break;
+			case 'POST':
+				return $HTTP->POST($data['fullpath'], $post);
+			break;
+			default:
+				return false;
+			break;
+		}
 	}
 
 }

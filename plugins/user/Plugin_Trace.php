@@ -29,9 +29,9 @@ class Plugin_Trace extends Plugin {
 			return;
 		}
 
-        $res = libHTTP::GET('www.geoiptool.com','/de/?IP='.urlencode($host));
+        $html = libHTTP::GET('http://www.geoiptool.com/de/?IP='.urlencode($host));
 
-		$raw = strtr($res['raw'], array("\n" => " ", "\r" => " "));
+		$raw = strtr($html, array("\n" => " ", "\r" => " "));
 		preg_match('#IP-Addresse:.*?<td.*?>(.*?)</td>#',$raw,$arr);
 		$ip = $arr[1];
 		preg_match('#Stadt:.*?<td.*?>(.*?)</td>#',$raw,$arr);

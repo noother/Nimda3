@@ -5,6 +5,8 @@
 	
 	require_once('functions.php');
 	
+	require_once('classes/HTTP.php');
+	
 	require_once('libs/libArray.php');
 	require_once('libs/libConvert.php');
 	require_once('libs/libCrypt.php');
@@ -19,5 +21,6 @@
 	require_once('libs/libSystem.php');
 	require_once('libs/libTime.php');
 	require_once('libs/libValidate.php');
+	
 	
 ?>

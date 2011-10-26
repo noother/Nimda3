@@ -54,8 +54,8 @@ class Plugin_Wiki extends Plugin {
 
 
 		$link = $output['link'];
-		$text = substr($output['text'],0,$this->maxlength - (strlen($link)+6));
-		$text.= "... (".$link.")";
+		$text = substr($output['text'],0,$this->maxlength - (strlen($link)+8));
+		$text.= "... ( ".$link." )";
 
 		$this->reply($text);
 	}
@@ -63,10 +63,9 @@ class Plugin_Wiki extends Plugin {
 	function getWikiText($term, $server, $path, $notfound) {
 		$term = str_replace(" ","_",$term);
 		$term[0] = strtoupper($term[0]);
-		$result = libHTTP::GET($server,$path.str_replace("%23","#",urlencode($term)));
-		$header = $result['header'];
-
-		$content = implode(" ",$result['content']);
+		$html = libHTTP::GET('http://'.$server.$path.str_replace("%23","#",urlencode($term)));
+		$content = str_replace(array("\r", "\n"), ' ', $html);
+		while(strstr($content, '  ')) $content = str_replace('  ', ' ', $content);
 
 		if(stristr($content,$notfound)) {
 			return false;

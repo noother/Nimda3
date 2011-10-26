@@ -4,14 +4,15 @@ class Hacker extends ChallengeStats {
 	
 	public $triggers = array('!hacker');
 	
-	protected $url = 'http://hacker.org';
+	protected $url       = 'http://hacker.org';
 	protected $statsText = '{username} solved {challs} challenges and has a score of {score} points at {url}{extra}';
 	
-	function getStats($username) {
-		$top = $this->getCache();
-		if($top === false) {
-			$res = libHTTP::GET('www.hacker.org', '/challenge/top.php');
-			$top = $res['raw'];
+	function getStats($username, $html) {
+		
+		$HTTP = new HTTP('www.hacker.org');
+		
+		if(false === $top = $this->getCache()) {
+			$top = $HTTP->GET('/challenge/top.php');
 			$this->putCache($top);
 		}
 
@@ -22,22 +23,23 @@ class Hacker extends ChallengeStats {
 		$solved = $arr[3];
 
 		$extra = array();
-		$res = libHTTP::GET('www.hacker.org', '/forum/profile.php?mode=viewprofile&u='.$arr[1]);
-		if (preg_match('#<td>([0-9]+)</td><td><a href="/coil/">#', $res['raw'], $arr))
+		$html = $HTTP->GET('/forum/profile.php?mode=viewprofile&u='.$arr[1]);
+		
+		if (preg_match('#<td>([0-9]+)</td><td><a href="/coil/">#', $html, $arr))
 			$extra[] = 'Mortal Coil: '.$arr[1];
-		if (preg_match('#<td>([0-9]+)</td><td><a href="/modulo/">#', $res['raw'], $arr))
+		if (preg_match('#<td>([0-9]+)</td><td><a href="/modulo/">#', $html, $arr))
 			$extra[] = 'Modulo: '.$arr[1];
-		if (preg_match('#<td>([0-9]+)</td><td><a href="/runaway/">#', $res['raw'], $arr))
+		if (preg_match('#<td>([0-9]+)</td><td><a href="/runaway/">#', $html, $arr))
 			$extra[] = 'Runaway: '.$arr[1];
-		if (preg_match('#<td>([0-9]+)</td><td><a href="/brick/">#', $res['raw'], $arr))
+		if (preg_match('#<td>([0-9]+)</td><td><a href="/brick/">#', $html, $arr))
 			$extra[] = 'Bricolage: '.$arr[1];
-		if (preg_match('#<td>([0-9]+)</td><td><a href="/oneofus/">#', $res['raw'], $arr))
+		if (preg_match('#<td>([0-9]+)</td><td><a href="/oneofus/">#', $html, $arr))
 			$extra[] = 'OneOfUs: '.$arr[1];
-		if (preg_match('#<td>([0-9]+)</td><td><a href="/push/">#', $res['raw'], $arr))
+		if (preg_match('#<td>([0-9]+)</td><td><a href="/push/">#', $html, $arr))
 			$extra[] = 'Pusherboy: '.$arr[1];
-		if (preg_match('#<td>([0-9]+)</td><td><a href="/tapeworm/">#', $res['raw'], $arr))
+		if (preg_match('#<td>([0-9]+)</td><td><a href="/tapeworm/">#', $html, $arr))
 			$extra[] = 'Tapeworm: '.$arr[1];
-		if (preg_match('#<td>([0-9]+)</td><td><a href="/cross/">#', $res['raw'], $arr))
+		if (preg_match('#<td>([0-9]+)</td><td><a href="/cross/">#', $html, $arr))
 			$extra[] = 'Crossflip: '.$arr[1];
 
 		$data = array(

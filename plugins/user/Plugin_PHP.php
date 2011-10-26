@@ -30,19 +30,24 @@ class Plugin_PHP extends Plugin {
 	private function fetchFunctionDescription($func) {
 		if($this->getConfig('language') == 'de') $host = 'de.php.net';
 		else $host = 'php.net';
-		$res = libHTTP::GET($host, '/'.$func, 'LAST_LANG='.$this->getConfig('language'), 2);
-		if(!$res) {
+		
+		$HTTP = new HTTP($host);
+		$HTTP->setCookie('LAST_LANG', $this->getConfig('language'));
+		$html = $HTTP->GET('/'.$func);
+		
+		if($html === false) {
 			$this->reply('Timeout on contacting '.$host);
 			return;
 		}
 	
-		if (preg_match('/<span class=\"refname\">(.*?)<\/span> &mdash; <span class=\"dc\-title\">(.*?)<\/span>/si', $res['raw'], $match)) {
+		if (preg_match('/<span class=\"refname\">(.*?)<\/span> &mdash; <span class=\"dc\-title\">(.*?)<\/span>/si', $html, $match)) {
 			$match[2] = str_replace(array("\n", "\r"), ' ', strip_tags($match[2]));
 
-			preg_match('/<div class=\"methodsynopsis dc\-description\">(.*?)<\/div>/si', $res['raw'], $descmatch);
+			preg_match('/<div class=\"methodsynopsis dc\-description\">(.*?)<\/div>/si', $html, $descmatch);
 
 			$decl = isset($descmatch[1])?strip_tags($descmatch[1]):$match[1];
 			$decl = html_entity_decode(str_replace(array("\n", "\r"), ' ', $decl));
+			while(strstr($decl, '  ')) $decl = str_replace('  ', ' ', $decl);
 			$decl = str_replace($func, "\x02".$func."\x02", $decl);
 			$output =  $decl.' - '.html_entity_decode($match[2]).' ( http://'.$host.'/'.$func.' )';
 			
@@ -50,7 +55,7 @@ class Plugin_PHP extends Plugin {
 		} else {    // if several possibilities
 			$output = '';
 
-			if (preg_match_all('/<a href=\"\/manual\/[a-z]+\/(?:.*?)\.php\">(?:<b>)?(.*?)(?:<\/b>)?<\/a><br/i', $res['raw'], $matches, PREG_SET_ORDER)) {
+			if (preg_match_all('/<a href=\"\/manual\/[a-z]+\/(?:.*?)\.php\">(?:<b>)?(.*?)(?:<\/b>)?<\/a><br/i', $html, $matches, PREG_SET_ORDER)) {
 				if ($this->redirects++ < 2)
 					$this->fetchFunctionDescription($matches[0][1]);
 				else 

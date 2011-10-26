@@ -4,12 +4,12 @@ class DYM extends ChallengeStats {
 	
 	public $triggers = array('!dym', '!dareyourmind');
 	
-	protected $url = 'http://www.dareyourmind.net';
+	protected $url        = 'http://www.dareyourmind.net';
+	protected $profileUrl = 'http://www.dareyourmind.net/userscore.php?username=%s';
 	
-	function getStats($username) {
-		$res = libHTTP::GET('www.dareyourmind.net', '/userscore.php?username='.urlencode($username));
+	function getStats($username, $html) {
 
-		$tmp = explode(':', $res['raw']);
+		$tmp = explode(':', $html);
 		if($tmp[1] == '0') return false;
 		
 		$data = array(

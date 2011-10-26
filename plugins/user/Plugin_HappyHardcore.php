@@ -21,8 +21,8 @@ class Plugin_HappyHardcore extends Plugin {
 	}
 	
 	private function getHappyHardcoreStats() {
-		$res = libHTTP::GET('www.happyhardcore.com', '/radio/player/tools/timequery.asp');
-		preg_match_all('/station\.(.+?)\s*=\s*\'?(.*?)\'?\s*;/', $res['raw'], $arr);
+		$html = libHTTP::GET('http://www.happyhardcore.com/radio/player/tools/timequery.asp');
+		preg_match_all('/station\.(.+?)\s*=\s*\'?(.*?)\'?\s*;/', $html, $arr);
 		
 		$raw_data = array();
 		for($x=0;$x<sizeof($arr[1]);$x++) {
