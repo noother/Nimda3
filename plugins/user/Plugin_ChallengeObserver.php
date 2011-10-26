@@ -86,7 +86,7 @@ class Plugin_ChallengeObserver extends Plugin {
 		foreach($lines as $line) {
 			$line = trim($line);
 			$data = explode('::',$line);
-			if(sizeof($data) < 11) return false;
+			if(sizeof($data) < 11) continue;
 			$sites[$data[1]] = array('name' => str_replace('\:',':',$data[0]), 'url' => str_replace('\:',':',$data[3]), 'challs' => $data[7]);
 		}
 		
