@@ -2,6 +2,8 @@
 
 abstract class ChallengeStats {
 	
+	private $Plugin;
+	
 	public $triggers = array();
 	
 	protected $url          = false;
@@ -10,6 +12,10 @@ abstract class ChallengeStats {
 	protected $statsText    = '{username} solved {challs_solved} (of {challs_total}) challenges and is on rank {rank} (of {users_total}) at {url}';
 	
 	abstract protected function getStats($username, $html);
+	
+	public final function __construct($Plugin) {
+		$this->Plugin = $Plugin;
+	}
 	
 	public final function getData($username) {
 		if(!$this->url) return false;
@@ -37,7 +43,7 @@ abstract class ChallengeStats {
 	}
 	
 	protected final function getCache($lifetime=86400) {
-		$path = 'plugins/user/ChallengeStats/cache/'.get_class($this).'.cache';
+		$path = $this->Plugin->Bot->getTempDir().'/cache/challstats_'.get_class($this);
 		if(file_exists($path) && time() - filemtime($path) < $lifetime) {
 			return file_get_contents($path);
 		}
@@ -46,7 +52,7 @@ abstract class ChallengeStats {
 	}
 	
 	protected final function putCache($data) {
-		$path = 'plugins/user/ChallengeStats/cache/'.get_class($this).'.cache';
+		$path = $this->Plugin->Bot->getTempDir().'/cache/challstats_'.get_class($this);
 		file_put_contents($path, $data);
 		clearstatcache();
 	}

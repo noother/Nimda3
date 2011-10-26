@@ -22,8 +22,9 @@ abstract class Plugin {
 	
 	
 	
-	public final function __construct($name, $Bot, $MySQL) {
-		$this->id           = strtolower($name);
+	public final function __construct($Bot, $MySQL) {
+		list($crap, $plugin_name) = explode('_', get_class($this), 2);
+		$this->id           = strtolower($plugin_name);
 		$this->Bot          = $Bot;
 		$this->MySQL        = $MySQL;
 		$this->lastInterval = time();
@@ -56,6 +57,26 @@ abstract class Plugin {
 				echo 'Error - No reply-rule set for '.$this->command."\n";
 			break;
 		}
+	}
+	
+	public final function addJob($data) {
+		$filename = $this->id.'_'.
+		            $this->Server->id.'_'.
+		            ($this->Channel ? $this->Channel->id : 'none').'_'.
+		            $this->User->id.'_'.
+		            libCrypt::getRandomHash();
+		
+		$data = array(
+			'classname'         => get_class($this),
+			'plugin_path'       => 'plugins/'.(libString::startsWith('CorePlugin', get_class($this))?'core':'user').'/'.get_class($this).'.php',
+			'job_done_filename' => $this->Bot->getTempDir().'/jobs_done/'.$filename,
+			'data'              => $data
+		);
+		
+		$filepath = $this->Bot->getTempDir().'/jobs/'.$filename;
+		
+		file_put_contents($filepath, serialize($data));
+		shell_exec('/usr/bin/php ./core/Job.php '.escapeshellarg($filepath).' > /dev/null &');
 	}
 	
 	public final function saveVar($name, $value) {
@@ -158,6 +179,19 @@ abstract class Plugin {
 		*/
 	}
 	
+	public function onJobDone() {
+		/*
+			Triggered when a job has been processed and output is ready
+			
+			object Channel
+			object User
+			
+			array data [
+				mixed result => The data doJob() returned
+			]
+		*/
+	}
+	
 	
 	/*
 		All following events have object Server set
@@ -168,7 +202,7 @@ abstract class Plugin {
 			IRC command "001"
 			Triggered when the bot connects
 			
-			array data[
+			array data [
 				string server          => the server's hostname
 				string my_nick         => the final bots nick
 				string welcome_message => The welcome message, the server sent

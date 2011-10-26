@@ -13,13 +13,17 @@ class Nimda {
 	public $servers = array();
 	public $plugins = array();
 	public $time;
+	public $MySQL;
 	
 	private $CONFIG = array();
-	private $MySQL;
 	private $timersLastTriggered;
+	private $jobsLastTriggered;
 	private $permanentVars = array();
+	private $tempDir;
 	
 	function __construct() {
+		pcntl_signal(SIGINT,  array($this, 'cleanShutdown'));
+		
 		$this->initBot();
 		
 		while(true) {
@@ -30,6 +34,7 @@ class Nimda {
 			
 			$this->time = time();
 			$this->triggerTimers();
+			$this->triggerJobs();
 			
 			$check = false;
 			foreach($this->servers as $Server) {
@@ -58,9 +63,11 @@ class Nimda {
 		
 		$this->autoUpdateSQL();
 		
+		$this->createTempDir();
 		$this->initPlugins();
 		$this->initServers();
 		$this->timersLastTriggered = time()+10; // Give him some time to do the connecting before triggering the timers
+		$this->jobsLastTriggered   = time();
 	}
 	
 	private function autoUpdateSQL() {
@@ -126,6 +133,23 @@ class Nimda {
 		$this->servers[$Server->id] = $Server;
 	}
 	
+	private function createTempDir() {
+		$this->tempDir = sys_get_temp_dir().'/nimda-'.libCrypt::getRandomHash();
+		mkdir($this->tempDir);
+		chmod($this->tempDir, 0700);
+		mkdir($this->tempDir.'/cache');
+		mkdir($this->tempDir.'/jobs');
+		mkdir($this->tempDir.'/jobs_done');
+	}
+	
+	private function removeTempDir() {
+		shell_exec('rm -R '.$this->tempDir);
+	}
+	
+	public function getTempDir() {
+		return $this->tempDir;
+	}
+	
 	private function initPlugins() {
 		$userplugin_files = libFilesystem::getFiles('plugins/user/', 'php');
 		$coreplugin_files = libFilesystem::getFiles('plugins/core/', 'php');
@@ -144,8 +168,7 @@ class Nimda {
 			echo 'Loading '.($file['isCore']?'core':'user').' plugin '.$plugin_name.'..'."\n";
 			
 			require_once('plugins/'.($file['isCore']?'core/':'user/').$file['filename']);
-			list($crap, $plugin_name) = explode('_', $classname, 2);
-			$Plugin = new $classname($plugin_name, $this, $this->MySQL);
+			$Plugin = new $classname($this, $this->MySQL);
 			$Plugin->onLoad();
 			$this->plugins[$Plugin->id] = $Plugin;
 		}
@@ -158,6 +181,49 @@ class Nimda {
 			}
 			
 			$this->timersLastTriggered = $this->time;
+		}
+	}
+	
+	private function triggerJobs() {
+		if($this->time >= $this->jobsLastTriggered+5) {
+			$jobs = libFilesystem::getFiles($this->tempDir.'/jobs_done');
+			
+			foreach($jobs as $job) {
+				$content = file_get_contents($this->tempDir.'/jobs_done/'.$job);
+				unlink($this->tempDir.'/jobs_done/'.$job);
+				
+				list($plugin, $server, $channel, $user) = explode('_', $job);
+				
+				if(!isset($this->plugins[$plugin])) continue;
+				$Plugin = $this->plugins[$plugin];
+				
+				if(!isset($this->servers[$server])) continue;
+				$Server = $this->servers[$server];
+				
+				
+				
+				if($channel === 'query') {
+					$Channel = false;
+					if(!isset($Server->users[$user])) continue;
+					$User = $Server->users[$user];
+				} else {
+					if(!isset($Server->channels[$channel])) continue;
+					$Channel = $Server->channels[$channel];
+					
+					if(!isset($Channel->users[$user])) continue;
+					$User = $Channel->users[$user];
+				}
+				
+				$Plugin->Server  = $Server;
+				$Plugin->Channel = $Channel;
+				$Plugin->User    = $User;
+				
+				$Plugin->data = array('result' => unserialize($content));
+				
+				$Plugin->onJobDone();
+			}
+			
+			$this->jobsLastTriggered = $this->time;
 		}
 	}
 	
@@ -291,6 +357,15 @@ class Nimda {
 		if(!$res) return false; // nothing deleted
 		
 	return true;
+	}
+	
+	public function cleanShutdown() {
+		echo "Shutting down cleanly\n";
+		die();
+	}
+	
+	public function __destruct() {
+		$this->removeTempDir();
 	}
 	
 }
