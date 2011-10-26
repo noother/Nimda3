@@ -46,7 +46,7 @@ class Plugin_Wiki extends Plugin {
 				$output = $this->getWikiText($term, 'www.stupidedia.org', '/stupi/', 'Der Artikel kann nicht angezeigt werden');
 				break;
 		}
-
+		
 		if(!$output) {
 			$this->reply($this->notfoundText);
 			return;

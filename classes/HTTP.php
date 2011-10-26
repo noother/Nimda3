@@ -8,12 +8,12 @@ class HTTP {
 	private $port;
 	private $cookies   = array();
 	private $settings = array(
-		'useragent'           => false, // Sets the userAgent to use in the HTTP header
-		'auto-follow'         => true,  // If true, header Location's will be followed
-		'max-follow'          => 5,     // Follow max this many Location's
-		'accept-cookies'      => true,  // Send cookies the server gives us on future requests
-		'unstable-connection' => false, // Try to reconnect until a connection is established
-		'connect-timeout'     => 5      // Seconds the connection might take to establish
+		'useragent'           => 'Nimda3', // Sets the userAgent to use in the HTTP header
+		'auto-follow'         => true,     // If true, header Location's will be followed
+		'max-follow'          => 5,        // Follow max this many Location's
+		'accept-cookies'      => true,     // Send cookies the server gives us on future requests
+		'unstable-connection' => false,    // Try to reconnect until a connection is established
+		'connect-timeout'     => 5         // Seconds the connection might take to establish
 	);
 	
 	private $lastHeader = false;
