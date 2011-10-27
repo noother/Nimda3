@@ -17,9 +17,9 @@ class Nimda {
 	
 	private $CONFIG = array();
 	private $timersLastTriggered;
-	private $jobsLastTriggered;
 	private $permanentVars = array();
 	private $tempDir;
+	private $jobsDoneDP;
 	
 	function __construct() {
 		pcntl_signal(SIGINT,  array($this, 'cleanShutdown'));
@@ -64,10 +64,10 @@ class Nimda {
 		$this->autoUpdateSQL();
 		
 		$this->createTempDir();
+		$this->initJobs();
 		$this->initPlugins();
 		$this->initServers();
 		$this->timersLastTriggered = time()+10; // Give him some time to do the connecting before triggering the timers
-		$this->jobsLastTriggered   = time();
 	}
 	
 	private function autoUpdateSQL() {
@@ -174,6 +174,10 @@ class Nimda {
 		}
 	}
 	
+	private function initJobs() {
+		$this->jobsDoneDP = opendir($this->getTempDir().'/jobs_done');
+	}
+	
 	private function triggerTimers() {
 		if($this->time >= $this->timersLastTriggered+1) {
 			foreach($this->plugins as $Plugin) {
@@ -189,55 +193,57 @@ class Nimda {
 	}
 	
 	private function triggerJobs() {
-		if($this->time >= $this->jobsLastTriggered+5) {
-			$jobs = libFilesystem::getFiles($this->tempDir.'/jobs_done');
+		$jobs = array();
+		while(false !== $file = readdir($this->jobsDoneDP)) {
+			if($file{0} == '.') continue;
+			$jobs[] = $file;
+		}
+		rewinddir($this->jobsDoneDP);
+		
+		foreach($jobs as $job) {
+			$data = unserialize(file_get_contents($this->tempDir.'/jobs_done/'.$job));
+			unlink($this->tempDir.'/jobs_done/'.$job);
 			
-			foreach($jobs as $job) {
-				$data = unserialize(file_get_contents($this->tempDir.'/jobs_done/'.$job));
-				unlink($this->tempDir.'/jobs_done/'.$job);
+			list($plugin, $server, $channel, $user) = explode('_', $job);
+			
+			if(!isset($this->plugins[$plugin])) continue;
+			$Plugin = $this->plugins[$plugin];
+			
+			if($server == 'none') {
+				$Server  = false;
+				$Channel = false;
+				$User    = false;
+			} elseif(!isset($this->servers[$server])) {
+				continue;
+			} else {
+				$Server = $this->servers[$server];
 				
-				list($plugin, $server, $channel, $user) = explode('_', $job);
-				
-				if(!isset($this->plugins[$plugin])) continue;
-				$Plugin = $this->plugins[$plugin];
-				
-				if($server == 'none') {
-					$Server  = false;
+				if($channel == 'none') {
 					$Channel = false;
-					$User    = false;
-				} elseif(!isset($this->servers[$server])) {
+				} elseif(!isset($Server->channels[$channel])) {
 					continue;
 				} else {
-					$Server = $this->servers[$server];
-					
-					if($channel == 'none') {
-						$Channel = false;
-					} elseif(!isset($Server->channels[$channel])) {
-						continue;
-					} else {
-						$Channel = $Server->channels[$channel];
-					}
-					
-					if($user == 'none') {
-						$User = false;
-					} elseif(!isset($Server->users[$user])) {
-						continue;
-					} else {
-						$User = $Server->users[$user];
-					}
+					$Channel = $Server->channels[$channel];
 				}
 				
-				$Plugin->Server  = $Server;
-				$Plugin->Channel = $Channel;
-				$Plugin->User    = $User;
-				
-				$Plugin->data = $data;
-				
-				$Plugin->onJobDone();
+				if($user == 'none') {
+					$User = false;
+				} elseif(!isset($Server->users[$user])) {
+					continue;
+				} else {
+					$User = $Server->users[$user];
+				}
 			}
 			
-			$this->jobsLastTriggered = $this->time;
+			$Plugin->Server  = $Server;
+			$Plugin->Channel = $Channel;
+			$Plugin->User    = $User;
+			
+			$Plugin->data = $data;
+			
+			$Plugin->onJobDone();
 		}
+		
 	}
 	
 	private function triggerPlugins($data, $Server) {
