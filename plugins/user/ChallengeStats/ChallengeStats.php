@@ -9,6 +9,7 @@ abstract class ChallengeStats {
 	protected $url          = false;
 	protected $profileUrl   = false;
 	protected $notfoundText = 'The requested user was not found. You can register at %s';
+	protected $timeoutText  = 'Timeout on contacting %s';
 	protected $statsText    = '{username} solved {challs_solved} (of {challs_total}) challenges and is on rank {rank} (of {users_total}) at {url}';
 	
 	abstract protected function getStats($username, $html);
@@ -21,10 +22,18 @@ abstract class ChallengeStats {
 		if(!$this->url) return false;
 		if(empty($this->triggers)) return false;
 		
-		if(false !== $stats = $this->getStats($username, $this->profileUrl !== false ? libHTTP::GET(sprintf($this->profileUrl, urlencode($username))) : null)) {
-			$result = $this->getStatsText($stats);
+		if($this->profileUrl !== false) {
+			$html = libHTTP::GET(sprintf($this->profileUrl, urlencode($username)));
 		} else {
+			$html = null;
+		}
+		
+		if($html === false || 'timeout' === $stats = $this->getStats($username, $html)) {
+			$result = sprintf($this->timeoutText, $this->url);
+		} elseif($stats === false) {
 			$result = sprintf($this->notfoundText, $this->url);
+		} else {
+			$result = $this->getStatsText($stats);
 		}
 		
 	return $result;

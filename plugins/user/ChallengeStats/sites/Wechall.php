@@ -11,11 +11,13 @@ class Wechall extends ChallengeStats {
 		
 		$HTTP = new HTTP('www.wechall.net');
 		$html = $HTTP->GET('/wechallchalls.php?username='.urlencode($username));
+		if($html === false) return 'timeout';
 		if(libString::startsWith('The user', $html)) return false;
 		
 		preg_match('/^(.+?) solved (\d+?) of (\d+?) Challenges with (\d+?) of (\d+?) possible points \(([\d\.]+?)%\). Rank for the site WeChall: (\d+)$/', $html, $arr);
 		
 		$html = $HTTP->GET('/wechall.php?username=noother');
+		if($html === false) return 'timeout';
 		preg_match('/is ranked \d+? from (\d+),/', $html, $arr2);
 		
 		$data = array(

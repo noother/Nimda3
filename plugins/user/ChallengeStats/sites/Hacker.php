@@ -13,6 +13,7 @@ class Hacker extends ChallengeStats {
 		
 		if(false === $top = $this->getCache()) {
 			$top = $HTTP->GET('/challenge/top.php');
+			if($top === false) return 'timeout';
 			$this->putCache($top);
 		}
 
@@ -24,6 +25,7 @@ class Hacker extends ChallengeStats {
 
 		$extra = array();
 		$html = $HTTP->GET('/forum/profile.php?mode=viewprofile&u='.$arr[1]);
+		if($html === false) return 'timeout';
 		
 		if (preg_match('#<td>([0-9]+)</td><td><a href="/coil/">#', $html, $arr))
 			$extra[] = 'Mortal Coil: '.$arr[1];

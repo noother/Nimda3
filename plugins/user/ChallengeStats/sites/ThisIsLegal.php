@@ -11,10 +11,12 @@ class ThisIsLegal extends ChallengeStats {
 		
 		$HTTP = new HTTP('thisislegal.com');
 		$html = $HTTP->GET('/userscore.php?username='.urlencode($username));
-		if($html == '0') return false;
+		if($html === false) return 'timeout';
+		if($html === '0') return false;
 		$info = explode(':', $html);
 		
 		$html = $HTTP->GET('/user/'.urlencode($username));
+		if($html === false) return 'timeout';
 		$challs = substr_count($html,'<font color=\'#00FF00\' face=\'Verdana\'>Yes</font>');
 		
 		$data = array(
