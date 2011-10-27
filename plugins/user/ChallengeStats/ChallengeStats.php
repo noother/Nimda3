@@ -2,7 +2,7 @@
 
 abstract class ChallengeStats {
 	
-	private $Plugin;
+	private $cachedir;
 	
 	public $triggers = array();
 	
@@ -13,8 +13,8 @@ abstract class ChallengeStats {
 	
 	abstract protected function getStats($username, $html);
 	
-	public final function __construct($Plugin) {
-		$this->Plugin = $Plugin;
+	public final function __construct($cachedir) {
+		$this->cachedir = $cachedir;
 	}
 	
 	public final function getData($username) {
@@ -43,7 +43,7 @@ abstract class ChallengeStats {
 	}
 	
 	protected final function getCache($lifetime=86400) {
-		$path = $this->Plugin->Bot->getTempDir().'/cache/challstats_'.get_class($this);
+		$path = $this->cachedir.'/challstats_'.get_class($this);
 		if(file_exists($path) && time() - filemtime($path) < $lifetime) {
 			return file_get_contents($path);
 		}
@@ -52,7 +52,7 @@ abstract class ChallengeStats {
 	}
 	
 	protected final function putCache($data) {
-		$path = $this->Plugin->Bot->getTempDir().'/cache/challstats_'.get_class($this);
+		$path = $this->cachedir.'/challstats_'.get_class($this);
 		file_put_contents($path, $data);
 		clearstatcache();
 	}
