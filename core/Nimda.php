@@ -177,6 +177,10 @@ class Nimda {
 	private function triggerTimers() {
 		if($this->time >= $this->timersLastTriggered+1) {
 			foreach($this->plugins as $Plugin) {
+				$Plugin->Server  = false;
+				$Plugin->Channel = false;
+				$Plugin->User    = false;
+				$Plugin->data    = false;
 				$Plugin->triggerTimer();
 			}
 			
@@ -189,7 +193,7 @@ class Nimda {
 			$jobs = libFilesystem::getFiles($this->tempDir.'/jobs_done');
 			
 			foreach($jobs as $job) {
-				$content = file_get_contents($this->tempDir.'/jobs_done/'.$job);
+				$data = unserialize(file_get_contents($this->tempDir.'/jobs_done/'.$job));
 				unlink($this->tempDir.'/jobs_done/'.$job);
 				
 				list($plugin, $server, $channel, $user) = explode('_', $job);
@@ -197,28 +201,37 @@ class Nimda {
 				if(!isset($this->plugins[$plugin])) continue;
 				$Plugin = $this->plugins[$plugin];
 				
-				if(!isset($this->servers[$server])) continue;
-				$Server = $this->servers[$server];
-				
-				
-				
-				if($channel === 'query') {
+				if($server == 'none') {
+					$Server  = false;
 					$Channel = false;
-					if(!isset($Server->users[$user])) continue;
-					$User = $Server->users[$user];
+					$User    = false;
+				} elseif(!isset($this->servers[$server])) {
+					continue;
 				} else {
-					if(!isset($Server->channels[$channel])) continue;
-					$Channel = $Server->channels[$channel];
+					$Server = $this->servers[$server];
 					
-					if(!isset($Channel->users[$user])) continue;
-					$User = $Channel->users[$user];
+					if($channel == 'none') {
+						$Channel = false;
+					} elseif(!isset($Server->channels[$channel])) {
+						continue;
+					} else {
+						$Channel = $Server->channels[$channel];
+					}
+					
+					if($user == 'none') {
+						$User = false;
+					} elseif(!isset($Server->users[$user])) {
+						continue;
+					} else {
+						$User = $Server->users[$user];
+					}
 				}
 				
 				$Plugin->Server  = $Server;
 				$Plugin->Channel = $Channel;
 				$Plugin->User    = $User;
 				
-				$Plugin->data = unserialize($content);
+				$Plugin->data = $data;
 				
 				$Plugin->onJobDone();
 			}

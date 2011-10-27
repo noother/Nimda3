@@ -61,7 +61,7 @@ abstract class Plugin {
 	
 	public final function addJob($callback, $data=null) {
 		$filename = $this->id.'_'.
-		            $this->Server->id.'_'.
+		            ($this->Server ? $this->Server->id : 'none').'_'.
 		            ($this->Channel ? $this->Channel->id : 'none').'_'.
 		            ($this->User ? $this->User->id : 'none').'_'.
 		            libCrypt::getRandomHash();
