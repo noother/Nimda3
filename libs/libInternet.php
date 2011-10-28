@@ -26,8 +26,11 @@ class libInternet {
 	}
 	
 	static function youtubeID($string) {
-		if(preg_match('#http://(www\.)?youtube\.com/.*?(\?|&)v=([a-zA-Z0-9_-]{11}?)#',$string,$arr)) {
-			return $arr[3];
+		if(
+			preg_match('#youtube\.com/.*?(?:(?:(?:\?|&)v=)|(?:\#(?:./){4}))([a-zA-Z0-9_-]{11})#', $string, $arr) ||
+			preg_match('#youtu\.be/([a-zA-Z0-9_-]{11})#', $string, $arr)
+		) {
+			return $arr[1];
 		} else {
 			return false;
 		}
