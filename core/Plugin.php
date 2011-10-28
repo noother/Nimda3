@@ -12,14 +12,11 @@ abstract class Plugin {
 	public $command;
 	public $lastInterval;
 	
-	private $messageIsQuery;
-	
 	// You can override the following properties in plugins
 	protected $config = array();
 	protected $enabledByDefault = true;
 	public $triggers = array();
 	public $interval = 0;
-	
 	
 	
 	public final function __construct($Bot, $MySQL) {
@@ -40,8 +37,8 @@ abstract class Plugin {
 	protected final function reply($string) {
 		switch($this->command) {
 			case 'PRIVMSG':
-				if($this->messageIsQuery) $this->User->privmsg($string);
-				else $this->Channel->privmsg($string);
+				if($this->Channel) $this->Channel->privmsg($string);
+				else $this->User->privmsg($string);
 			break;
 			case '315': case 'JOIN': case 'PART':
 				$this->Channel->privmsg($string);
@@ -448,8 +445,6 @@ abstract class Plugin {
 	}
 	
 	public final function onPrivmsg() {
-		$this->messageIsQuery = $this->data['isQuery'];
-		
 		$this->onMessage();
 		
 		foreach($this->triggers as $trigger) {
@@ -470,8 +465,9 @@ abstract class Plugin {
 			}
 		}
 		
+		$isQuery = $this->data['isQuery'];
 		unset($this->data['isQuery']);
-		if($this->messageIsQuery) $this->onQuery();
+		if($isQuery) $this->onQuery();
 		else $this->onChannelMessage();
 	}
 	
