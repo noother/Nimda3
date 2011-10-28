@@ -15,11 +15,16 @@ class Plugin_Translate extends Plugin {
 						'!fr-de', '!it-de', '!nl-de', '!pl-de', '!sv-de', '!es-de', '!no-de', '!en-fr', '!en-it', '!en-nl',
 						'!en-pl', '!en-sv', '!en-es', '!en-no', '!fr-en', '!it-en', '!nl-en', '!pl-en', '!sv-en', '!es-en',
 						'!no-en');
+	
+	public $helpTriggers = array('!translate');
+	public $helpCategory = 'Internet';
+	public $helpText = "Translates some foreign language to the channel language. There are also shortcuts available, like !en-de, !en-nl, etc.";
+	public $usage = '<text>';
 
 	
 	function isTriggered() {
 		if(!isset($this->data['text'])) {
-			$this->reply("Usage: ".$this->data['trigger']." <text>");
+			$this->printUsage();
 			return;
 		}
 

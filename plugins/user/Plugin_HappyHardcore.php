@@ -4,6 +4,10 @@ class Plugin_HappyHardcore extends Plugin {
 	
 	public $triggers = array('!np', '!hc', '!happyhardcore', '!happy-hardcore');
 	
+	public $helpTriggers = array('!np');
+	public $helpText = 'Prints which track is currently running on di.fm\'s hardcore radio.';
+	public $helpCategory = 'Internet';
+	
 	function isTriggered() {
         $data = $this->getHappyHardcoreStats();
         

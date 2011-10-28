@@ -14,8 +14,8 @@ abstract class ChallengeStats {
 	
 	abstract protected function getStats($username, $html);
 	
-	public final function __construct($cachedir) {
-		$this->cachedir = $cachedir;
+	public final function __construct($cachedir=null) {
+		if(isset($cachedir)) $this->cachedir = $cachedir;
 	}
 	
 	public final function getData($username) {
@@ -49,6 +49,10 @@ abstract class ChallengeStats {
 		$text = strtr($this->statsText, $replace_pairs);
 		
 	return $text;
+	}
+	
+	public final function getUrl() {
+		return $this->url;
 	}
 	
 	protected final function getCache($lifetime=86400) {

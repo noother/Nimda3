@@ -3,6 +3,11 @@
 class Plugin_Wiki extends Plugin {
 	
 	public $triggers = array('!wiki', '!wikipedia', '!wiki-en', '!wiki-de', '!stupi');
+	public $usage = '<term>';
+	
+	public $helpCategory = 'Internet';
+	public $helpTriggers = array('!wiki', '!stupi');
+	public $helpText = "Fetches information from wikipedia or stupidedia for the given <term> in the channel/user language.";
 	
 	protected $config = array(
 		'language' => array(

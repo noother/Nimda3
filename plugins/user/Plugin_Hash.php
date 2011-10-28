@@ -4,6 +4,11 @@ class Plugin_Hash extends Plugin {
 	
 	public $triggers = array('!hash');
 	
+	public $helpText = 'Calculates hashes with various alogrithms. There are also shortcuts for the most used algorithms, like !md5, !sha1, etc.';
+	public $helpCategory = 'Cryptography';
+	public $helpTriggers = array('!hash');
+	public $usage = '(<algo> <text>) | algos';
+	
 	function onLoad() {
 		$algos = hash_algos();
 		foreach($algos as $algo) {

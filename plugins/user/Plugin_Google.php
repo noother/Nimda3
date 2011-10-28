@@ -4,6 +4,10 @@ class Plugin_Google extends Plugin {
 	
 	public $triggers = array('!google');
 	
+	public $usage = '<search_term>';
+	public $helpText = 'Gives back a link to Google with your <search_term> and the approximate results.';
+	public $helpCategory = 'Internet';
+	
 	protected $config = array(
 		'language' => array(
 			'type' => 'enum',
@@ -15,7 +19,7 @@ class Plugin_Google extends Plugin {
 	
 	function isTriggered() {
 		if(!isset($this->data['text'])) {
-			$this->reply('Usage: !google <search_term>');
+			$this->printUsage();
 			return;
 		}
 

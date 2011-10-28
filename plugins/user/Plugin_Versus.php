@@ -3,11 +3,14 @@
 class Plugin_Versus extends Plugin {
 	
 	public $triggers = array('!vs');
-	private $usage = 'Usage: %s <word1>,<word2>';
+	public $usage = '<word1>,<word2>';
+	
+	public $helpCategory = 'Internet';
+	public $helpText = "Compares the number of google results for 2 terms";
 	
 	function isTriggered() {
 		if(!isset($this->data['text'])) {
-			$this->reply(sprintf($this->usage,$this->data['trigger']));
+			$this->printUsage();
 			return;
 		}
 

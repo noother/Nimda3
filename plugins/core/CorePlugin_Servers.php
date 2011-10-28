@@ -3,6 +3,7 @@
 class CorePlugin_Servers extends Plugin {
 	
 	public $triggers = array('!servers');
+	public $hideFromHelp = true;
 	
 	function isTriggered() {
 		foreach($this->Bot->servers as $Server) {

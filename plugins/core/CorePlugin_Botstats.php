@@ -4,6 +4,8 @@ class CorePlugin_Botstats extends Plugin {
 	
 	public $triggers = array('!botstats');
 	
+	public $helpText = 'Displays on how many servers/channel the bot currently is and how many users he sees';
+	
 	function isTriggered() {
 		$servercount = sizeof($this->Bot->servers);
 		$channelcount = 0;

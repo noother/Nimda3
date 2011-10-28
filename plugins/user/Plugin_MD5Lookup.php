@@ -4,9 +4,14 @@ class Plugin_MD5Lookup extends Plugin {
 	
 	public $triggers = array('!md5lookup', '!md5crack');
 	
+	public $helpText = 'Checks various MD5 rainbow tables for your hash and reports back the plaintext if found.';
+	public $helpCategory = 'Cryptography';
+	public $helpTriggers = array('!md5lookup');
+	public $usage = '<md5_hash>';
+	
 	function isTriggered() {
 		if(!isset($this->data['text'])) {
-			$this->reply('Usage: '.$this->data['trigger'].' <hash>');
+			$this->printUsage();
 			return;
 		}
 		

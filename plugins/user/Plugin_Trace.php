@@ -3,6 +3,10 @@
 class Plugin_Trace extends Plugin {
 	
 	public $triggers = array('!trace');
+	
+	public $helpCategory = 'Internet';
+	public $helpText = "Traces an IRC user or a IP/host and gives back it's approximate location.";
+	public $usage = '[nick|host|ip]';
     
 	
 	function isTriggered() {

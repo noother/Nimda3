@@ -3,6 +3,10 @@
 class Plugin_Roulette extends Plugin {
 	
 	public $triggers = array('!roulette');
+	public $usage = '[[global]stats [nick]]';
+	
+	public $helpCategory = 'Games';
+	public $helpText = "Russian roulette. Die or don't - with highscore";
 	
 	private $game;
 	
@@ -30,10 +34,6 @@ class Plugin_Roulette extends Plugin {
 		} else {
 			$this->playGame();
 		}
-	}
-	
-	private function printUsage() {
-		$this->reply('Usage: '.$this->data['trigger'].' [[global]stats [nick]]');
 	}
 	
 	private function initGame() {

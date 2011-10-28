@@ -4,6 +4,9 @@ class Plugin_Ping extends Plugin {
 	
 	public $triggers = array('!ping', '!pong', '!pang', '!peng', '!pung');
 	
+	public $helpTriggers = array('!ping');
+	public $helpText = 'Sends back Pong! so you can see if you\'re still connected.';
+	
 	function isTriggered() {
 		switch($this->data['trigger']) {
 			case '!ping':

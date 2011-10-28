@@ -3,11 +3,14 @@
 class Plugin_Decide extends Plugin {
 	
 	public $triggers = array('!decide', '!choose');
-	private $usage = 'Usage: !decide <option1> or <option2> or ...';
+	
+	public $usage = '<option1> or <option2> or ...';
+	public $helpTriggers = array('!decide');
+	public $helpText = 'Helps you decide what to do.';
 	
 	function isTriggered() {
 		if(!isset($this->data['text'])) {
-			$this->reply($this->usage);
+			$this->printUsage();
 			return;
 		}
 

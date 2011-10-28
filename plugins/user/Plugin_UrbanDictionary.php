@@ -3,11 +3,15 @@
 class Plugin_UrbanDictionary extends Plugin {
 	
 	public $triggers = array('!wtf', '!define', '!urban', '!ud', '!urban-dictionary');
-	private $usage = 'Usage: %s <term>';
+	public $usage = '<term>';
+	
+	public $helpCategory = 'Internet';
+	public $helpTriggers = array('!define');
+	public $helpText = "Fetches definition and example from urbandictionary.org and prints it back.";
 	
 	function isTriggered() {
 		if(!isset($this->data['text'])) {
-			$this->reply(sprintf($this->usage, $this->data['trigger']));
+			$this->printUsage();
 			return;
 		}
 		

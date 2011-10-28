@@ -10,13 +10,17 @@
 class Plugin_Calc extends Plugin {
 	
 	public $triggers = array('!calc','!math');
-    private $usage = 'Usage: %s <expression>';
+	
+	public $helpTriggers = array('!calc');
+	public $helpText = 'Evaluates <expression> and prints the output.';
+	public $usage = '<expression>';
+	
 	private $connection_error = 'Error connection failed';
 	private $parse_error = 'Error while parsing the result';
 	
 	function isTriggered() {
 		if(!isset($this->data['text'])) {
-			$this->reply(sprintf($this->usage, $this->data['trigger']));
+			$this->printUsage();
 			return;
 		}
 

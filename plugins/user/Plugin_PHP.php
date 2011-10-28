@@ -2,6 +2,12 @@
 
 class Plugin_PHP extends Plugin {
 	
+	public $triggers = array('!php', '!phpmanual');
+	public $helpTriggers = array('!php');
+	public $helpText = 'Fetches <function> description from php.net';
+	public $helpCategory = 'Internet';
+	public $usage = '<function>';
+	
 	protected $config = array(
 		'language' => array(
 			'type' => 'enum',
@@ -11,14 +17,13 @@ class Plugin_PHP extends Plugin {
 		)
 	);
 	
-	public $triggers = array('!php', '!phpmanual');
+	
 	private $redirects;
 	private $notfoundtext = 'Nothing matches your query, try search:';
-
 	
 	function isTriggered() {
 		if(!isset($this->data['text'])) {
-			$this->reply('Usage: !php <function>');
+			$this->printUsage();
 			return;
 		}
 

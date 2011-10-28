@@ -8,7 +8,7 @@ abstract class Plugin {
 	public $Channel;
 	public $User;
 	public $MySQL;
-	public $data;
+	public $data = array();
 	public $command;
 	public $lastInterval;
 	
@@ -17,6 +17,11 @@ abstract class Plugin {
 	protected $enabledByDefault = true;
 	public $triggers = array();
 	public $interval = 0;
+	public $helpTriggers = false;
+	public $helpCategory = 'Misc';
+	public $helpText = 'There is no help available for this command.';
+	public $hideFromHelp = false;
+	public $usage = false;
 	
 	
 	public final function __construct($Bot, $MySQL) {
@@ -163,6 +168,33 @@ abstract class Plugin {
 		foreach($channels as $Channel) {
 			$Channel->privmsg($message);
 		}
+	}
+	
+	public final function printUsage() {
+		if(false === $usage = $this->getUsage()) return false;
+		$this->reply($usage);
+	}
+	
+	public final function getUsage() {
+		if($this->usage === false) return false;
+		return "\x02Usage:\x02 ".$this->data['trigger'].(!empty($this->usage) ? ' '.$this->usage : '');
+	}
+	
+	public final function getPluginByTrigger($trigger) {
+		foreach($this->Bot->plugins as $Plugin) {
+			if(array_search($trigger, $Plugin->triggers) !== false) {
+				$Plugin->Server  = $this->Server;
+				$Plugin->Channel = $this->Channel;
+				$Plugin->User    = $this->User;
+				return $Plugin;
+			}
+		}
+		
+	return false;
+	}
+	
+	public function getHelpText() {
+		return $this->helpText;
 	}
 	
 	// Events

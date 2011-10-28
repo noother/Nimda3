@@ -3,12 +3,15 @@
 class Plugin_TinyURL extends Plugin {
 	
 	public $triggers = array('!tinyurl', '!tiny', '!tu');
+	public $usage = '<long_url>';
 	
-	private $usage = 'Usage: %s <long_url>';
+	public $helpCategory = 'Internet';
+	public $helpTriggers = array('!tinyurl');
+	public $helpText = "Gives back a shortenend url from tinyurl.com";
 	
 	function isTriggered() {
 		if(!isset($this->data['text'])) {
-			$this->reply(sprintf($this->usage, $this->data['trigger']));
+			$this->printUsage();
 			return;
 		}
 		

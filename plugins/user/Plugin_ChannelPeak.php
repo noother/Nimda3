@@ -4,6 +4,8 @@ class Plugin_ChannelPeak extends Plugin {
 	
 	public $triggers = array('!peak');
 	
+	public $helpText = 'Prints the current channel peak and when it was achieved. Can also announce new channel peaks live.';
+	
 	protected $config = array(
 		'peakshow' => array(
 			'type' => 'enum',

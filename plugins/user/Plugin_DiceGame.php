@@ -3,6 +3,10 @@
 class Plugin_DiceGame extends Plugin {
 	
 	public $triggers = array('!dice');
+	public $usage = 'start|stop|join|roll|stand|rules';
+	
+	public $helpCategory = 'Games';
+	public $helpText = "A game with dice. Type \x02!dice rules\x02 to see the rules.";
 	
 	private $game;
 	
@@ -83,10 +87,6 @@ class Plugin_DiceGame extends Plugin {
 		
 		$this->saveGamestate();
 		
-	}
-	
-	private function printUsage() {
-		$this->reply('Usage: '.$this->data['trigger'].' start|stop|join|roll|stand|rules');
 	}
 	
 	private function reset() {

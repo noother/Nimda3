@@ -2,6 +2,11 @@
 
 class Plugin_ChallengeStats extends Plugin {
 	
+	public $helpCategory = 'Challenges';
+	public $helpTriggers = array();
+	public $usage = '[username]';
+	public $helpText = 'Prints your, or [username]\'s challenge status at %s';
+	
 	private $links;
 	
 	function onLoad() {
@@ -13,11 +18,18 @@ class Plugin_ChallengeStats extends Plugin {
 			
 			$classname = substr($file, 0, -4);
 			$Class     = new $classname($this);
+			$c = 0;
 			foreach($Class->triggers as $trigger) {
+				if($c++ == 0) $this->helpTriggers[] = $trigger;
 				$this->triggers[]      = $trigger;
 				$this->links[$trigger] = $classname;
 			}
 		}
+	}
+	
+	function getHelpText() {
+		$Plugin = new $this->links[$this->data['trigger']];
+	return sprintf($this->helpText, $Plugin->getUrl());
 	}
 	
 	function isTriggered() {

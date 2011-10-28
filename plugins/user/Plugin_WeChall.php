@@ -3,7 +3,11 @@
 class Plugin_WeChall extends Plugin {
 	
 	public $triggers = array('!wechall', '!wc');
-	private $usage = 'Usage: %s <nick>';
+	public $usage = '[<wechall_command>]';
+	
+	public $helpCategory = 'Challenges';
+	public $helpTriggers = array('!wechall');
+	public $helpText = "Uses the wechall API to print challenge players/sites statistics";
 
 
 	function isTriggered() {

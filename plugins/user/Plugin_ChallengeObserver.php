@@ -4,8 +4,12 @@ class Plugin_ChallengeObserver extends Plugin {
 	
 	public $interval = 60;
 	public $triggers = array('!latest', '!recent', '!latest_challs', '!recent_challs', '!new_challs');
+	public $enabledByDefault = false;
 	
-	protected $enabledByDefault = false;
+	public $helpTriggers = array('!latest');
+	public $helpText = 'Prints the 5 most recent challenges the challenge observer collected. Also it checks periodically if there are new challenges available and prints them in the channel.';
+	public $helpCategory = 'Challenges';
+	
 	
 	function onLoad() {
 		if(!$this->getVar('sites'))  $this->saveVar('sites', $this->getSites());

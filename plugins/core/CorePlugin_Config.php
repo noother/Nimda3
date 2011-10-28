@@ -3,6 +3,10 @@
 class CorePlugin_Config extends Plugin {
 	
 	public $triggers = array('!config', '!conf');
+	public $usage = '<!trigger> (list)|(set name value)';
+	
+	public $helpTriggers = array('!config');
+	public $helpText = "Let's you configure the plugin for your channel / yourself (in query). To set channel configuration you have to be an operator in the channel";
 	
 	function isTriggered() {
 		if($this->Channel !== false && $this->User->mode != '@') {
@@ -11,13 +15,13 @@ class CorePlugin_Config extends Plugin {
 		}
 		
 		if(!isset($this->data['text'])) {
-			$this->_printUsage();
+			$this->printUsage();
 			return;
 		}
 		
 		$parts = explode(' ', $this->data['text'], 4);
 		if(sizeof($parts) < 2) {
-			$this->_printUsage();
+			$this->printUsage();
 			return;
 		}
 		
@@ -29,23 +33,19 @@ class CorePlugin_Config extends Plugin {
 			break;
 			case 'set':
 				if(sizeof($parts) != 4) {
-					$this->_printUsage();
+					$this->printUsage();
 					return;
 				}
 				$this->_setConfig($trigger, $parts[2], $parts[3]);
 			break;
 			default:
-				$this->_printUsage();
+				$this->printUsage();
 			break;
 		}
 	}
 	
-	private function _printUsage() {
-		$this->reply('Usage: !config !trigger (list)|(set name value)');
-	}
-	
 	private function _listConfig($trigger) {
-		$Plugin = $this->_getPlugin($trigger);
+		$Plugin = $this->getPluginByTrigger($trigger);
 		if($Plugin === false) {
 			$this->reply('This plugin doesn\'t exist.');
 			return;
@@ -88,7 +88,7 @@ class CorePlugin_Config extends Plugin {
 	}
 	
 	private function _setConfig($trigger, $name, $value) {
-		$Plugin = $this->_getPlugin($trigger);
+		$Plugin = $this->getPluginByTrigger($trigger);
 		if($Plugin === false) {
 			$this->reply('This plugin doesn\'t exist.');
 			return;
@@ -112,19 +112,6 @@ class CorePlugin_Config extends Plugin {
 				$this->reply('Please specify a valid value for this config variable.');
 			}
 		}
-	}
-	
-	private function _getPlugin($trigger) {
-		foreach($this->Bot->plugins as $Plugin) {
-			if(array_search($trigger, $Plugin->triggers) !== false) {
-				$Plugin->User    = $this->User;
-				$Plugin->Channel = $this->Channel;
-				$Plugin->Server  = $this->Server;
-				return $Plugin;
-			}
-		}
-		
-	return false;
 	}
 	
 }

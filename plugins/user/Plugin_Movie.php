@@ -3,6 +3,11 @@
 class Plugin_Movie extends Plugin {
 	
 	public $triggers = array('!movie', '!tmdb', '!film');
+	public $usage = '<movie>';
+	
+	public $helpTriggers = array('!movie');
+	public $helpText = 'Displays information about <movie> fetched from themoviedb.org';
+	public $helpCategory = 'Internet';
 	
 	protected $config = array(
 		'language' => array(
@@ -14,11 +19,10 @@ class Plugin_Movie extends Plugin {
 	);
 	
 	private $api_key  = '9fc8c3894a459cac8c75e3284b712dfc'; // shamelessly stolen from gcstar
-	private $usage    = 'Usage: %s <movie>';
 	
 	function isTriggered() {
 		if(!isset($this->data['text'])) {
-			$this->reply(sprintf($this->usage, $this->data['trigger']));
+			$this->printUsage();
 			return;
 		}
 		
