@@ -4,6 +4,7 @@ class CorePlugin_Help extends Plugin {
 	
 	public $triggers = array('!help');
 	
+	public $hideFromHelp = true;
 	public $helpText = 'I am not able to help you.';
 	
 	private $Target;
@@ -12,7 +13,14 @@ class CorePlugin_Help extends Plugin {
 		if(isset($this->data['text'])) {
 			$this->printHelpText($this->data['text']);
 		} else {
-			$this->printHelp();
+			$last_triggered = $this->User->getVar('last_triggered');
+			
+			if($last_triggered === false || $this->Bot->time >= $last_triggered + 60) {
+				$this->printHelp();
+				$this->User->saveVar('last_triggered', $this->Bot->time);
+			} else {
+				$this->reply('You can only show !help once a minute.');
+			}
 		}
 	}
 	
