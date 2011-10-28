@@ -204,7 +204,7 @@ class Nimda {
 			$data = unserialize(file_get_contents($this->tempDir.'/jobs_done/'.$job));
 			unlink($this->tempDir.'/jobs_done/'.$job);
 			
-			list($plugin, $server, $channel, $user) = explode('_', $job);
+			list($plugin, $server, $channel, $user, $command) = explode('_', $job);
 			
 			if(!isset($this->plugins[$plugin])) continue;
 			$Plugin = $this->plugins[$plugin];
@@ -238,8 +238,8 @@ class Nimda {
 			$Plugin->Server  = $Server;
 			$Plugin->Channel = $Channel;
 			$Plugin->User    = $User;
-			
-			$Plugin->data = $data;
+			$Plugin->data    = $data;
+			$Plugin->command = $command;
 			
 			$Plugin->onJobDone();
 		}

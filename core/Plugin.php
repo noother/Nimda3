@@ -61,6 +61,7 @@ abstract class Plugin {
 		            ($this->Server ? $this->Server->id : 'none').'_'.
 		            ($this->Channel ? $this->Channel->id : 'none').'_'.
 		            ($this->User ? $this->User->id : 'none').'_'.
+		            ($this->command ? $this->command : 'none').'_'.
 		            libCrypt::getRandomHash();
 		
 		$data = array(
