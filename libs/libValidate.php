@@ -7,7 +7,7 @@ class libValidate {
 	}
 	
 	static function email($string) {
-		if(!preg_match('/^[a-z0-9][a-z0-9_\.+-]*@[a-z0-9\-\.]+\.[a-z]{2,}$/i',$string)) return false;
+		if(!preg_match('/^[a-z0-9][a-z0-9_\.+-]*@[a-z0-9\-\.]+\.[a-z]{2,}$/iD',$string)) return false;
 	return true;
 	}
 	
@@ -29,6 +29,11 @@ class libValidate {
 		}
 	
 		if(!(libMath::checksum($number)%10)) return true;
+	return false;
+	}
+	
+	static function md5Hash($hash) {
+		if(preg_match('/^[0-9a-f]{32}$/iD', $hash)) return true;
 	return false;
 	}
 	
