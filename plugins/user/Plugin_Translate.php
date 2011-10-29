@@ -64,9 +64,6 @@ class Plugin_Translate extends Plugin {
 
 
 	private function googleTranslate($text, $from='', $to = 'de') {
-		$host = 'ajax.googleapis.com';
-		$get  = '/ajax/services/language/translate?v=1.0&q='.rawurlencode($text).'&langpair='.rawurlencode($from.'|'.$to);
-		
 		$html = libHTTP::GET('http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q='.rawurlencode($text).'&langpair='.rawurlencode($from.'|'.$to));
 		
 		preg_match('/{"translatedText":"(.*?)"(,"detectedSourceLanguage":"([a-z-]+)")?}/i', $html, $matches);
