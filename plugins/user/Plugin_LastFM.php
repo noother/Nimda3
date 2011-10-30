@@ -25,7 +25,7 @@ class Plugin_LastFM extends Plugin {
 		}
 
 		if ($track['nowplaying'])
-			$this->reply($username . " np: \x02" . $track['title'] . "\x02");
+			$this->reply($username . " is now playing: \x02" . $track['title'] . "\x02");
 		else
 			$this->reply($username . " last played: \x02" . $track['title'] . "\x02");
 	}
