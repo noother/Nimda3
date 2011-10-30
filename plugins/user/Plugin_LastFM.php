@@ -2,11 +2,11 @@
 
 class Plugin_LastFM extends Plugin {
 	
-	public $triggers = array('!lastfm', '!lfm');
+	public $triggers = array('!np', '!lastfm', '!lfm');
 	public $usage = '[nick]';
 	
 	public $helpCategory = 'Internet';
-	public $helpTriggers = array('!lastfm');
+	public $helpTriggers = array('!np');
 	public $helpText = 'Displays currently playing track on lastfm.';
 
 	// if you set this API key to an last.fm API key, we will fetch real "now playing" instead of last scrobbled track
