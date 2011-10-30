@@ -24,6 +24,11 @@ class Plugin_LastFM extends Plugin {
 			return;
 		}
 
+		if (isset($track['notracks'])) {
+			$this->reply($username . ' has never heard any music');
+			return;
+		}
+
 		if ($track['nowplaying'])
 			$this->reply($username . " is now playing: \x02" . $track['title'] . "\x02");
 		else
@@ -40,11 +45,11 @@ class Plugin_LastFM extends Plugin {
 			
 			$xml = simplexml_load_string($ret);
 			
-			if (!$xml) {
-				// this should be an error code if it isnt xml
-				echo 'last.fm response: '.$ret;
+			if (!$xml || !empty($xml->error[0]))
 				return false;
-			}
+
+			if (intval($xml->recenttracks['total']) == 0)
+				return array('notracks' => true);
 
 			$res['title'] = $xml->recenttracks->track[0]->artist . ' - ' . $xml->recenttracks->track[0]->name;
 			$res['nowplaying'] = $xml->recenttracks->track[0]['nowplaying'] == 'true';
@@ -57,6 +62,9 @@ class Plugin_LastFM extends Plugin {
 			
 			if (!$xml)
 				return false;
+			
+			if (empty($xml->channel->item))
+				return array('notracks' => true);
 
 			return array('title' => $xml->channel->item[0]->title, 'nowplaying' => false);
 		}
