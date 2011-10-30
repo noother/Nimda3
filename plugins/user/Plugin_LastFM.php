@@ -3,14 +3,14 @@
 class Plugin_LastFM extends Plugin {
 	
 	public $triggers = array('!lastfm', '!lfm');
-	public $usage = '<nick>';
+	public $usage = '[nick]';
 	
 	public $helpCategory = 'Internet';
 	public $helpTriggers = array('!lastfm');
 	public $helpText = 'Displays currently playing track on lastfm.';
 
 	// if you set this API key to an last.fm API key, we will fetch real "now playing" instead of last scrobbled track
-	private $apiKey = '';
+	private $apiKey = false;
 	
 
 
@@ -33,7 +33,7 @@ class Plugin_LastFM extends Plugin {
 	
 	function getRecentTracks($nick) {
 		
-		if ($this->apiKey != '') {
+		if ($this->apiKey !== false) {
 			$ret = libHTTP::GET('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks'
 				.'&user='.urlencode($nick)
 				.'&api_key='.$this->apiKey);
