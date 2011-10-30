@@ -181,9 +181,10 @@ class HTTP {
 		
 		for($c=0; '' !== $line = trim(fgets($this->socket)); $c++) {
 			if(!$c) {
-				preg_match('#^HTTP/1\.(?:1|0) (\d+?) ([\w ]+?)$#', $line, $arr);
-				$header['status_code'] = (int)$arr[1];
-				$header['status']      = $arr[2];
+				preg_match('#^HTTP/(1\.(?:1|0)) (\d+?) ([\w ]+?)$#', $line, $arr);
+				$header['http_version'] = $arr[1];
+				$header['status_code'] = (int)$arr[2];
+				$header['status']      = $arr[3];
 			} else {
 				$tmp = explode(': ', $line, 2);
 				if(!isset($tmp[1])) $tmp[1] = '';
@@ -196,7 +197,9 @@ class HTTP {
 			}
 		}
 		
-		if(isset($header['Transfer-Encoding']) && $header['Transfer-Encoding'] == 'chunked') {
+		if($header['http_version'] == '1.0') {
+			$content_length = false;
+		} elseif(isset($header['Transfer-Encoding']) && $header['Transfer-Encoding'] == 'chunked') {
 			$line = trim(fgets($this->socket));
 			preg_match('#^([0-9a-f]+)#', $line, $arr);
 			$content_length = hexdec($arr[1]);
@@ -212,28 +215,36 @@ class HTTP {
 	
 	private function _getBody($content_length, $chunked) {
 		$body = '';
-		$received = 0;
-		while($received < $content_length) {
-			$part = fread($this->socket, $content_length-$received);
-			$received+= strlen($part);
-			$body.= $part;
-		}
 		
-		if($chunked) {
-			fgets($this->socket); // get the \r\n
+		if($content_length === false) { // HTTP 1.0
+			while(!feof($this->socket)) {
+				$body.= fgets($this->socket);
+			}
+			return $body;
+		} else { // HTTP 1.1
+			$received = 0;
+			while($received < $content_length) {
+				$part = fread($this->socket, $content_length-$received);
+				$received+= strlen($part);
+				$body.= $part;
+			}
+	
+			if($chunked) {
+				fgets($this->socket); // get the \r\n
+		
+				$next_length = hexdec(trim(fgets($this->socket)));
+				if($next_length) {
+					return $body.$this->_getBody($next_length, true);
+				} else {
+					do {
+						$line = fgets($this->socket);
+					} while($line !== false && $line !== "\r\n");
 			
-			$next_length = hexdec(trim(fgets($this->socket)));
-			if($next_length) {
-				return $body.$this->_getBody($next_length, true);
+					return $body;
+				}
 			} else {
-				do {
-					$line = fgets($this->socket);
-				} while($line !== false && $line !== "\r\n");
-				
 				return $body;
 			}
-		} else {
-			return $body;
 		}
 	}
 	
