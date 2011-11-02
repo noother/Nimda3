@@ -181,8 +181,8 @@ class Plugin_MD5Lookup extends Plugin {
 		if($html === false) return false;
 		
 		if(preg_match('#<font color="\#66aa00">MD5: .+? = (.*?)</font>#', $html, $arr)) {
-			if(strstr($arr[1], 'Which algorithm would you like to see added to the website')) return false; // lol, fail
-			return $arr[1];
+			if($arr[1] == 'Hash not found!') return false;
+			else return $arr[1];
 		}
 		
 	return false;
