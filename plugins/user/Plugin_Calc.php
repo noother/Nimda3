@@ -25,19 +25,19 @@ class Plugin_Calc extends Plugin {
 		}
 
 		$google = libHTTP::GET('http://www.google.com/search?q='.urlencode($this->data['text']).'&hl=de&safe=off');
-        
 		if($google === false) {
 			$this->reply($this->connection_error);
 			return;
 		}
 		
-		$result = preg_match_all("@<h2 class=r style=\"font-size:138%\"><b>(.*)</b></h2>@", $google, $matches);
-		if($result == 0 || $result == false) {
+		if(!preg_match('#<h2 class="r" dir="ltr" style="font-size:138%">(.*?)</h2>#s', $google, $arr)) {
 			$this->reply($this->parse_error);
 			return;
 		}
 
-		$result = preg_replace("/<sup>/",'^',$matches[1][0]);
+		$result = preg_replace("/<sup>/",'^',$arr[1]);
+		
+		while(false !== strstr($result, '  ')) $result = str_replace('  ', ' ', $result);
 
 		$this->reply(utf8_encode(html_entity_decode(strip_tags($result))));
 	}
