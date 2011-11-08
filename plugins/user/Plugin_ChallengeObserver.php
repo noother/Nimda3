@@ -111,6 +111,9 @@ class Plugin_ChallengeObserver extends Plugin {
 			case 'Rankk':
 				$this->getRankkChalls($challcount);
 			break;
+			case 'Revolution Elite':
+				$this->getRevolutionEliteChalls($challcount);
+			break;
 			case 'Right-Answer':
 				$this->getRightAnswerChalls($challcount);
 			break;
@@ -302,6 +305,33 @@ class Plugin_ChallengeObserver extends Plugin {
 				$this->addLatestChall('Rankk', $text);
 			}
 		}
+	}
+	
+	private function getRevolutionEliteChalls($count) {
+		$html = libHTTP::GET('http://sabrefilms.co.uk/revolutionelite/index.php');
+		if(!$html) return;
+		
+		preg_match('#<h5>Latest Challenge Online:</h5><a href="http://sabrefilms.co.uk/revolutionelite/challs.php\?challs=(.+?) *?"> *?(.+?) *?</a>#', $html, $arr);
+		
+		$chall_name = trim($arr[2]);
+		
+		$url = strtolower($arr[1]);
+		$new_url = '';
+		for($i=0;$i<strlen($url);$i++) {
+			if(preg_match('/[a-z0-9 ]/', $url{$i})) {
+				$new_url.= $url{$i};
+			}
+		}
+		$new_url = str_replace(' ', '-', $new_url);
+		$url = 'http://sabrefilms.co.uk/revolutionelite/'.$new_url.'.php';
+		
+		$text = sprintf("\x02%s\x02 ( %s )",
+			$chall_name,
+			$url
+		);
+		
+		$this->sendToEnabledChannels($text);
+		$this->addLatestChall('Revolution Elite', $text);
 	}
 	
 	private function getRightAnswerChalls($count) {
