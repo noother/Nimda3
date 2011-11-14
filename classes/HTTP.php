@@ -120,7 +120,9 @@ class HTTP {
 		$header.= "\r\n";
 		fputs($this->socket, $header);
 		
-		list($header, $content_length) = $this->_getHeader();
+		$res = $this->_getHeader();
+		if($res === false) return false;
+		list($header, $content_length) = $res;
 		
 		$body = $this->_getBody(
 			$content_length,
@@ -181,7 +183,9 @@ class HTTP {
 		
 		for($c=0; '' !== $line = trim(fgets($this->socket)); $c++) {
 			if(!$c) {
-				preg_match('#^HTTP/(1\.(?:1|0)) (\d+?) ([\w ]+?)$#', $line, $arr);
+				if(!preg_match('#^HTTP/(1\.(?:1|0)) (\d+?) ([\w ]+?)$#', $line, $arr)) {
+					return false;
+				}
 				$header['http_version'] = $arr[1];
 				$header['status_code'] = (int)$arr[2];
 				$header['status']      = $arr[3];
@@ -197,14 +201,16 @@ class HTTP {
 			}
 		}
 		
-		if($header['http_version'] == '1.0') {
-			$content_length = false;
-		} elseif(isset($header['Transfer-Encoding']) && $header['Transfer-Encoding'] == 'chunked') {
+		if(!$c) return false; // got no response
+		
+		if(isset($header['Transfer-Encoding']) && $header['Transfer-Encoding'] == 'chunked') {
 			$line = trim(fgets($this->socket));
 			preg_match('#^([0-9a-f]+)#', $line, $arr);
 			$content_length = hexdec($arr[1]);
 		} elseif(isset($header['Content-Length'])) {
 			$content_length = $header['Content-Length'];
+		} elseif($header['http_version'] == '1.0') {
+			$content_length = false;
 		} else {
 			$content_length = 0;
 		}
