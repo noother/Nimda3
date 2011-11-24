@@ -245,6 +245,15 @@ class Plugin_ChallengeObserver extends Plugin {
 		$html = libHTTP::GET('http://feeds.feedburner.com/SphereOnlineJudge?format=xml');
 		if($html === false) return;
 		
+		// Temporary, till SPOJ fixes their feed
+		$tmp = explode("\n", $html);
+		$new = '';
+		foreach($tmp as $line) {
+			if(!libString::endsWith('<br />', $line)) $new.= $line."\n";
+		}
+		$html = $new;
+		
+		
 		$XML = simplexml_load_string($html);
 		if($XML === false) return;
 		

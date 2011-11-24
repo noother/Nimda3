@@ -60,6 +60,10 @@ class libString {
 		return substr($haystack, 0, strlen($needle)) == $needle;
 	}
 	
+	static function endsWith($needle, $haystack) {
+		return substr($haystack, -strlen($needle)) == $needle;
+	}
+	
 	static function plural($word, $num) {
 		$num = (int)($num);
 		
