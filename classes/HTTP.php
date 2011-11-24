@@ -286,7 +286,6 @@ class HTTP {
 					$body = gzdecode($body);
 				} else {
 					$filename = '/tmp/'.md5(rand()).'.gz';
-					echo $filename."\n";
 					file_put_contents($filename, $body);
 					$body = shell_exec('gzip -cd '.$filename);
 					unlink($filename);
