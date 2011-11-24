@@ -62,6 +62,27 @@ class HTTP {
 		}
 	}
 	
+	public function getCookie($name) {
+		if(isset($this->cookies[$name])) {
+			return $this->cookies[$name];
+		} else {
+			return false;
+		}
+	}
+	
+	public function getCookies() {
+		return $this->cookies;
+	}
+	
+	public function removeCookie($name) {
+		if(isset($this->cookies[$name])) {
+			unset($this->cookies[$name]);
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public function clearCookies() {
 		$this->cookies = array();
 	}
