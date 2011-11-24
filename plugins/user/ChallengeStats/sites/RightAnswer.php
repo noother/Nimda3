@@ -12,7 +12,7 @@ class RightAnswer extends ChallengeStats {
 		if (strpos($html, 'Ce membre n\'existe pas') !== false)
 			return false;
 
-		preg_match("#Position dans le classement: (.*?) / (.*?)<br#", $html, $arr);
+		preg_match("#Position in the ranking: (.*?) / (.*?)<br#", $html, $arr);
 		$rank  = $arr[1];
 		$users = $arr[2];
 
