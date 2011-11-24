@@ -120,6 +120,9 @@ class Plugin_ChallengeObserver extends Plugin {
 			case 'SPOJ':
 				$this->getSpojChalls($challcount);
 			break;
+			case 'wargame.kr':
+				$this->getWargameKrChalls($challcount);
+			break;
 		}
 	}
 	
@@ -358,6 +361,24 @@ class Plugin_ChallengeObserver extends Plugin {
 			$this->sendToEnabledChannels($text);
 			$this->addLatestChall('Right-Answer', $text);
 		}
+	}
+	
+	private function getWargameKrChalls($count) {
+		$html = libHTTP::GET('http://www.wargame.kr/challenge/regtime/');
+		if(!$html) return;
+		
+		preg_match_all('#<li .+?<a.+?href=\'(.+?)\'.+?<strong>(.+?)</strong>.+?Point : (\d+?) p#', $html, $arr);
+		
+		for($i=0;$i<$count&&$i<sizeof($arr[1]);$i++) {
+			$text = sprintf("\x02%s\x02 worth %d points ( %s )",
+				$arr[2][$i],
+				$arr[3][$i],
+				$arr[1][$i]
+			);
+			$this->sendToEnabledChannels($text);
+			$this->addLatestChall('wargame.kr', $text);
+		}
+		
 	}
 	
 	private function sortByID($a, $b) {
