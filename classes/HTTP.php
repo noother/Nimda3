@@ -281,16 +281,16 @@ class HTTP {
 				// plain - do nothing
 			break;
 			case 'gzip':
-				/*
-					Does anyone have any idea how to do this without calling an external program?
-					PHP's gzuncompress fails. And implementing the gz-algorithm in php is probably
-					way too expensive. The correct function would be http://php.net/gzdecode
-					but it doesn't exist :)
-				*/
-				$filename = '/tmp/'.md5(rand()).'.gz';
-				file_put_contents($filename, $body);
-				$body = shell_exec('gzip -cd '.$filename);
-				unlink($filename);
+				// gzdecode() got added in PHP 5.4 - so let's use it, if available
+				if(function_exists('gzdecode')) {
+					$body = gzdecode($body);
+				} else {
+					$filename = '/tmp/'.md5(rand()).'.gz';
+					echo $filename."\n";
+					file_put_contents($filename, $body);
+					$body = shell_exec('gzip -cd '.$filename);
+					unlink($filename);
+				}
 			break;
 			default:
 				trigger_error('Server sent content with unimplemented encoding "'.$encoding.'"');
