@@ -350,7 +350,7 @@ class Plugin_ChallengeObserver extends Plugin {
 		$html = libHTTP::GET('http://www.right-answer.net/index.php');
 		if(!$html) return;
 		
-		preg_match_all('#Rapporte (\d+?) XP.+?href="epreuves.php\?nom=(.+?)">(.+?)</a>#s', $html, $arr);
+		preg_match_all('#<a.+?Give (\d+?) XP.+?href="epreuves\.php\?nom=(.+?)">(.+?)</a>#s', $html, $arr);
 		
 		for($i=0;$i<$count&&$i<sizeof($arr[1]);$i++) {
 			$text = sprintf("\x02%s\x02 worth %d XP ( %s )",
