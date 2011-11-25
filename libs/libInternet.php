@@ -7,11 +7,11 @@ class libInternet {
 	
 	static function googleResults($string) {
 		$html = libHTTP::GET('http://www.google.com/search?q='.urlencode($string).'&hl=en&safe=off');
-		preg_match('#of about <b>([\d\,]+?)</b> for#', $html, $arr);
-		
-		if(empty($arr)) return 0;
-		
-	return str_replace(',', '', $arr[1]);
+		if(preg_match('#<div>Results .+? of (?:about )?<b>([\d,]+?)</b>#', $html, $arr)) {
+			return str_replace(',', '', $arr[1]);
+		} else {
+			return 0;
+		}
 	}
 	
 	static function googleTranslate($text, $from='', $to = 'de') {
