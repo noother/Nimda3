@@ -184,11 +184,16 @@ class HTTP {
 				$reconnect = true;
 			}
 			
+			$path = $parts['path'];
+			if(isset($parts['query'])) {
+				$path.= '?'.$parts['query'];
+			}
+			
 			if($reconnect) {
 				$this->_connect();
 			}
 			
-			return $this->_getResponse($method, $parts['path'], $additional_headers);
+			return $this->_getResponse($method, $path, $additional_headers);
 		}
 		
 		if($this->settings['accept-cookies'] && !empty($header['cookies'])) {
