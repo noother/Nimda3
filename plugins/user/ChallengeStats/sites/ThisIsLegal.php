@@ -4,12 +4,12 @@ class ThisIsLegal extends ChallengeStats {
 	
 	public $triggers = array('!til', '!thisislegal');
 	
-	protected $url       = 'http://thisislegal.com';
+	protected $url       = 'http://www.thisislegal.com';
 	protected $statsText = '{username} solved {challs_solved} (of {challs_total}) challenges and is on rank {rank} (of {users_total}) with {score} (of {score_total}) points at {url}';
 	
 	function getStats($username, $html) {
 		
-		$HTTP = new HTTP('thisislegal.com');
+		$HTTP = new HTTP('www.thisislegal.com');
 		$html = $HTTP->GET('/userscore.php?username='.urlencode($username));
 		if($html === false) return 'timeout';
 		if($html === '0') return false;
