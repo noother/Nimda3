@@ -22,17 +22,11 @@ class Plugin_Google extends Plugin {
 			$this->printUsage();
 			return;
 		}
-
-        $link = "http://www.google.com/search?q=".urlencode($this->data['text'])."&hl=".$this->getConfig('language')."&safe=off";
-
-        $results = number_format(libInternet::googleResults($this->data['text']),0,',','.');
-
-        $output = $link." (Results: ";
-        if(!$results) $output.= "0";
-        else $output.= "~ ";
-        $output.= $results.")";
-
-        $this->reply($output);
+		
+		$this->reply(sprintf('%s (Results: %s)',
+			"http://www.google.com/search?q=".urlencode($this->data['text'])."&hl=".$this->getConfig('language')."&safe=off",
+			number_format(libInternet::googleResults($this->data['text']), 0, ',', '.')
+		));
 	}
 	
 }
