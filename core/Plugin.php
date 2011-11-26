@@ -114,7 +114,6 @@ abstract class Plugin {
 			$Target = $this->Channel;
 		}
 		
-		
 		$config = $Target->getVar('config_'.$this->id.'_'.$name);
 		
 		if($config === false) {
@@ -180,16 +179,38 @@ abstract class Plugin {
 		return "\x02Usage:\x02 ".$this->data['trigger'].(!empty($this->usage) ? ' '.$this->usage : '');
 	}
 	
+	public final function findPlugin($text) {
+		if(false === $Plugin = $this->getPluginByTrigger($text)) {
+			$Plugin = $this->getPluginById($text);
+		}
+		
+	return $Plugin;
+	}
+	
 	public final function getPluginByTrigger($trigger) {
 		foreach($this->Bot->plugins as $Plugin) {
-			if(array_search($trigger, $Plugin->triggers) !== false) {
+			if(array_search($trigger, $Plugin->triggers) !== false || ($trigger{0} != '!' && array_search('!'.$trigger, $Plugin->triggers) !== false)) {
 				$Plugin->Server  = $this->Server;
 				$Plugin->Channel = $this->Channel;
 				$Plugin->User    = $this->User;
 				return $Plugin;
 			}
 		}
-		
+	
+	return false;
+	}
+	
+	public final function getPluginById($id) {
+		$id = strtolower($id);
+		foreach($this->Bot->plugins as $Plugin) {
+			if($Plugin->id == $id) {
+				$Plugin->Server  = $this->Server;
+				$Plugin->Channel = $this->Channel;
+				$Plugin->User    = $this->User;
+				return $Plugin;
+			}
+		}
+	
 	return false;
 	}
 	

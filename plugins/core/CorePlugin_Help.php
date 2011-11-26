@@ -33,20 +33,26 @@ class CorePlugin_Help extends Plugin {
 			elseif(!empty($Plugin->triggers)) $triggers = $Plugin->triggers;
 			else continue;
 			
+			foreach($triggers as &$trigger) {
+				if($trigger{0} == '!') $trigger = substr($trigger, 1);
+			}
+			
 			if(!isset($categories[$Plugin->helpCategory])) $categories[$Plugin->helpCategory] = array();
 			$categories[$Plugin->helpCategory] = array_merge($categories[$Plugin->helpCategory], $triggers);
 		}
+		
+		$this->User->privmsg('Available commands (Type a \'!\' in front of each command)');
 		
 		foreach($categories as $category => $commands) {
 			$this->User->privmsg($text = "\x02".$category."\x02: ".implode(', ', $commands));
 		}
 		
-		$this->User->privmsg('To get more information about a command, type '.$this->data['trigger'].' <!command>.');
+		$this->User->privmsg('To get more information about a command, type '.$this->data['trigger'].' <command>.');
 		$this->User->privmsg('Nimda is open source. You can find it\'s source code at https://github.com/noother/Nimda3. If you want Nimda in your own channel, either run your own copy, or ask noother to let Nimda join your server/channel. He\'s happy if his copy runs on as many servers/channels possible :)');
 	}
 	
 	function printHelpText($trigger) {
-		$Plugin = $this->getPluginByTrigger($trigger);
+		$Plugin = $this->findPlugin($trigger);
 		if(!$Plugin) {
 			$this->reply('This command doesn\'t exist.');
 		} else {

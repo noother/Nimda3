@@ -3,7 +3,7 @@
 class CorePlugin_Config extends Plugin {
 	
 	public $triggers = array('!config', '!conf');
-	public $usage = '<!trigger> (list)|(set name value)';
+	public $usage = '<trigger> [<name>] [<value>]';
 	
 	public $helpTriggers = array('!config');
 	public $helpText = "Let's you configure the plugin for your channel / yourself (in query). To set channel configuration you have to be an operator in the channel";
@@ -19,38 +19,27 @@ class CorePlugin_Config extends Plugin {
 			return;
 		}
 		
-		$parts = explode(' ', $this->data['text'], 4);
-		if(sizeof($parts) < 2) {
-			$this->printUsage();
-			return;
-		}
+		$parts = explode(' ', $this->data['text'], 3);
+		$plugin = $parts[0];
+		if(isset($parts[1])) $name  = $parts[1];
+		if(isset($parts[2])) $value = $parts[2];
 		
-		$trigger = $parts[0];
-		$action  = $parts[1];
-		switch($action) {
-			case 'list':
-				$this->_listConfig($trigger);
-			break;
-			case 'set':
-				if(sizeof($parts) != 4) {
-					$this->printUsage();
-					return;
-				}
-				$this->_setConfig($trigger, $parts[2], $parts[3]);
-			break;
-			default:
-				$this->printUsage();
-			break;
-		}
-	}
-	
-	private function _listConfig($trigger) {
-		$Plugin = $this->getPluginByTrigger($trigger);
+		$Plugin = $this->findPlugin($plugin);
 		if($Plugin === false) {
 			$this->reply('This plugin doesn\'t exist.');
 			return;
 		}
 		
+		if(isset($value)) {
+			$this->_setConfig($Plugin, $name, $value);
+		} elseif(isset($name)) {
+			$this->_showConfig($Plugin, $name);
+		} else {
+			$this->_listConfig($Plugin);
+		}
+	}
+	
+	private function _listConfig($Plugin) {
 		$config = $Plugin->getConfigList();
 		list($crap, $plugin_name) = explode('_', get_class($Plugin), 2);
 		
@@ -87,13 +76,25 @@ class CorePlugin_Config extends Plugin {
 		}
 	}
 	
-	private function _setConfig($trigger, $name, $value) {
-		$Plugin = $this->getPluginByTrigger($trigger);
-		if($Plugin === false) {
-			$this->reply('This plugin doesn\'t exist.');
+	private function _showConfig($Plugin, $name) {
+		list($crap, $plugin_name) = explode('_', get_class($Plugin), 2);
+		
+		$value = $Plugin->getConfig($name);
+		if($value === false) {
+			$this->reply('There is no such config variable in plugin '.$plugin_name);
 			return;
 		}
 		
+		$this->reply(sprintf(
+			"Config variable \x02%s\x02 of plugin \x02%s\x02 for %s is set to \x02%s\x02.",
+				$name,
+				$plugin_name,
+				($this->Channel === false ? 'user '.$this->User->name : 'channel '.$this->Channel->name.' on '.$this->Server->id),
+				$value
+		));
+	}
+	
+	private function _setConfig($Plugin, $name, $value) {
 		list($crap, $plugin_name) = explode('_', get_class($Plugin), 2);
 		
 		if($Plugin->setConfig($name, $value)) {
