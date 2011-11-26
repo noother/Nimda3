@@ -37,8 +37,8 @@ final class IRC_Server {
 		$this->port         = $port;
 		$this->isSSL        = $ssl;
 		
-		if(!$this->getVar('estimated_CLIENT_FLOOD')) $this->saveVar('estimated_CLIENT_FLOOD', -1);
-		if(!$this->getVar('estimated_RECVQ_SPEED')) $this->saveVar('estimated_RECVQ_SPEED', 1);
+		if($this->getVar('estimated_CLIENT_FLOOD') === false) $this->saveVar('estimated_CLIENT_FLOOD', -1);
+		if($this->getVar('estimated_RECVQ_SPEED') === false)  $this->saveVar('estimated_RECVQ_SPEED', 1);
 		
 		$this->connect();
 	}
