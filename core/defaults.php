@@ -19,7 +19,6 @@
 	require_once('libs/libHTTP.php');
 	require_once('libs/libMath.php');
 	require_once('libs/libString.php');
-	require_once('libs/libSystem.php');
 	require_once('libs/libTime.php');
 	require_once('libs/libValidate.php');
 	

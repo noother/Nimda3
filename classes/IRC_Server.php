@@ -41,7 +41,7 @@ final class IRC_Server {
 		$this->socket = fsockopen(($this->isSSL?'ssl://':'').$this->host, $this->port);
 		stream_set_blocking($this->socket, 0);
 		
-		$this->lastLifeSign = libSystem::getMicrotime();
+		$this->lastLifeSign = microtime(true);
 	}
 	
 	private function reconnect() {
@@ -88,7 +88,7 @@ final class IRC_Server {
 	private function write($string) {
 		echo '<< '.$string."\n";
 		fputs($this->socket, $string."\n");
-		$this->lastMessageSend = libSystem::getMicrotime();
+		$this->lastMessageSend = microtime(true);
 	}
 	
 	private function getUser($nick) {
@@ -167,7 +167,7 @@ final class IRC_Server {
 		if(false !== $data = $this->getData()) {
 			$this->queueRead[] = $data;
 		} else {
-			$idle_time = libSystem::getMicrotime() - $this->lastLifeSign;
+			$idle_time = microtime(true) - $this->lastLifeSign;
 			if($idle_time > 320) {
 				$this->reconnect();
 				$this->waitingForPong = false;
@@ -195,7 +195,7 @@ final class IRC_Server {
 	}
 	
 	public function sendQueue() {
-		if(libSystem::getMicrotime() - $this->lastMessageSend > 1 && !empty($this->queueSend)) {
+		if(microtime(true) - $this->lastMessageSend > 1 && !empty($this->queueSend)) {
 			$this->write(array_shift($this->queueSend));
 			return true;
 		}
@@ -441,7 +441,7 @@ final class IRC_Server {
 			break;
 		}
 		
-		$this->lastLifeSign = libSystem::getMicrotime();
+		$this->lastLifeSign = microtime(true);
 		
 	return $data;
 	}
