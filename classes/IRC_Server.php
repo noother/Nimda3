@@ -10,8 +10,11 @@ final class IRC_Server {
 	private $socket;
 	private $queueRead = array();
 	private $queueSend = array();
-	private $lastMessageSend = 0;
 	private $waitingForPong = false;
+	private $estimatedRecvq = array();
+	private $lastRecvqRemoved = 0;
+	private $floodCooldown = false;
+	private $reconnect = false;
 	
 	private $myData = array();
 	
@@ -33,6 +36,9 @@ final class IRC_Server {
 		$this->host         = $host;
 		$this->port         = $port;
 		$this->isSSL        = $ssl;
+		
+		if(!$this->getVar('estimated_CLIENT_FLOOD')) $this->saveVar('estimated_CLIENT_FLOOD', -1);
+		if(!$this->getVar('estimated_RECVQ_SPEED')) $this->saveVar('estimated_RECVQ_SPEED', 1);
 		
 		$this->connect();
 	}
@@ -56,6 +62,7 @@ final class IRC_Server {
 		}
 		$this->channels = array();
 		$this->users    = array();
+		$this->estimatedRecvq = array();
 		
 		$this->connect();
 		
@@ -73,6 +80,8 @@ final class IRC_Server {
 		foreach($channels as $channel) {
 			$this->joinChannel($channel);
 		}
+		
+		$this->reconnect = false;
 	}
 	
 	private function read() {
@@ -87,8 +96,8 @@ final class IRC_Server {
 
 	private function write($string) {
 		echo '<< '.$string."\n";
-		fputs($this->socket, $string."\n");
-		$this->lastMessageSend = microtime(true);
+		fputs($this->socket, $string."\r\n");
+		$this->estimatedRecvq[] = array('msg' => $string, 'length' => strlen($string));
 	}
 	
 	private function getUser($nick) {
@@ -160,16 +169,19 @@ final class IRC_Server {
 	}
 	
 	public function tick() {
+		if($this->floodCooldown !== false) $this->checkFloodCooldown();
+		if($this->reconnect && ($this->floodCooldown === false || microtime(true) + 10 > $this->floodCooldown)) $this->reconnect();
+		$this->doRecvq();
 		$this->sendQueue();
 		
-		$check = false;
+		$raw = $this->read();
 		
-		if(false !== $data = $this->getData()) {
-			$this->queueRead[] = $data;
+		if($raw !== false) {
+			$this->queueRead[] = $this->getData($raw);
 		} else {
 			$idle_time = microtime(true) - $this->lastLifeSign;
 			if($idle_time > 320) {
-				$this->reconnect();
+				$this->reconnect = true;
 				$this->waitingForPong = false;
 			} elseif(!$this->waitingForPong && $idle_time > 300) {
 				$this->sendPing('are_you_still_there?_:)');
@@ -177,9 +189,11 @@ final class IRC_Server {
 			}
 		}
 		
-		if(false !== $data = $this->readQueue()) $check = $data;
-		
-	return $check;
+		return $this->readQueue();
+	}
+	
+	private function checkFloodCooldown() {
+		if(microtime(true) > $this->floodCooldown) $this->floodCooldown = false;
 	}
 	
 	public function enqueueRead($data) {
@@ -195,20 +209,89 @@ final class IRC_Server {
 	}
 	
 	public function sendQueue() {
-		if(microtime(true) - $this->lastMessageSend > 1 && !empty($this->queueSend)) {
+		if($this->floodCooldown !== false) return false;
+		
+		$flood = $this->getVar('estimated_CLIENT_FLOOD');
+		
+		if(!empty($this->queueSend) && ($flood == -1 || $this->getRecvqSum()+strlen($this->queueSend[0]) < $flood)) {
 			$this->write(array_shift($this->queueSend));
 			return true;
 		}
 	return false;
 	}
+	
+	private function doRecvq() {
+		$time = microtime(true);
+		
+		if(empty($this->estimatedRecvq)) $this->lastRecvqRemoved = $time;
+		elseif($time > $this->lastRecvqRemoved + $this->getVar('estimated_RECVQ_SPEED')) {
+			array_shift($this->estimatedRecvq);
+			$this->lastRecvqRemoved = $time;
+		}
+	}
+	
+	private function getRecvqSum() {
+		$sum = 0;
+		foreach($this->estimatedRecvq as $item) {
+			$sum+= $item['length'];
+		}
+	
+	return $sum;
+	}
+	
+	private function onFlood() {
+		$this->floodCooldown = microtime(true)+20;
+		
+		$this->queueSend = array();
+		
+		$new_client_flood = $this->getRecvqSum()-1;
+		$new_recvq_speed = false;
+		if($new_client_flood < 512) {
+			// wtf network, not even 1 full msg / second - well, let's try to decrease our recvq-cleaning speed now
+			$new_client_flood = -1;
+			$new_recvq_speed = $this->getVar('estimated_RECVQ_SPEED')+1;
+		}
+		
+		$text = sprintf('Ops - Looks like I flooded! Some messages may have gotten lost. Setting estimated CLIENT_FLOOD for %s from %s to %s.',
+			$this->host,
+			$this->getVar('estimated_CLIENT_FLOOD') == -1 ? 'unlimited' : $this->getVar('estimated_CLIENT_FLOOD'),
+			$new_client_flood == -1 ? 'unlimited' : $new_client_flood
+		);
+		
+		if($new_recvq_speed !== false) {
+			$text.= sprintf(' Setting RECVQ_SPEED from %d to %d.',
+				$this->getVar('estimated_RECVQ_SPEED'),
+				$new_recvq_speed
+			);
+		}
+		
+		$sent = array();
+		foreach($this->estimatedRecvq as $item) {
+			$parsed = $this->parseIRCMessage(':'.$this->Me->banmask.' '.$item['msg']);
+			$target = strtolower($parsed['params'][0]);
+			
+			if(array_search($target, $sent) === false) {
+				$Target = false;
+				if(isset($this->channels[$target])) $Target = $this->channels[$target];
+				elseif(isset($this->users[$target])) $Target = $this->users[$target];
+				
+				if($Target !== false) {
+					$Target->privmsg($text);
+					$sent[] = $target;
+				}
+			}
+		}
+		
+		$this->saveVar('estimated_CLIENT_FLOOD', $new_client_flood);
+		if($new_recvq_speed !== false) $this->saveVar('estimated_RECVQ_SPEED', $new_recvq_speed);
+	}
 
-	public function getData() {
-		if(false === $raw = $this->read()) return false;
-		$parsed = $this->parseIRCMessage($raw);
+	public function getData($irc_msg) {
+		$parsed = $this->parseIRCMessage($irc_msg);
 		if(!$parsed) return false;
 		
 		$data['command'] = $parsed['command'];
-		$data['raw']     = $raw;
+		$data['raw']     = $irc_msg;
 		
 		switch($data['command']) {
 			case '001':
@@ -282,11 +365,15 @@ final class IRC_Server {
 				$data['nick'] = $parsed['params'][1];
 			break;
 			case 'ERROR':
-				// Sent when the bot quitted the server
-				// TODO: notrly
-				foreach($this->channels as $Channel) {
-					$Channel->remove();
+				// Sent when the server decides to close our connection
+				$data['text'] = $parsed['params'][0];
+				
+				if(libString::endsWith('(Excess Flood)', $data['text'])) {
+					$this->onFlood();
 				}
+				
+				$this->floodCooldown = microtime(true) + 60;
+				$this->reconnect = true;
 			break;
 			case 'JOIN':
 				// Sent when the bot or a user joins a channel
@@ -377,7 +464,14 @@ final class IRC_Server {
 					$data['User'] = $User;
 					$data['text'] = $text;
 				} else {
-					// TODO: Sent when the server sends a notice
+					if(isset($parsed['servername'])) $data['servername'] = $parsed['servername'];
+					else $parsed['servername'] = false;
+					// $data['target'] = $parsed['params'][0];
+					$data['message'] = $parsed['params'][1];
+					
+					if($this->floodCooldown === false && preg_match('/Message to .+? throttled/', $data['message'])) {
+						$this->onFlood();
+					}
 				}
 			break;
 			case 'PART':
@@ -452,45 +546,45 @@ final class IRC_Server {
 	}
 	
 	public function sendPing($challenge=null) {
-		$this->sendRaw('PING '.(isset($challenge) ? $challenge : $this->host));
+		$this->sendRaw('PING '.(isset($challenge) ? $challenge : $this->host), true);
 	}
 	
-	public function sendPong($string, $bypass_queue=true) {
-		$this->sendRaw('PONG :'.$string, $bypass_queue);
+	public function sendPong($challenge) {
+		$this->sendRaw('PONG :'.$challenge, true);
 	}
 	
-	public function sendWhois($nick, $bypass_queue=false) {
-		$this->sendRaw('WHOIS '.$nick, $bypass_queue);
+	public function sendWhois($nick) {
+		$this->sendRaw('WHOIS '.$nick, true);
 	}
 	
-	public function setPass($pass, $bypass_queue=true) {
+	public function setPass($pass) {
 		$this->myData['pass'] = $pass;
 		
-		$this->sendRaw('PASS '.$pass, $bypass_queue);
+		$this->sendRaw('PASS '.$pass, true);
 	}
 	
-	public function setUser($username, $hostname, $servername, $realname, $bypass_queue=true) {
+	public function setUser($username, $hostname, $servername, $realname) {
 		$this->myData['username']   = $username;
 		$this->myData['hostname']   = $hostname;
 		$this->myData['servername'] = $servername;
 		$this->myData['realname']   = $realname;
 		
-		$this->sendRaw('USER '.$username.' '.$hostname.' '.$servername.' :'.$realname, $bypass_queue);
+		$this->sendRaw('USER '.$username.' '.$hostname.' '.$servername.' :'.$realname, true);
 	}
 	
-	public function setNick($nick, $bypass_queue=false) {
+	public function setNick($nick) {
 		$this->myData['nick'] = $nick;
 		
-		$this->sendRaw('NICK '.$nick, $bypass_queue);
+		$this->sendRaw('NICK '.$nick, true);
 	}
 	
-	public function joinChannel($channel, $key=false, $bypass_queue=false) {
-		$this->sendRaw('JOIN '.$channel.($key?' '.$key:''), $bypass_queue);
+	public function joinChannel($channel, $key=false) {
+		$this->sendRaw('JOIN '.$channel.($key?' '.$key:''), true);
 	}
 	
-	public function quit($message=null, $bypass_queue=true) {
-		if(isset($message)) $this->sendRaw('QUIT :'.$message, $bypass_queue);
-		else                $this->sendRaw('QUIT', $bypass_queue);
+	public function quit($message=null) {
+		if(isset($message)) $this->sendRaw('QUIT :'.$message, true);
+		else                $this->sendRaw('QUIT', true);
 	}
 	
 	public function saveVar($name, $value) {
@@ -503,6 +597,10 @@ final class IRC_Server {
 	
 	public function removeVar($name) {
 		$this->Bot->removePermanent($name, 'server', $this->id);
+	}
+	
+	function __destruct() {
+		$this->quit('Terminating');
 	}
 	
 }

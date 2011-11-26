@@ -20,7 +20,7 @@ final class IRC_Channel extends IRC_Target {
 	}
 	
 	private function sendWho() {
-		$this->Server->sendRaw('WHO '.$this->name);
+		$this->Server->sendRaw('WHO '.$this->name, true);
 	}
 	
 	public function part($message=false) {
