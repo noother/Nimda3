@@ -252,7 +252,7 @@ final class IRC_Server {
 			$new_recvq_speed = $this->getVar('estimated_RECVQ_SPEED')+1;
 		}
 		
-		$text = sprintf('Ops - Looks like I flooded! Some messages may have gotten lost. Setting estimated CLIENT_FLOOD for %s from %s to %s.',
+		$text = sprintf("\x02Ops - Looks like I flooded!\x02 Some messages may have gotten lost. Setting estimated CLIENT_FLOOD for %s from %s to %s.",
 			$this->host,
 			$this->getVar('estimated_CLIENT_FLOOD') == -1 ? 'unlimited' : $this->getVar('estimated_CLIENT_FLOOD'),
 			$new_client_flood == -1 ? 'unlimited' : $new_client_flood
