@@ -262,7 +262,11 @@ class Plugin_ChallengeObserver extends Plugin {
 		
 		$items = $XML->xpath('channel/item/description');
 		
-		for($i=0;$i<$count&&$i<sizeof($items);$i++) {
+		// Only show 5 challs for SPOJ, because due to their quantitiy the spam disadvantage overweights their interestingness
+		$show_count = $count;
+		if($show_count > 5) $show_count = 5;
+		
+		for($i=0;$i<$show_count&&$i<sizeof($items);$i++) {
 			$html = (string)$items[$i];
 			if(!preg_match('#Problem (.+?) \((\d+)\. (.+?)\) added by (.+?) is now available in the (.+?) problemset#', $html, $arr)) {
 				$count++;
@@ -288,6 +292,13 @@ class Plugin_ChallengeObserver extends Plugin {
 			// Intentionally not adding to the latest challs, because
 			// they have just too many and it would flood the normal challs
 		}
+		
+		if($count > $show_count) {
+			$this->sendToEnabledChannels(sprintf("... and %d more. See http://feeds.feedburner.com/SphereOnlineJudge?format=xml for the full list.",
+				$count-$show_count
+			));
+		}
+		
 	}
 	
 	private function getRankkChalls($count) {
