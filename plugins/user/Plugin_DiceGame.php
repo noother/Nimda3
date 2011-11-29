@@ -59,7 +59,7 @@ class Plugin_DiceGame extends Plugin {
 				switch($this->game['state']) {
 					case 'initializing':
 						if($this->addPlayer($this->User->nick)) {
-							$this->reply($this->User->nick." joined the game. Start the game with \x02".$this->data['trigger']." start\x02 or wait for other players to \x02join\x02");
+							$this->reply($this->User->nick." joined the game. Start the game with \x02".$this->data['trigger']." start\x02 or wait for other players to \x02join\x02".);
 						} else {
 							$this->reply('You already joined.');
 						}
@@ -361,6 +361,7 @@ class Plugin_DiceGame extends Plugin {
 		$ranking = $this->getVar('ranking');
 		if($ranking === false) $ranking = array();
 		
+		$put_won = false;
 		foreach($players as $player) {
 			$check = false;
 			foreach($ranking as &$rank) {
@@ -370,8 +371,9 @@ class Plugin_DiceGame extends Plugin {
 					$check = true;
 				}
 			
-				if($rank['nick'] == $winner['nick']) {
+				if(!$put_won && $rank['nick'] == $winner['nick']) {
 					$rank['won']++;
+					$put_won = true;
 				}
 			}
 			if(!$check) {
@@ -453,14 +455,15 @@ class Plugin_DiceGame extends Plugin {
 			}
 		}
 	
-		$text = sprintf("%s has played %s, won %d and lost %d. %s is on rank %d of %d.",
+		$text = sprintf("%s has played %s, won %d and lost %d. %s is on rank %d of %d. %s's last game was %s ago.",
 			$stats['nick'],
 			libString::plural('game', $stats['played']),
 			$stats['won'],
 			$stats['played'] - $stats['won'],
 			$stats['nick'],
 			$stats['rank'],
-			sizeof($ranking)
+			sizeof($ranking),
+			libTime::secondsToString(time() - $stats['time'])
 		);
 		
 		if($stats['rank'] != 1) {
