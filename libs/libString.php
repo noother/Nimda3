@@ -67,12 +67,18 @@ class libString {
 	static function plural($word, $num) {
 		$num = (int)($num);
 		
-		if($word == 'time') {
-			switch($num) {
-				case 1:  return 'once';
-				case 2:  return 'twice';
-				case 3:  return 'thrice';
-			}
+		switch($word) {
+			case 'time':
+				switch($num) {
+					case 1:  return 'once';
+					case 2:  return 'twice';
+					case 3:  return 'thrice';
+				}
+			break;
+			case 'have': case 'has':
+				if($num == 1) return 'has';
+				else return 'have';
+			break;
 		}
 		
 		if($num != 1) $word.= 's';
