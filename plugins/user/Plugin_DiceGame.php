@@ -59,7 +59,7 @@ class Plugin_DiceGame extends Plugin {
 				switch($this->game['state']) {
 					case 'initializing':
 						if($this->addPlayer($this->User->nick)) {
-							$this->reply($this->User->nick." joined the game. Start the game with \x02".$this->data['trigger']." start\x02 or wait for other players to \x02join\x02".);
+							$this->reply($this->User->nick." joined the game. Start the game with \x02".$this->data['trigger']." start\x02 or wait for other players to \x02join\x02.");
 						} else {
 							$this->reply('You already joined.');
 						}
