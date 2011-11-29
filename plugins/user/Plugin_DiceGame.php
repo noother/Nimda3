@@ -464,7 +464,7 @@ class Plugin_DiceGame extends Plugin {
 			$stats['rank'],
 			sizeof($ranking),
 			$stats['nick'],
-			libTime::secondsToString(time() - $stats['time'])
+			libTime::secondsToString(time() - $stats['last_played'])
 		);
 		
 		if($stats['rank'] != 1) {
