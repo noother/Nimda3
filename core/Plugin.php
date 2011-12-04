@@ -62,15 +62,16 @@ abstract class Plugin {
 	}
 	
 	public final function addJob($callback, $data=null) {
-		$filename = $this->id.'_'.
-		            ($this->Server ? $this->Server->id : 'none').'_'.
-		            ($this->Channel ? $this->Channel->id : 'none').'_'.
-		            ($this->User ? $this->User->id : 'none').'_'.
-		            ($this->command ? $this->command : 'none').'_'.
-		            libCrypt::getRandomHash();
-		
+		$filename = libCrypt::getRandomHash().'.nimdajob';
 		$data = array(
 			'classname'         => get_class($this),
+			'origin'            => array(
+				'plugin'			=> $this->id,
+				'server'            => ($this->Server ? $this->Server->id : false),
+				'channel'           => ($this->Channel ? $this->Channel->id : false),
+				'user'              => ($this->User ? $this->User->id : false),
+				'command'           => ($this->command ? $this->command : false)
+			),
 			'callback'          => $callback,
 			'plugin_path'       => 'plugins/'.(libString::startsWith('CorePlugin', get_class($this))?'core':'user').'/'.get_class($this).'.php',
 			'job_done_filename' => $this->Bot->getTempDir().'/jobs_done/'.$filename,

@@ -44,7 +44,7 @@ class Job {
 	}
 	
 	private function writeJobDone($result) {
-		$data = array('callback' => $this->data['callback'], 'result' => $result);
+		$data = array('callback' => $this->data['callback'], 'origin' => $this->data['origin'], 'result' => $result);
 		file_put_contents($this->data['job_done_filename'], serialize($data));
 	}
 	

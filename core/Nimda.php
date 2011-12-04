@@ -204,12 +204,16 @@ class Nimda {
 			$data = unserialize(file_get_contents($this->tempDir.'/jobs_done/'.$job));
 			unlink($this->tempDir.'/jobs_done/'.$job);
 			
-			list($plugin, $server, $channel, $user, $command) = explode('_', $job);
+			$plugin  = &$data['origin']['plugin'];
+			$server  = &$data['origin']['server'];
+			$channel = &$data['origin']['channel'];
+			$user    = &$data['origin']['user'];
+			$command = &$data['origin']['command'];
 			
 			if(!isset($this->plugins[$plugin])) continue;
 			$Plugin = $this->plugins[$plugin];
 			
-			if($server == 'none') {
+			if($server === false) {
 				$Server  = false;
 				$Channel = false;
 				$User    = false;
@@ -218,7 +222,7 @@ class Nimda {
 			} else {
 				$Server = $this->servers[$server];
 				
-				if($channel == 'none') {
+				if($channel === false) {
 					$Channel = false;
 				} elseif(!isset($Server->channels[$channel])) {
 					continue;
@@ -226,7 +230,7 @@ class Nimda {
 					$Channel = $Server->channels[$channel];
 				}
 				
-				if($user == 'none') {
+				if($user === false) {
 					$User = false;
 				} elseif(!isset($Server->users[$user])) {
 					continue;
