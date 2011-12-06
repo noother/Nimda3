@@ -178,7 +178,7 @@ class Plugin_DiceGame extends Plugin {
 		
 		$text = '';
 		foreach($this->game['players'] as $player) {
-			$text.= $player['nick'].': '.$player['points'].' points, ';
+			$text.= libIRC::noHighlight($player['nick']).': '.$player['points'].' points, ';
 		}
 		
 		$text = substr($text, 0, -2).'.';
