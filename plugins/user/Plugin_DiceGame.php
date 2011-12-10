@@ -345,12 +345,29 @@ class Plugin_DiceGame extends Plugin {
 			foreach($players as $player) {
 				$new_max_players['players'][] = $player['nick'];
 			}
+			
+			$this->reply(sprintf("A new largest game record has been achieved. %d players (%s). Old one was %d players (%s) %s ago",
+				$new_max_players['count'],
+				implode(', ', $new_max_players['players']),
+				sizeof($max_players['count']),
+				implode(', ', $max_players['players']),
+				libTime::secondsToString($new_max_players['date'] - $max_players['date'])
+			));
+			
 			$this->saveVar('stats_max_players', $new_max_players);
 		}
 		
 		$max_points = $this->getVar('stats_max_points');
 		
 		if($max_points === false || $winner['points'] > $max_points['points']) {
+			
+			$this->reply(sprintf("You broke the highest sum record with %d points. Old one was %s with %d points %s ago.",
+				$winner['points'],
+				$max_points['nick'],
+				$max_points['points'],
+				libTime::secondsToString(time() - $max_points['time'])
+			));
+			
 			$this->saveVar('stats_max_points', array(
 				'nick'   => $winner['nick'],
 				'points' => $winner['points'],
