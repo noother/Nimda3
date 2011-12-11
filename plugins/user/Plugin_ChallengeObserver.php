@@ -358,7 +358,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getRightAnswerChalls($count) {
-		$html = libHTTP::GET('http://www.right-answer.net/index.php');
+		$html = libHTTP::GET('http://www.right-answer.net/?lang=Us');
 		if(!$html) return;
 		
 		preg_match_all('#<a.+?Give (\d+?) XP.+?href="epreuves\.php\?nom=(.+?)">(.+?)</a>#s', $html, $arr);
