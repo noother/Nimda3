@@ -14,15 +14,25 @@ class libInternet {
 		}
 	}
 	
-	static function googleTranslate($text, $from='', $to = 'de') {
-		$host = 'ajax.googleapis.com';
-		$get  = '/ajax/services/language/translate?v=1.0&q='.rawurlencode($text).'&langpair='.rawurlencode($from.'|'.$to);
+	static function googleTranslate($text, $from='auto', $to='de', $return_source_lang=false) {
+		$html = libHTTP::POST('http://translate.google.com/', array(
+			'sl' => $from,
+			'tl' => $to,
+			'js' => 'n',
+			'hl' => 'en',
+			'ie' => 'UTF-8',
+			'text' => $text
+		));
 		
-		$raw = libHTTP::GET('http://'.$host.$get);
-		preg_match('/{"translatedText":"(.*?)"}/i', $raw, $matches);
-
-		if (empty($matches)) return false;
-	return $matches[1];
+		if(!preg_match('#<span id=result_box .+?<span.+?>(.+?)</span>#', $html, $arr)) return false;
+		$translation = mb_convert_encoding($arr[1], 'UTF-8', 'HTML-ENTITIES');
+		
+		if($return_source_lang) {
+			if(!preg_match('#<div id=autotrans.+?<h3.+?>(.+?) to .+? translation</h3>#', $html, $arr)) return false;
+			return array('translation' => $translation, 'source_lang' => $arr[1]);
+		} else {
+			return $translation;
+		}
 	}
 	
 	static function youtubeID($string) {

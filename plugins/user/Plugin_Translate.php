@@ -5,89 +5,61 @@ class Plugin_Translate extends Plugin {
 	protected $config = array(
 		'language' => array(
 			'type' => 'enum',
-			'options' => array('de', 'en'),
+			'options' => array(),
 			'default' => 'en',
 			'description' => 'Determines to which language !translate should auto-translate'
 		)
 	);
 	
-	public $triggers = array('!translate', '!de-en', '!de-fr', '!de-it', '!de-nl', '!de-pl', '!de-sv', '!de-es', '!de-no', '!en-de',
-						'!fr-de', '!it-de', '!nl-de', '!pl-de', '!sv-de', '!es-de', '!no-de', '!en-fr', '!en-it', '!en-nl',
-						'!en-pl', '!en-sv', '!en-es', '!en-no', '!fr-en', '!it-en', '!nl-en', '!pl-en', '!sv-en', '!es-en',
-						'!no-en');
+	public $triggers = array('!translate');
 	
 	public $helpTriggers = array('!translate');
 	public $helpCategory = 'Internet';
-	public $helpText = "Translates some foreign language to the channel language. There are also shortcuts available, like !en-de, !en-nl, etc.";
+	public $helpText = "Translates some foreign language to the channel language. There are also shortcuts available, like !en-de, !pl-ja, etc.";
 	public $usage = '<text>';
-
+	
+	
+	function onLoad() {
+		$languages = array('af', 'sq', 'ar', 'hy', 'az', 'eu', 'bn', 'bg', 'da', 'de', 'en', 'et', 'fi', 'fr', 'gl', 'ka', 'el', 'gu', 'ht', 'iw', 'hi', 'id', 'ga', 'is', 'it', 'ja', 'yi', 'kn', 'ca', 'ko', 'hr', 'la', 'lv', 'lt', 'ms', 'mt', 'mk', 'nl', 'no', 'fa', 'pl', 'pt', 'ro', 'ru', 'sv', 'sr', 'sk', 'sl', 'es', 'sw', 'tl', 'ta', 'te', 'th', 'cs', 'tr', 'uk', 'hu', 'ur', 'vi', 'cy', 'be');
+		
+		foreach($languages as $lang1) {
+			foreach($languages as $lang2) {
+				if($lang1 == $lang2) continue;
+				$this->triggers[] = '!'.$lang1.'-'.$lang2;
+			}
+			$this->triggers[] = '!auto-'.$lang1;
+			$this->config['language']['options'][] = $lang1;
+		}
+	}
 	
 	function isTriggered() {
 		if(!isset($this->data['text'])) {
 			$this->printUsage();
 			return;
 		}
-
-		if ($this->data['trigger'] == '!translate') {
-			$sl = '';
-			$tl = $this->getConfig('language');
-		} else {
-			$trigger = substr($this->data['trigger'],1);
-			$tmp = explode("-",$trigger);
-			$sl = $tmp[0];
-			$tl = $tmp[1];
+		
+		switch($this->data['trigger']) {
+			case '!translate':
+				$sl = 'auto';
+				$tl = $this->getConfig('language');
+			break;
+			default:
+				$trigger = substr($this->data['trigger'], 1);
+				list($sl, $tl) = explode('-', $trigger);
+			break;
 		}
-
-		$res = $this->googleTranslate($this->data['text'], $sl, $tl);
-
-		if (empty($res['translation']))  {
+		
+		if(false === $translation = libInternet::googleTranslate($this->data['text'], $sl, $tl, $sl=='auto'?true:false)) {
 			$this->reply("\x02Something weird occurred \x02");
 			return;
 		}
-
-		$res['translation'] = preg_replace_callback(
-			'/\\\u([0-9a-f]{4})/',
-			create_function(
-				'$m',
-				'return chr(hexdec($m[1]));'
-			),
-			$res['translation']
-		);
-
-		$res['translation'] = $this->unhtmlentities($res['translation']);
-
-		if (isset($res['detected_lang']))
-			$this->reply("\x02Translation (autodetect: '".$res['detected_lang']."'): \x02".$res['translation']);
-		else 
-			$this->reply("\x02Translation: \x02".$res['translation']);
-	}
-
-
-	private function googleTranslate($text, $from='', $to = 'de') {
-		$html = libHTTP::GET('http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&q='.rawurlencode($text).'&langpair='.rawurlencode($from.'|'.$to));
 		
-		preg_match('/{"translatedText":"(.*?)"(,"detectedSourceLanguage":"([a-z-]+)")?}/i', $html, $matches);
-
-		if (empty($matches)) 
-			return false;
-		if (isset($matches[3]))
-			return array('translation' => $matches[1], 'detected_lang' => $matches[3]);
-		
-		return array('translation' => $matches[1]);
+		if($sl == 'auto') {
+			$this->reply("\x02Translation from ".$translation['source_lang'].": \x02".$translation['translation']);
+		} else {
+			$this->reply("\x02Translation: \x02".$translation);
+		}
 	}
-	
-
-	function unhtmlentities($string) {
-		// replace numeric entities
-		$string = preg_replace('~&#x([0-9a-f]+);~ei', 'chr(hexdec("\\1"))', $string);
-		$string = preg_replace('~&#([0-9]+);~e', 'chr("\\1")', $string);
-		// replace literal entities
-		$trans_tbl = get_html_translation_table(HTML_ENTITIES);
-		$trans_tbl = array_flip($trans_tbl);
-		return strtr($string, $trans_tbl);
-	}
-
-
 	
 }
 
