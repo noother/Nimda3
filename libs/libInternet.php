@@ -24,8 +24,8 @@ class libInternet {
 			'text' => $text
 		));
 		
-		if(!preg_match('#<span id=result_box .+?<span.+?>(.+?)</span>#', $html, $arr)) return false;
-		$translation = mb_convert_encoding($arr[1], 'UTF-8', 'HTML-ENTITIES');
+		if(!preg_match('#<span id=result_box .+?>(.+?)</div>#', $html, $arr)) return false;
+		$translation = mb_convert_encoding(strip_tags($arr[1]), 'UTF-8', 'HTML-ENTITIES');
 		
 		if($return_source_lang) {
 			if(!preg_match('#<div id=autotrans.+?<h3.+?>(.+?) to .+? translation</h3>#', $html, $arr)) return false;
