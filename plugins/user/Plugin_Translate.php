@@ -20,7 +20,7 @@ class Plugin_Translate extends Plugin {
 	
 	
 	function onLoad() {
-		$languages = array('af', 'sq', 'ar', 'hy', 'az', 'eu', 'bn', 'bg', 'da', 'de', 'en', 'et', 'fi', 'fr', 'gl', 'ka', 'el', 'gu', 'ht', 'iw', 'hi', 'id', 'ga', 'is', 'it', 'ja', 'yi', 'kn', 'ca', 'ko', 'hr', 'la', 'lv', 'lt', 'ms', 'mt', 'mk', 'nl', 'no', 'fa', 'pl', 'pt', 'ro', 'ru', 'sv', 'sr', 'sk', 'sl', 'es', 'sw', 'tl', 'ta', 'te', 'th', 'cs', 'tr', 'uk', 'hu', 'ur', 'vi', 'cy', 'be');
+		$languages = array('af', 'ar', 'az', 'be', 'bg', 'bn', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'en', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'ga', 'gl', 'gu', 'hi', 'hr', 'ht', 'hu', 'hy', 'id', 'is', 'it', 'iw', 'ja', 'ka', 'kn', 'ko', 'la', 'lt', 'lv', 'mk', 'ms', 'mt', 'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sq', 'sr', 'sv', 'sw', 'ta', 'te', 'th', 'tl', 'tr', 'uk', 'ur', 'vi', 'yi');
 		
 		foreach($languages as $lang1) {
 			foreach($languages as $lang2) {
