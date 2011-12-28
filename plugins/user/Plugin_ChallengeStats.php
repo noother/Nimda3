@@ -28,7 +28,13 @@ class Plugin_ChallengeStats extends Plugin {
 	}
 	
 	function getHelpText() {
-		$Plugin = new $this->links[$this->data['trigger']];
+		$trigger = $this->data['trigger'];
+		if(!isset($this->links[$trigger])) {
+			$trigger = '!'.$trigger;
+		}
+		
+		$Plugin = new $this->links[$trigger];
+		
 	return sprintf($this->helpText, $Plugin->getUrl());
 	}
 	
