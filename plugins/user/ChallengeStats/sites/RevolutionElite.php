@@ -10,23 +10,23 @@ class RevolutionElite extends ChallengeStats {
 
 	
 	function getStats($username, $html) {
-		if (strpos($html, 'User Not Found') !== false)
+		if(preg_match("#Challenges solved: (.*?) from a possible (.*?)  \(.*?Rank: (.*?) <br#s", $html, $arr)) {
+			$solved = $arr[1];
+			$total  = $arr[2];
+			$rank   = $arr[3];
+		
+			$data = array(
+				'username'  => $username,
+				'challs_solved' 	=> $solved,
+				'challs_total' 	=> $total,
+				'rank'		=> $rank,
+				'users_total'	=> false
+			);
+		
+			return $data;
+		} else {
 			return false;
-
-		preg_match("#Challenges solved: (.*?) from a possible (.*?)  \(.*?Rank: (.*?) <br#s", $html, $arr);
-		$solved = $arr[1];
-		$total  = $arr[2];
-		$rank   = $arr[3];
-		
-		$data = array(
-			'username'  => $username,
-			'challs_solved' 	=> $solved,
-			'challs_total' 	=> $total,
-			'rank'		=> $rank,
-			'users_total'	=> false
-		);
-		
-	return $data;
+		}
 	}
 	
 }
