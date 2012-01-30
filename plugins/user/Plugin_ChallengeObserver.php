@@ -245,6 +245,11 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getSpojChalls($count) {
+		
+		$this->sendToEnabledChannels("See http://feeds.feedburner.com/SphereOnlineJudge?format=xml for the full list.");
+		return;
+		
+		/*
 		$html = libHTTP::GET('http://feeds.feedburner.com/SphereOnlineJudge?format=xml');
 		if($html === false) return;
 		
@@ -298,6 +303,7 @@ class Plugin_ChallengeObserver extends Plugin {
 				$count-$show_count
 			));
 		}
+		*/
 		
 	}
 	
