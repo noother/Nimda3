@@ -28,9 +28,9 @@ final class IRC_Channel extends IRC_Target {
 		else         $this->Server->sendRaw('PART '.$this->name);
 	}
 	
-	public function kick($User, $message=false) {		
-		if($message !== false) $this->Server->sendRaw('KICK '.$this->name.' '.$User->Name.' :'.$message);
-		else                   $this->Server->sendRaw('KICK '.$this->name.' '.$User->Name);
+	public function kick($User, $message=false) {
+		if($message !== false) $this->Server->sendRaw('KICK '.$this->name.' '.$User->nick.' :'.$message);
+		else                   $this->Server->sendRaw('KICK '.$this->name.' '.$User->nick);
 	}
 	
 	public function invite($User) {
