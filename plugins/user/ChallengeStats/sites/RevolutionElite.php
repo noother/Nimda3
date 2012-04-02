@@ -4,29 +4,30 @@ class RevolutionElite extends ChallengeStats {
 	
 	public $triggers = array('!rev', '!revolution', '!revolutionelite');
 	
-	protected $url        = 'http://sabrefilms.co.uk/revolutionelite';
-	protected $profileUrl = 'http://sabrefilms.co.uk/revolutionelite/profile.php?user=%s';
-	protected $statsText  = '{username} solved {challs_solved} (of {challs_total}) challenges and is on rank {rank} at {url}';
+	protected $url        = 'http://revolutionelite.co.uk';
+	protected $profileUrl = 'http://sabrefilms.co.uk/revolutionelite/w3ch4ll/userscore.php?username=%s';
+	#protected $statsText = '{username} solved {challs_solved} (of {challs_total}) challenges with {points} (of {points_total} points) and is on rank {rank} (of {users_total}) at {url}';
+	# for now each chall scores 1 point so no sense in outputting solved challs AND score
+	protected $statsText = '{username} solved {challs_solved} (of {challs_total}) challenges and is on rank {rank} (of {users_total}) at {url}';
 
 	
 	function getStats($username, $html) {
-		if(preg_match("#Challenges solved: (.*?) from a possible (.*?)  \(.*?Rank: (.*?) <br#s", $html, $arr)) {
-			$solved = $arr[1];
-			$total  = $arr[2];
-			$rank   = $arr[3];
-		
-			$data = array(
-				'username'  => $username,
-				'challs_solved' 	=> $solved,
-				'challs_total' 	=> $total,
-				'rank'		=> $rank,
-				'users_total'	=> false
-			);
-		
-			return $data;
-		} else {
+		if ($html === '0')
 			return false;
-		}
+
+		$tmp = explode(':', $html);
+		
+		$data = array(
+			'username'  	=> $tmp[0],
+			'rank'			=> $tmp[1],
+			'points'		=> $tmp[2],
+			'points_total'	=> $tmp[3],
+			'challs_solved' => $tmp[4],
+			'challs_total' 	=> $tmp[5],
+			'users_total'	=> $tmp[6]
+		);
+		
+		return $data;
 	}
 	
 }
