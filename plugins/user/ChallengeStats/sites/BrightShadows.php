@@ -19,6 +19,10 @@ class BrightShadows extends ChallengeStats {
 			'challs_solved' => $tmp[3],
 			'challs_total'  => $tmp[4]
 		);
+
+		# check for unranked users
+		if ($data['rank'] == -1)
+			$this->statsText = '{username} solved {challs_solved} (of {challs_total}) challenges and is not ranked at {url}';
 		
 	return $data;
 	}
