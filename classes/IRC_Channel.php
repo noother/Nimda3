@@ -6,6 +6,7 @@ require_once('IRC_Target.php');
 final class IRC_Channel extends IRC_Target {
 	
 	public $topic = '';
+	public $modes = array();
 	public $users = array();
 	
 	private $Bot;
@@ -16,11 +17,23 @@ final class IRC_Channel extends IRC_Target {
 		$this->name   = $name;
 		$this->Bot    = $Server->Bot;
 		
+		$this->sendMode();
 		$this->sendWho();
+	}
+	
+	private function sendMode() {
+		$this->Server->sendRaw('MODE '.$this->name, true);
 	}
 	
 	private function sendWho() {
 		$this->Server->sendRaw('WHO '.$this->name, true);
+	}
+	
+	public function privmsg($message, $bypass_queue=false) {
+		if(isset($this->modes['c'])) {
+			$message = libIRC::stripControlChars($message);
+		}
+		parent::privmsg($message, $bypass_queue);
 	}
 	
 	public function part($message=false) {

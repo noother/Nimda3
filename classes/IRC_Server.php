@@ -326,6 +326,15 @@ final class IRC_Server {
 				// End of WHO list (Channel join complete)
 				$data['Channel'] = $this->getChannel($parsed['params'][1]);
 			break;
+			case '324':
+				// Server MODE reply
+				$Channel = $this->getChannel($parsed['params'][1]);
+				$modes = $parsed['params'][2];
+				$Channel->modes = array();
+				for($i=1;$i<strlen($modes);$i++) {
+					$Channel->modes[$modes{$i}] = true;
+				}
+			break;
 			case '352':
 				// Server WHO reply
 				$Channel  = $this->getChannel($parsed['params'][1]);
@@ -412,6 +421,7 @@ final class IRC_Server {
 				$data['kick_message'] = $kick_message;
 			break;
 			case 'MODE':
+				// TODO: Fix this up - It's not really correct
 				if(sizeof($parsed['params']) >= 3) {
 					// Sent if a mode for a user in a channel is changed
 					// TODO: Many modes with 1 command
@@ -422,7 +432,24 @@ final class IRC_Server {
 					// TODO: onMode() Event
 				} else {
 					if(isset($parsed['user'])) {
-						// TODO: Sent when the channel modes are changed
+						// Sent when the channel modes are changed
+						$Channel = $this->getChannel($parsed['params'][0]);
+						$modes = $parsed['params'][1];
+						$action = '';
+						for($i=0;$i<strlen($modes);$i++) {
+							if($modes{$i} == '+') $action = 'add';
+							elseif($modes{$i} == '-') $action = 'rm';
+							else {
+								switch($action) {
+									case 'add':
+										$Channel->modes[$modes{$i}] = true;
+									break;
+									case 'rm':
+										unset($Channel->modes[$modes{$i}]);
+									break;
+								}
+							}
+						}
 					} else {
 						// TODO: Sent on connect to show us our user modes on the server
 					}

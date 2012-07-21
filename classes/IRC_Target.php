@@ -11,7 +11,7 @@ abstract class IRC_Target {
 	
 	abstract public function remove();
 	
-	public final function privmsg($message, $bypass_queue=false) {
+	public function privmsg($message, $bypass_queue=false) {
 		if(strlen($message) == 0) return false;
 		
 		$message = strtr($message, array("\r" => ' ', "\n" => ' '));
