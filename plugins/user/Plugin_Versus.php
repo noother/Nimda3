@@ -21,8 +21,14 @@ class Plugin_Versus extends Plugin {
 			return;
 		}
 		
-		$word1Hits = libInternet::googleResults($input[0]);
-		$word2Hits = libInternet::googleResults($input[1]);
+		$terms = array();
+		for($i=0;$i<2;$i++) {
+			$terms[$i] = trim($input[$i]);
+			if(str_word_count($terms[$i]) == 1) $terms[$i] = '"'.$terms[$i].'"';
+		}
+		
+		$word1Hits = libInternet::googleResults($terms[0]);
+		$word2Hits = libInternet::googleResults($terms[1]);
 		
 		if ($word1Hits + $word2Hits == 0){
 			$zero = array('zero', 'oh', 'null', 'nil', 'nought');
