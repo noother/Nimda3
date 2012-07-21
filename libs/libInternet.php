@@ -7,8 +7,9 @@ class libInternet {
 	
 	static function googleResults($string) {
 		$html = libHTTP::GET('http://www.google.com/search?q='.urlencode($string).'&hl=en&safe=off');
-		if(preg_match('#<div>Results .+? of (?:about )?<b>([\d,]+?)</b>#', $html, $arr)) {
-			return str_replace(',', '', $arr[1]);
+		
+		if(preg_match('#<div>(?:About )([\d,]+) results</div>#', $html, $arr)) {
+			return (int)str_replace(',', '', $arr[1]);
 		} else {
 			return 0;
 		}
