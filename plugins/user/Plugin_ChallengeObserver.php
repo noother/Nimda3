@@ -123,6 +123,9 @@ class Plugin_ChallengeObserver extends Plugin {
 			case 'wargame.kr':
 				$this->getWargameKrChalls($challcount);
 			break;
+			case 'W3Challs':
+				$this->getW3Challs($challcount);
+			break;
 		}
 	}
 	
@@ -377,6 +380,38 @@ class Plugin_ChallengeObserver extends Plugin {
 			);
 			$this->sendToEnabledChannels($text);
 			$this->addLatestChall('Right-Answer', $text);
+		}
+	}
+	
+	private function getW3Challs($count) {
+		$HTTP = new HTTP('w3challs.com');
+		$html = $HTTP->GET('/');
+		preg_match('#<input type="hidden" name="member_token" value="(.+?)" />#', $html, $arr);
+		$token = $arr[1];
+		
+		$html = $HTTP->POST('/profile/awe', array('changeLanguage' => 'fr', 'member_token' => $token));
+		preg_match_all('#<a href="/challenges/challenge(\d+?)".+?title="(.+?), by (.+?) \(Points: (\d+?);#', $html, $arr);
+	
+		$challs = array();
+		for($i=0;$i<sizeof($arr[1]);$i++) {
+			$challs[] = array(
+				'id' => $arr[1][$i],
+				'name' => $arr[2][$i],
+				'author' => $arr[3][$i],
+				'points' => $arr[4][$i]
+			);
+		}
+		usort($challs, array('self', 'sortByID'));
+		
+		for($i=0;$i<$count;$i++) {
+			$text = sprintf("\x02%s\x02 by \x02%s\x02 worth %d points ( %s )",
+				$challs[$i]['name'],
+				$challs[$i]['author'],
+				$challs[$i]['points'],
+				'http://w3challs.com/challenges/challenge'.$challs[$i]['id']
+			);
+			$this->sendToEnabledChannels($text);
+			$this->addLatestChall('W3Challs', $text);
 		}
 	}
 	
