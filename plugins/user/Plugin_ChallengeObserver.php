@@ -114,6 +114,9 @@ class Plugin_ChallengeObserver extends Plugin {
 			case 'Revolution Elite':
 				$this->getRevolutionEliteChalls($challcount);
 			break;
+			case 'Rosecode':
+				$this->getRosecodeChalls($challcount);
+			break;
 			case 'Right-Answer':
 				$this->getRightAnswerChalls($challcount);
 			break;
@@ -383,13 +386,32 @@ class Plugin_ChallengeObserver extends Plugin {
 		}
 	}
 	
+	private function getRosecodeChalls($count) {
+		$html = libHTTP::GET('http://www.javaist.com/rosecode/');
+		if(!$html) return;
+		preg_match('#<span>New Problems</span></h2>.+?<ul.+?>(.+?)</ul>#s', $html, $tmp);
+		preg_match_all('#<a href="(.+?)">(?:<font.+?</font> )?(.+?)</a>#', $tmp[1], $arr);
+		
+		for($i=0;$i<$count&&$i<sizeof($arr[0]);$i++) {
+			$text = sprintf("\x02%s\x02 ( %s )",
+				$arr[2][$i],
+				'http://www.javaist.com/rosecode/'.$arr[1][$i]
+			);
+			
+			$this->sendToEnabledChannels($text);
+			$this->addLatestChall('Rosecode', $text);
+		}
+	}
+	
 	private function getW3Challs($count) {
 		$HTTP = new HTTP('w3challs.com');
 		$html = $HTTP->GET('/');
+		if(!$html) return;
 		preg_match('#<input type="hidden" name="member_token" value="(.+?)" />#', $html, $arr);
 		$token = $arr[1];
 		
 		$html = $HTTP->POST('/profile/awe', array('changeLanguage' => 'fr', 'member_token' => $token));
+		if(!$html) return;
 		preg_match_all('#<a href="/challenges/challenge(\d+?)".+?title="(.+?), by (.+?) \(Points: (\d+?);#', $html, $arr);
 	
 		$challs = array();
