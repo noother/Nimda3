@@ -2,8 +2,6 @@
 
 class Plugin_Youtube extends Plugin {
 	
-	public $triggers = array('!youtube');
-	
 	public $helpCategory = 'Internet';
 	public $helpText = "Observes the channel for youtube links and prints back information about it if found.";
 	
