@@ -222,7 +222,7 @@ class HTTP {
 					preg_match('#^(.+?)=(.+?)(:?;|$)#', $tmp[1], $arr);
 					$header['cookies'][$arr[1]] = $arr[2];
 				} else {
-					$header[$tmp[0]] = $tmp[1];
+					$header[$tmp[0]] = trim($tmp[1]);
 				}
 			}
 		}
