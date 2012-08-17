@@ -263,6 +263,10 @@ final class IRC_Server {
 				$this->getVar('estimated_RECVQ_SPEED'),
 				$new_recvq_speed
 			);
+		} else {
+			$text.= sprintf(' Estimated RECVQ_SPEED is %d.'
+				$this->getVar('estimated_RECVQ_SPEED')
+			);
 		}
 		
 		$sent = array();
