@@ -482,7 +482,8 @@ abstract class Plugin {
 			object Channel (only if the ACTION is sent to a channel)
 			
 			array data [
-				string text => The text sent by the User
+				string text  => The text sent by the User
+				bool isQuery => True if the action is sent in query, otherwise false
 			]
 		*/
 	}
