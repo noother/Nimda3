@@ -501,6 +501,10 @@ abstract class Plugin {
 	
 	public final function onPrivmsg() {
 		$this->onMessage();
+		$isQuery = $this->data['isQuery'];
+		unset($this->data['isQuery']);
+		if($isQuery) $this->onQuery();
+		else $this->onChannelMessage();
 		
 		foreach($this->triggers as $trigger) {
 			$trigger_len = strlen($trigger);
@@ -519,11 +523,6 @@ abstract class Plugin {
 				}
 			}
 		}
-		
-		$isQuery = $this->data['isQuery'];
-		unset($this->data['isQuery']);
-		if($isQuery) $this->onQuery();
-		else $this->onChannelMessage();
 	}
 	
 	public final function triggerTimer() {
