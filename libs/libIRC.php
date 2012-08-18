@@ -40,7 +40,7 @@ class libIRC {
 	public static function stripControlChars($message) {
 		$new_message = "";
 		for($i=0;$i<strlen($message);$i++) {
-			$ascii = ord($message);
+			$ascii = ord($message{$i});
 			if($ascii > 31 || $ascii == 1) {
 				$new_message.= $message{$i};
 			}
