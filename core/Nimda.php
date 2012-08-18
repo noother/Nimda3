@@ -292,7 +292,7 @@ class Nimda {
 				case 'NOTICE':  if($User) $Plugin->onNotice(); else /* TODO: Add onServerNotice() */; break;
 				case 'PART':    if($User) $Plugin->onPart(); else $Plugin->onMePart(); break;
 				case 'PING':    $Plugin->onPing();    break;
-				case 'PRIVMSG': $Plugin->onPrivmsg(); break;
+				case 'PRIVMSG': if(isset($data['isAction'])) { unset($Plugin->data['isAction']); $Plugin->onAction(); } else $Plugin->onPrivmsg(); break;
 				case 'QUIT':    $Plugin->onQuit(); break;
 			}
 		}

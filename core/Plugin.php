@@ -473,6 +473,20 @@ abstract class Plugin {
 		*/
 	}
 	
+	public function onAction() {
+		/*
+			IRC command "PRIVMSG \x01ACTION (..)\x01" (/me)
+			Triggered when a user sents an action
+			
+			object User
+			object Channel (only if the ACTION is sent to a channel)
+			
+			array data [
+				string text => The text sent by the User
+			]
+		*/
+	}
+	
 	public function onWhoisReply() {
 		/*
 			IRC command "WHOIS"

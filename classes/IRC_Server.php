@@ -552,6 +552,15 @@ final class IRC_Server {
 					$data['Channel']    = $this->getChannel($parsed['params'][0]);
 					$data['User']->mode = $data['User']->modes[$data['Channel']->id];
 				}
+				
+				if(substr($data['text'], 0, 8) == "\x01ACTION ") {
+					$data['isAction'] = true;
+					$data['text'] = substr($data['text'], 8);
+					if(substr($data['text'], -1) == "\x01") {
+						$data['text'] = substr($data['text'], 0, -1);
+					}
+				}
+				
 			break;
 			case 'QUIT':
 				// Sent when a user quits the server
