@@ -25,7 +25,8 @@ class libInternet {
 		$translation = html_entity_decode(strip_tags($arr[1]));
 		
 		if($return_source_lang) {
-			if(!preg_match('#<div id=autotrans.+?<h3.+?>(.+?) to .+? translation</h3>#', $html, $arr)) return false;
+			if(!preg_match('#<a id=gt-otf-switch href=.+?&sl=(.+?)&#', $html, $arr)) return false;
+			if(!preg_match('#<option value='.preg_quote($arr[1]).'>(.+?)</option>#', $html, $arr)) return false;
 			return array('translation' => $translation, 'source_lang' => $arr[1]);
 		} else {
 			return $translation;
