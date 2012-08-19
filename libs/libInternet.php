@@ -16,17 +16,13 @@ class libInternet {
 	}
 	
 	static function googleTranslate($text, $from='auto', $to='de', $return_source_lang=false) {
-		$html = libHTTP::POST('http://translate.google.com/', array(
-			'sl' => $from,
-			'tl' => $to,
-			'js' => 'n',
-			'hl' => 'en',
-			'ie' => 'UTF-8',
-			'text' => $text
-		));
+		$HTTP = new HTTP('translate.google.com');
+		$HTTP->set('useragent', 'Mozilla/5.0 (X11; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1');
+		$html = $HTTP->GET('/?sl='.$from.'&tl='.$to.'&q='.urlencode($text));
 		
 		if(!preg_match('#<span id=result_box .+?>(.+?)</div>#', $html, $arr)) return false;
-		$translation = mb_convert_encoding(strip_tags($arr[1]), 'UTF-8', 'HTML-ENTITIES');
+		
+		$translation = html_entity_decode(strip_tags($arr[1]));
 		
 		if($return_source_lang) {
 			if(!preg_match('#<div id=autotrans.+?<h3.+?>(.+?) to .+? translation</h3>#', $html, $arr)) return false;
