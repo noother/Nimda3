@@ -147,24 +147,22 @@ class HTTP {
 		
 		$body = $this->_getBody(
 			$content_length,
-			(isset($header['Transfer-Encoding']) && $header['Transfer-Encoding'] == 'chunked')
+			$this->_getHeaderValue('Transfer-Encoding') === 'chunked'
 		);
-		if(isset($header['Content-Encoding'])) $body = $this->_decodeBody($body, $header['Content-Encoding']);
+		if(false !== $encoding = $this->_getHeaderValue('Content-Encoding')) $body = $this->_decodeBody($body, $encoding);
 		
-		$this->lastHeader = $header;
-		
-		if(isset($header['Connection']) && $header['Connection'] == 'close') {
+		if($this->_getHeaderValue('Connection') === 'close') {
 			fclose($this->socket);
 			$this->socket = false;
 		}
 		
-		if($this->settings['auto-follow'] && isset($header['Location'])) {
+		if($this->settings['auto-follow'] && $this->_getHeaderValue('Location') !== false) {
 			if(++$this->followed == $this->settings['max-follow']) {
 				trigger_error('Server exceeded redirection limit of '.$this->settings['max-follow']);
 				return $body;
 			}
 			
-			$parts = parse_url($header['Location']);
+			$parts = parse_url($this->_getHeaderValue('Location'));
 			
 			$reconnect = false;
 			
@@ -229,12 +227,14 @@ class HTTP {
 		
 		if(!$c) return false; // got no response
 		
-		if(isset($header['Transfer-Encoding']) && $header['Transfer-Encoding'] == 'chunked') {
+		$this->lastHeader = $header;
+		
+		if($this->_getHeaderValue('Transfer-Encoding') === 'chunked') {
 			$line = trim(fgets($this->socket));
 			preg_match('#^([0-9a-f]+)#', $line, $arr);
 			$content_length = hexdec($arr[1]);
-		} elseif(isset($header['Content-Length'])) {
-			$content_length = $header['Content-Length'];
+		} elseif(false !== $content_length = $this->_getHeaderValue('Content-Length')) {
+			// $content_length = $content_length;
 		} elseif($header['http_version'] == '1.0') {
 			$content_length = false;
 		} else {
@@ -302,6 +302,14 @@ class HTTP {
 		}
 		
 	return $body;
+	}
+	
+	private function _getHeaderValue($name) {
+		$name = strtolower($name);
+		$header = array_change_key_case($this->lastHeader, CASE_LOWER);
+		if(!isset($header[$name])) return false;
+	
+	return $header[$name];
 	}
 	
 }
