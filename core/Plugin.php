@@ -226,6 +226,12 @@ abstract class Plugin {
 		*/
 	}
 	
+	public function onUnload() {
+		/*
+			Triggered once when the bot process quits
+		*/
+	}
+	
 	public function onInterval() {
 		/*
 			Triggered every $this->interval seconds, if interval is not 0

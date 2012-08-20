@@ -146,6 +146,12 @@ class Nimda {
 		shell_exec('rm -R '.$this->tempDir);
 	}
 	
+	private function unloadPlugins() {
+		foreach($this->plugins as $Plugin) {
+			$Plugin->onUnload();
+		}
+	}
+	
 	public function getTempDir() {
 		return $this->tempDir;
 	}
@@ -388,6 +394,7 @@ class Nimda {
 	}
 	
 	public function __destruct() {
+		$this->unloadPlugins();
 		$this->removeTempDir();
 	}
 	
