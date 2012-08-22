@@ -21,8 +21,7 @@ class Omegle {
 			return false;
 		}
 		
-		$res = $this->Stream->GET('/start');
-		$this->chatId = substr($res, 1, -1);
+		$this->chatId = json_decode($this->Stream->GET('/start'));
 		
 		$this->listener = popen('/usr/bin/php ./plugins/user/Omegle/OmegleListener.php '.escapeshellarg($this->chatId), 'r');
 		stream_set_blocking($this->listener, 0);
