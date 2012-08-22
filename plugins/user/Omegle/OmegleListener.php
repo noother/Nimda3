@@ -33,7 +33,7 @@ class OmegleListener extends Omegle {
 						echo "typing\n";
 					break;
 					case 'stoppedTyping':
-						echo "stoppedtyping\n";
+						echo "stoppedTyping\n";
 					break;
 					case 'strangerDisconnected':
 						echo "disconnected\n";
