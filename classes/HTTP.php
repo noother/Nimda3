@@ -13,7 +13,8 @@ class HTTP {
 		'max-follow'          => 5,        // Follow max this many Location's
 		'accept-cookies'      => true,     // Send cookies the server gives us on future requests
 		'unstable-connection' => false,    // Try to reconnect until a connection is established
-		'connect-timeout'     => 5         // Seconds the connection might take to establish
+		'connect-timeout'     => 5,        // Seconds the connection might take to establish
+		'keep-alive'          => true      // Keep HTTP 1.1 connections alive
 	);
 	
 	private $lastHeader = false;
@@ -132,7 +133,7 @@ class HTTP {
 		
 		if($this->settings['useragent'] !== false) $header.= "User-Agent: ".$this->settings['useragent']."\r\n";
 		
-		$header.= "Connection: Keep-Alive\r\n";
+		$header.= "Connection: ".($this->settings['keep-alive'] ? "Keep-Alive" : "Close" )."\r\n";
 		
 		if(isset($additional_headers)) {
 			$header.= $additional_headers;
