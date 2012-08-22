@@ -38,6 +38,9 @@ class OmegleListener extends Omegle {
 					case 'strangerDisconnected':
 						echo "disconnected\n";
 					break 3;
+					case 'error':
+						echo "error\n".$item[1]."\n";
+					break;
 					default:
 						echo "unrecognized ".serialize($item);
 					break;

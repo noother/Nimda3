@@ -61,6 +61,11 @@ class Plugin_Omeglespy extends Plugin {
 							$spy['Target']->privmsg("\x02[OmegleSpy]\x02 <".$name."> ".$message);
 							$OtherGuy->send($message);
 						break;
+						case 'error':
+							$message = trim(fgets($Victim->listener));
+							$spy['Target']->privmsg("An error occurred: ".$message);
+							$this->removeSpy($spy['Target']);
+						break;
 					}
 				}
 			}

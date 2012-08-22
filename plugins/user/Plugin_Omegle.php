@@ -81,6 +81,11 @@ class Plugin_Omegle extends Plugin {
 						$message = trim(fgets($Chatter->Omegle->listener));
 						$Chatter->sendMessage($message);
 					break;
+					case 'error':
+						$message = trim(fgets($Chatter->Omegle->listener));
+						$Chatter->sendMessage("An error occurred: ".$message);
+						$this->removeSession($key);
+					break;
 				}
 			}
 		}
