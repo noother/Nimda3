@@ -4,10 +4,10 @@ require_once('Omegle/Omegle.php');
 
 class Plugin_Omeglespy extends Plugin {
 	
-	public $triggers = array('!chatspy', '!omeglespy', '!stopspy');
+	public $triggers = array('!omeglespy', '!chatspy', '!stopspy');
 	
-	public $helpTriggers = array('!chatspy');
-	public $helpText = 'Lets you eavesdrop a conversation between two random users';
+	public $helpTriggers = array('!omeglespy');
+	public $helpText = 'Lets you eavesdrop a conversation between two random users on omegle.com';
 	
 	private $spies = array();
 	
@@ -20,7 +20,7 @@ class Plugin_Omeglespy extends Plugin {
 		}
 		
 		switch($this->data['trigger']) {
-			case '!chatspy': case '!omeglespy':
+			case '!omeglespy': case '!chatspy':
 				$this->addSpy($Target);
 			break;
 			
@@ -58,7 +58,7 @@ class Plugin_Omeglespy extends Plugin {
 						break;
 						case 'message':
 							$message = trim(fgets($Victim->listener));
-							$spy['Target']->privmsg("\x02[ChatSpy]\x02 <".$name."> ".$message);
+							$spy['Target']->privmsg("\x02[OmegleSpy]\x02 <".$name."> ".$message);
 							$OtherGuy->send($message);
 						break;
 					}
