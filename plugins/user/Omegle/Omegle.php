@@ -34,6 +34,7 @@ class Omegle {
 		if($this->chatId === false) return false;
 		$res = $this->Stream->POST('/events', array('id' => $this->chatId));
 		
+		if(empty($res)) return $this->read();
 		if($res === 'null') return false;
 		
 	return json_decode($res);

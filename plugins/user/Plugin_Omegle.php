@@ -39,7 +39,7 @@ class Plugin_Omegle extends Plugin {
 		
 		$this->chatters[$this->getChatterId()] = $Chatter = new Chatter(
 			$this->User,
-			isset($this->Channel) ? $this->Channel : false,
+			$this->Channel ? $this->Channel : false,
 			$this->Server
 		);
 		
@@ -88,7 +88,7 @@ class Plugin_Omegle extends Plugin {
 	
 	private function getChatterId() {
 		$id = $this->User->nick;
-		if(isset($this->Channel)) $id.= ':'.$this->Channel->name;
+		if($this->Channel) $id.= ':'.$this->Channel->name;
 		
 	return $id;
 	}
