@@ -522,7 +522,7 @@ abstract class Plugin {
 	
 	public final function onPrivmsg() {
 		$this->onMessage();
-		$isQuery = $this->data['isQuery'];
+		$isQuery = $this->data['isQuery']; 
 		unset($this->data['isQuery']);
 		if($isQuery) $this->onQuery();
 		else $this->onChannelMessage();
@@ -530,7 +530,7 @@ abstract class Plugin {
 		foreach($this->triggers as $trigger) {
 			$trigger_len = strlen($trigger);
 			
-			if($trigger == substr($this->data['text'], 0, $trigger_len)) {
+			if(libString::startsWith($trigger, $this->data['text'])) {
 				if($trigger_len == strlen($this->data['text'])) {
 					$this->data['trigger'] = $trigger;
 					unset($this->data['text']);
