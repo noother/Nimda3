@@ -231,7 +231,7 @@ class HTTP {
 		
 		if($this->_getHeaderValue('Transfer-Encoding') === 'chunked') {
 			$line = trim(fgets($this->socket));
-			preg_match('#^([0-9a-f]+)#', $line, $arr);
+			preg_match('#^([0-9a-f]+)#i', $line, $arr);
 			$content_length = hexdec($arr[1]);
 		} elseif(false !== $content_length = $this->_getHeaderValue('Content-Length')) {
 			// $content_length = $content_length;
