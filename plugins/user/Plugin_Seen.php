@@ -44,9 +44,11 @@ class Plugin_Seen extends Plugin {
 					$text.= '.';
 				}
 			break;
+			/*
 			case 'QUIT':
 				$text.= 'quitting the server with message "'.$data['message'].'".';
 			break;
+			*/
 		}
 		
 	return $text;
@@ -98,6 +100,7 @@ class Plugin_Seen extends Plugin {
 		));
 	}
 	
+	/*
 	function onQuit() {
 		$this->saveVar($this->User->nick, array(
 			'action'  => 'QUIT',
@@ -107,6 +110,7 @@ class Plugin_Seen extends Plugin {
 			'time'    => $this->Bot->time
 		));
 	}
+	*/
 	
 }
 
