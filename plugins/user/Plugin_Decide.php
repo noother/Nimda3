@@ -23,7 +23,7 @@ class Plugin_Decide extends Plugin {
 		$tmp = explode(" or ",$text);
 		$rand = rand(0,sizeof($tmp)-1);
 		
-		$this->reply($tmp[$rand]);
+		$this->reply($this->User->nick.': '.$tmp[$rand]);
 	}
 	
 }
