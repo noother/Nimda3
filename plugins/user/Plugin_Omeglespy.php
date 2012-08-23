@@ -8,6 +8,7 @@ class Plugin_Omeglespy extends Plugin {
 	
 	public $helpTriggers = array('!omeglespy');
 	public $helpText = 'Lets you eavesdrop a conversation between two random users on omegle.com';
+	public $helpCategory = 'Internet';
 	
 	private $spies = array();
 	

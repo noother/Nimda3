@@ -9,6 +9,7 @@ class Plugin_Omegle extends Plugin {
 	
 	public $helpTriggers = array('!chat');
 	public $helpText = 'Chat with one of the many different personalities of Nimda!';
+	public $helpCategory = 'Internet';
 	
 	private $chatters = array();
 	
