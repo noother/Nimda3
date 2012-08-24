@@ -50,6 +50,11 @@ class Plugin_DiceGame extends Plugin {
 						$this->reply('There is no game running.');
 					break;
 					default:
+						if(!$this->playerExists($this->User->nick)) {
+							$this->reply('You\'re not participating in the game.');
+							return;
+						}
+						
 						$this->reset();
 						$this->reply('The game has been stopped.');
 					break;
