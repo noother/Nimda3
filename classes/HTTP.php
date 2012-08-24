@@ -14,7 +14,8 @@ class HTTP {
 		'accept-cookies'      => true,     // Send cookies the server gives us on future requests
 		'unstable-connection' => false,    // Try to reconnect until a connection is established
 		'connect-timeout'     => 5,        // Seconds the connection might take to establish
-		'keep-alive'          => true      // Keep HTTP 1.1 connections alive
+		'keep-alive'          => true,     // Keep HTTP 1.1 connections alive
+		'proxy'               => false     // Use a proxy (format 1.2.3.4:5678)
 	);
 	
 	private $lastHeader = false;
@@ -94,16 +95,23 @@ class HTTP {
 	
 	
 	private function _connect() {
-		if($this->ip === false) $this->ip = gethostbyname($this->host);
+		if($this->settings['proxy']) {
+			list($ip, $port) = explode(':', $this->settings['proxy']);
+		} else {
+			if($this->ip === false) $this->ip = gethostbyname($this->host);
+			$ip = $this->ip;
+			$port = $this->port;
+		}
+		
 		if($this->socket) fclose($this->socket);
-		$this->socket = @fsockopen($this->ip, $this->port, $errno, $errstr, $this->settings['connect-timeout']);
+		$this->socket = @fsockopen($ip, $port, $errno, $errstr, $this->settings['connect-timeout']);
 		
 		if(!$this->socket) {
 			if($this->settings['unstable-connection']) {
 				usleep(500000);
 				return $this->_connect();
 			} else {
-				trigger_error('Could not connect to '.$this->host.' ('.$this->ip.') on port '.$this->port);
+				trigger_error('Could not connect to '.$this->host.' ('.$ip.') on port '.$port);
 				return false;
 			}
 		}
