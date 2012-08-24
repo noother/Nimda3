@@ -48,7 +48,7 @@ class CorePlugin_Help extends Plugin {
 		}
 		
 		$this->User->privmsg('To get more information about a command, type '.$this->data['trigger'].' <command>.');
-		$this->User->privmsg('Nimda is open source. You can find it\'s source code at https://github.com/noother/Nimda3. If you want Nimda in your own channel, either run your own copy, or ask noother to let Nimda join your server/channel. He\'s happy if his copy runs on as many servers/channels possible :)');
+		$this->User->privmsg('Nimda is open source. You can find its source code at https://github.com/noother/Nimda3. If you want Nimda in your own channel, either run your own copy, or ask noother to let Nimda join your server/channel. He\'s happy if his copy runs on as many servers/channels possible :)');
 	}
 	
 	function printHelpText($trigger) {
