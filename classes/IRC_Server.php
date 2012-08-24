@@ -97,7 +97,9 @@ final class IRC_Server {
 	private function write($string) {
 		echo '<< '.$string."\n";
 		fputs($this->socket, $string."\r\n");
-		$this->estimatedRecvq[] = array('msg' => $string, 'length' => strlen($string));
+		if($this->getVar('estimated_CLIENT_FLOOD') != -1) {
+			$this->estimatedRecvq[] = array('msg' => $string, 'length' => strlen($string));
+		}
 	}
 	
 	private function getUser($nick) {
@@ -221,6 +223,8 @@ final class IRC_Server {
 	}
 	
 	private function doRecvq() {
+		if($this->getVar('estimated_CLIENT_FLOOD') == -1) return;
+		
 		$time = microtime(true);
 		
 		if(empty($this->estimatedRecvq)) $this->lastRecvqRemoved = $time;
