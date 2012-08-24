@@ -4,10 +4,10 @@ require_once('Omegle/Omegle.php');
 
 class Plugin_Omeglespy extends Plugin {
 	
-	public $triggers = array('!omeglespy', '!chatspy', '!stopspy');
+	public $triggers = array('!omeglespy', '!chatspy', '!stopspy', '!alice', '!bob');
 	
 	public $helpTriggers = array('!omeglespy');
-	public $helpText = 'Lets you eavesdrop a conversation between two random users on omegle.com';
+	public $helpText = 'Lets you eavesdrop a conversation between two random users on omegle.com. You may inject messages with !alice <text> and !bob <text>';
 	public $helpCategory = 'Internet';
 	
 	private $spies = array();
@@ -27,6 +27,10 @@ class Plugin_Omeglespy extends Plugin {
 			
 			case '!stopspy':
 				$this->removeSpy($Target);
+			break;
+			
+			case '!alice': case '!bob':
+				$this->injectMessage($Target);
 			break;
 		}
 		
@@ -71,6 +75,32 @@ class Plugin_Omeglespy extends Plugin {
 				}
 			}
 		}
+	}
+	
+	private function injectMessage($Target) {
+		if(!isset($this->data['text'])) {
+			$this->reply('No message to inject');
+			return;
+		}
+		
+		if(!isset($this->spies[$Target->id])) {
+			$this->reply('There is no spy running here.');
+			return;
+		}
+		
+		switch($this->data['trigger']) {
+			case '!alice':
+				$name = 'Alice';
+				$send_to = 'Bob';
+			break;
+			case '!bob':
+				$name = 'Bob';
+				$send_to = 'Alice';
+			break;
+		}
+		
+		$this->spies[$Target->id][$send_to]->send($this->data['text']);
+		$this->reply("\x02[OmegleSpy]\x02 <".$name."> ".$this->data['text']);
 	}
 	
 	private function addSpy($Target) {
