@@ -4,6 +4,7 @@ class Plugin_DiceGame extends Plugin {
 	
 	public $triggers = array('!dice');
 	public $usage = 'start|stop|join|roll|stand|rules|(stats [player])';
+	public $interval = 60;
 	
 	public $helpCategory = 'Games';
 	public $helpText = "A game with dice. Type \x02!dice rules\x02 to see the rules.";
@@ -127,11 +128,26 @@ class Plugin_DiceGame extends Plugin {
 		
 	}
 	
+	function onInterval() {
+		foreach($this->Bot->servers as $Server) {
+			foreach($Server->channels as $Channel) {
+				$state = $Channel->getVar('dicegame_gamestate');
+				if(!$state) continue;
+				
+				if($state['state'] != 'stopped' && $state['last_action'] < $this->Bot->time-600) { // if nothing happend in the last 10 minutes
+					$Channel->removeVar('dicegame_gamestate');
+					$Channel->privmsg('DiceGame has been stopped due to inactivity.');
+				}
+			}
+		}
+	}
+	
 	private function reset() {
 		$this->Channel->saveVar('dicegame_gamestate', array(
 			'state' => 'stopped',
 			'players' => array(),
-			'turn' => false
+			'turn' => false,
+			'last_action' => $this->Bot->time
 		));
 		$this->loadGamestate();
 	}
@@ -506,6 +522,7 @@ class Plugin_DiceGame extends Plugin {
 	}
 	
 	private function saveGamestate() {
+		$this->game['last_action'] = $this->Bot->time;
 		$this->Channel->saveVar('dicegame_gamestate', $this->game);
 	}
 	
