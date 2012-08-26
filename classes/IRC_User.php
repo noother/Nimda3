@@ -33,7 +33,7 @@ final class IRC_User extends IRC_Target {
 	public function notice($message, $bypass_queue=false) {
 		$this->Server->sendRaw('NOTICE '.$this->name.' :'.$message, $bypass_queue);
 	}
-	
+	/*
 	public function isIdentified() {
 		if($this->nickservStatus == 3) return true;
 		if(!$this->Server->nickservIdentifyCommand) return false;
@@ -73,7 +73,7 @@ final class IRC_User extends IRC_Target {
 		
 		return ($this->nickservStatus == 3);
 	}
-	
+	*/
 	public function changeNick($nick) {
 		$new_id = strtolower($nick);
 		

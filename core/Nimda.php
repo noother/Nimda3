@@ -43,7 +43,7 @@ class Nimda {
 					if(is_array($data)) {
 						unset($data['raw']); // TODO: Logging & stuff
 						$this->triggerPlugins($data, $Server);
-						$Server->sendQueue();
+						$Server->doSendQueue();
 					}
 				}
 			}
