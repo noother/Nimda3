@@ -297,7 +297,7 @@ final class IRC_Server {
 					$Channel->sendNames();
 					// TODO: onMode() Event
 				} else {
-					if(isset($parsed['user'])) {
+					if(isset($this->channels[$parsed['params'][0]])) {
 						// Sent when the channel modes are changed
 						$Channel = $this->getChannel($parsed['params'][0]);
 						$modes = $parsed['params'][1];
