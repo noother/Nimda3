@@ -4,7 +4,7 @@ require_once('Omegle/Omegle.php');
 
 class Plugin_Omeglespy extends Plugin {
 	
-	public $triggers = array('!omeglespy', '!chatspy', '!stopspy', '!alice', '!bob');
+	public $triggers = array('!omeglespy', '!chatspy', '!eavesdrop', '!stopspy', '!alice', '!bob');
 	
 	public $helpTriggers = array('!omeglespy');
 	public $helpText = 'Lets you eavesdrop a conversation between two random users on omegle.com. You may inject messages with !alice <text> and !bob <text>';
@@ -100,7 +100,7 @@ class Plugin_Omeglespy extends Plugin {
 		}
 		
 		$this->spies[$Target->id][$send_to]->send($this->data['text']);
-		$this->reply("\x02[OmegleSpy]\x02 <".$name."> ".$this->data['text']);
+		$this->reply("\x02[OmegleSpy]\x02 <Mallory_".$name."> ".$this->data['text']);
 	}
 	
 	private function addSpy($Target) {
