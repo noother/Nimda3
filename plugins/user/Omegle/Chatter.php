@@ -7,13 +7,15 @@ class Chatter {
 	public $Server;
 	public $Omegle;
 	
+	public $connected = false;
+	
 	function __construct($User, $Channel, $Server) {
 		$this->User    = $User;
 		$this->Channel = $Channel;
 		$this->Server  = $Server;
 		$this->Omegle  = new Omegle;
 		
-		$this->Omegle->start();
+		$this->connected = $this->Omegle->start();
 	}
 	
 	function sendMessage($message) {

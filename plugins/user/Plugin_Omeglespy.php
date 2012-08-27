@@ -115,11 +115,19 @@ class Plugin_Omeglespy extends Plugin {
 			'Bob'    => new Omegle
 		);
 		
-		$spy['Alice']->start();
-		$spy['Bob']->start();
+		$check1 = $spy['Alice']->start();
+		$check2 = $spy['Bob']->start();
+		
+		if(!$check1 || !$check2) {
+			$this->reply('Error while connecting');
+			$this->removeSpy($Target);
+			return false;
+		}
 		
 		$this->reply('Eavesdropping started, stop with !stopspy.');
 		$this->interval = 1;
+	
+	return true;
 	}
 	
 	private function removeSpy($Target) {

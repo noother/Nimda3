@@ -9,9 +9,11 @@ class Omegle {
 	protected $chatId = false;
 	
 	private $Stream;
+	private $proxy = false;
 	
 	function __construct() {
 		$this->Stream = new HTTP('cardassia.omegle.com');
+		if($this->proxy) $this->Stream->set('proxy', $this->proxy);
 		$this->Stream->set('keep-alive', false);
 	}
 	
@@ -22,6 +24,7 @@ class Omegle {
 		}
 		
 		$this->chatId = json_decode($this->Stream->GET('/start'));
+		if(!$this->chatId) return false;
 		
 		$this->listener = popen('/usr/bin/php ./plugins/user/Omegle/OmegleListener.php '.escapeshellarg($this->chatId), 'r');
 		stream_set_blocking($this->listener, 0);

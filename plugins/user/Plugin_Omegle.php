@@ -44,6 +44,12 @@ class Plugin_Omegle extends Plugin {
 			$this->Server
 		);
 		
+		if(!$Chatter->connected) {
+			$this->reply('Error while connecting');
+			$this->removeSession($this->getChatterId());
+			return false;
+		}
+		
 		$this->interval = 1;
 		if(array_search($Chatter->Server->Me->nick, $this->triggers) === false) {
 			$this->triggers[] = $Chatter->Server->Me->nick.':';
