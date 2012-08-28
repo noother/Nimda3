@@ -6,7 +6,7 @@ class Hackquest extends ChallengeStats {
 	
 	protected $url        = 'http://hackquest.com';
 	protected $profileUrl = 'http://hackquest.com/user.php?op=userinfo&uname=%s';
-	protected $statsText  = '{username} is a {user_title} at Hackquest with {challs} challenges solved and {score} rankpoints. {username} visited {url} {visits} times and spent a total of {time} there. {username} was last online {last_online}.';
+	protected $statsText  = '{username} is a {user_title} at Hackquest with {challs} challenges solved and {score} rankpoints. {username} visited {url} {visits} and spent a total of {time} there. {username} was last online {last_online}.';
 	
 	function getStats($username, $html) {
 		if (strpos($html, 'There is no available information for') !== false)
@@ -15,7 +15,9 @@ class Hackquest extends ChallengeStats {
 		preg_match('#<h3>User information of (VIP )?(.*?)</h3>#',$html,$arr);
 		$nick = $arr[2];
 
-		preg_match('#<b>Rank:</b>.*?<font color=".*?">(.*?)</font>#',$html,$arr);
+		# inactive users will match the username regex with ' ' but there are no details about them, so return false then
+		if (!preg_match('#<b>Rank:</b>.*?<font color=".*?">(.*?)</font>#',$html,$arr))
+			return false;
 		$rank = $arr[1];
 
 		preg_match('#<b>Number of hacks:</b>.*?<td>(.*?)</td>#',$html,$arr);
