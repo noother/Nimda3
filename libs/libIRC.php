@@ -44,6 +44,9 @@ class libIRC {
 			if($ascii > 31 || $ascii == 1) {
 				$new_message.= $message{$i};
 			}
+			
+			if($ascii == 3) $i++;
+			
 		}
 		
 	return $new_message;
