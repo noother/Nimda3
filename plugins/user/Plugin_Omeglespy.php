@@ -21,7 +21,7 @@ class Plugin_Omeglespy extends Plugin {
 		}
 		
 		switch($this->data['trigger']) {
-			case '!omeglespy': case '!chatspy':
+			case '!omeglespy': case '!chatspy': case '!eavesdrop':
 				$this->addSpy($Target);
 			break;
 			
@@ -100,7 +100,7 @@ class Plugin_Omeglespy extends Plugin {
 		}
 		
 		$this->spies[$Target->id][$send_to]->send($this->data['text']);
-		$this->reply("\x02[OmegleSpy]\x02 <Mallory_".$name."> ".$this->data['text']);
+		$this->reply("\x02[OmegleSpy]\x02 <".$name."> ".$this->data['text']);
 	}
 	
 	private function addSpy($Target) {
@@ -124,7 +124,7 @@ class Plugin_Omeglespy extends Plugin {
 			return false;
 		}
 		
-		$this->reply('Eavesdropping started, stop with !stopspy.');
+		$this->reply('Eavesdropping started, stop with !stopspy. Inject messages with !alice & !bob');
 		$this->interval = 1;
 	
 	return true;
