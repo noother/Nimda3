@@ -26,19 +26,14 @@ class Plugin_PHP extends Plugin {
 			$this->printUsage();
 			return;
 		}
-
 		
 		$this->redirects = 0;
 		$this->fetchFunctionDescription($this->data['text']);  
 	}
 	
 	private function fetchFunctionDescription($func) {
-		if($this->getConfig('language') == 'de') $host = 'de.php.net';
-		else $host = 'php.net';
-		
-		$HTTP = new HTTP($host);
-		$HTTP->setCookie('LAST_LANG', $this->getConfig('language'));
-		$html = $HTTP->GET('/'.$func);
+		$HTTP = new HTTP('php.net');
+		$html = $HTTP->GET('/'.$this->getConfig('language').'/'.$func);
 		
 		if($html === false) {
 			$this->reply('Timeout on contacting '.$host);
@@ -54,7 +49,7 @@ class Plugin_PHP extends Plugin {
 			$decl = html_entity_decode(str_replace(array("\n", "\r"), ' ', $decl));
 			while(strstr($decl, '  ')) $decl = str_replace('  ', ' ', $decl);
 			$decl = str_replace($func, "\x02".$func."\x02", $decl);
-			$output =  $decl.' - '.html_entity_decode($match[2]).' ( http://'.$host.'/'.$func.' )';
+			$output =  $decl.' - '.html_entity_decode($match[2]).' ( http://php.net/'.$func.' )';
 			
 			$this->reply(libString::isUTF8($output)?$output:utf8_encode($output));
 		} else {    // if several possibilities
@@ -64,10 +59,10 @@ class Plugin_PHP extends Plugin {
 				if ($this->redirects++ < 2)
 					$this->fetchFunctionDescription($matches[0][1]);
 				else 
-					$this->reply($this->notfoundtext.' http://'.$host.'/search.php?show=wholesite&pattern='.$this->data['text']);
+					$this->reply($this->notfoundtext.' http://php.net/search.php?show=wholesite&pattern='.$this->data['text']);
 				return;
 			} else
-				$output = $this->notfoundtext.' http://'.$host.'/search.php?show=wholesite&pattern='.$func;
+				$output = $this->notfoundtext.' http://php.net/search.php?show=wholesite&pattern='.$func;
 
 			$this->reply(libString::isUTF8($output)?$output:utf8_encode($output));
 		}
