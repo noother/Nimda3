@@ -22,16 +22,18 @@ final class IRC_Server {
 	public $host         = '';
 	public $port         = 0;
 	public $isSSL        = false;
+	public $bind         = '';
 	public $Me;
 	//public $NickServ;
 	//public $nickservIdentifyCommand = false;
 	
-	public function __construct($Bot, $name, $host, $port, $ssl=false) {
+	public function __construct($Bot, $name, $host, $port, $ssl=false, $bind='0.0.0.0:0') {
 		$this->Bot          = $Bot;
 		$this->id           = $name;
 		$this->host         = $host;
 		$this->port         = $port;
 		$this->isSSL        = $ssl;
+		$this->bind         = $bind;
 		
 		if($this->getVar('estimated_CLIENT_FLOOD') === false) $this->saveVar('estimated_CLIENT_FLOOD', -1);
 		if($this->getVar('estimated_RECVQ_SPEED') === false)  $this->saveVar('estimated_RECVQ_SPEED', 1);
@@ -50,12 +52,21 @@ final class IRC_Server {
 		$c = &$this->connectCooldown;
 		if($c['last_connect'] + $c['cooldown'] > time()) return false;
 		
-		if(!$this->socket = @fsockopen(($this->isSSL?'ssl://':'').$this->host, $this->port)) {
+		$this->socket = @stream_socket_client(
+			($this->isSSL?'ssl://':'').$this->host.':'.$this->port,
+			$errno,
+			$errstr,
+			5,
+			STREAM_CLIENT_CONNECT,
+			stream_context_create(array('socket' => array('bindto' => $this->bind)))
+		);
+		
+		if(!$this->socket) {
 			if(!$c['cooldown']) $c['cooldown'] = 1;
 			elseif($c['cooldown'] < 300) $c['cooldown']*= 2;
 			$c['last_connect'] = time();
 			
-			echo 'Could not connect to '.$this->host.' on '.$this->port.'. Trying again in '.$c['cooldown']." seconds\n";
+			echo 'Could not connect to '.$this->host.' on '.$this->port.' because "'.$errstr.'". Trying again in '.$c['cooldown']." seconds\n";
 			return false;
 		}
 		

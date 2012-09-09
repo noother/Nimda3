@@ -118,3 +118,8 @@
 	ALTER TABLE `memory` DROP `is_array`;
 	UPDATE `version` SET `version` = '7';
 -- [/7]
+
+-- [8]
+	ALTER TABLE `servers` ADD `bind` VARCHAR( 255 ) NOT NULL DEFAULT '0.0.0.0:0' AFTER `ssl`;
+	UPDATE `version` SET `version` = '8';
+-- [/8]
