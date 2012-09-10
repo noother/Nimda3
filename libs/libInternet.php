@@ -87,6 +87,18 @@ class libInternet {
 		return libHTTP::GET('http://tinyurl.com/api-create.php?url='.urlencode($longurl));
 	}
 	
+	static function tinyURLDecode($tinyurl) {
+		$parts = parse_url($tinyurl);
+		$HTTP = new HTTP('tinyurl.com');
+		$HTTP->set('auto-follow', false);
+		$HTTP->GET($parts['path']);
+		$header = $HTTP->getHeader();
+		
+		if(!isset($header['Location'])) return false;
+		
+	return $header['Location'];
+	}
+	
 }
 
 ?>

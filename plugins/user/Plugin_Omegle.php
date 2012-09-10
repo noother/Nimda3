@@ -24,7 +24,10 @@ class Plugin_Omegle extends Plugin {
 			default:
 				$chatterId = $this->getChatterId();
 				if(isset($this->chatters[$chatterId]) && $this->data['trigger'] == $this->chatters[$chatterId]->Server->Me->nick.':') {
-					$this->chatters[$chatterId]->Omegle->send($this->data['text']);
+					$check = $this->chatters[$chatterId]->Omegle->send($this->data['text']);
+					if($check === 'spam') {
+						$this->reply('The message was not sent because it would get us banned.');
+					}
 				}
 			break;
 		}

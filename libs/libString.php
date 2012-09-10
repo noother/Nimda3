@@ -85,5 +85,10 @@ class libString {
 		
 	return $num.' '.$word;
 	}
+	
+	static function getUrls($string) {
+		preg_match_all('#(https?://.+?)(?:\s|$)#i', $string, $arr);
+	return $arr[1];
+	}
 }
 ?>

@@ -1,6 +1,8 @@
 <?php
 
 require_once('classes/HTTP.php');
+require_once('libs/libInternet.php');
+require_once('libs/libString.php');
 
 class Omegle {
 	
@@ -10,6 +12,8 @@ class Omegle {
 	
 	private $Stream;
 	private $proxy = false;
+	
+	private static $bannedHosts = array('ihookup.com', 'naughtybenaughty.com', 'omegleadult.info');
 	
 	function __construct() {
 		$this->Stream = new HTTP('cardassia.omegle.com');
@@ -45,6 +49,8 @@ class Omegle {
 	function send($text) {
 		if($this->chatId === false) return false;
 		
+		if($this->checkSpam($text)) return 'spam';
+		
 		$res = $this->Stream->POST('/send', array('id' => $this->chatId, 'msg' => $text));
 		if($res == 'win') return true;
 		else return false;
@@ -72,6 +78,22 @@ class Omegle {
 		$res = $this->Stream->POST('/disconnect', array('id' => $this->chatId));
 		if($res == 'win') return true;
 		else return false;
+	}
+	
+	private function checkSpam($text) {
+		$links = libString::getUrls($text);
+		foreach($links as $link) {
+			$parts = parse_url($link);
+			if($parts['host'] == 'tinyurl.com' && isset($parts['path']) && !isset($path['query']) && ctype_alnum(substr($parts['path'], 1))) {
+				if($this->checkSpam(libInternet::tinyURLDecode($link))) return true;
+			} else {
+				preg_match('/[^\.]+\.[^\.]+$/', $parts['host'], $arr);
+				$domain = $arr[0];
+				if(in_array($domain, self::$bannedHosts)) return true;
+			}
+		}
+		
+	return false;
 	}
 	
 	function __destruct() {

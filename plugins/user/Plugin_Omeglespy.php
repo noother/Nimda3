@@ -64,7 +64,10 @@ class Plugin_Omeglespy extends Plugin {
 						case 'message':
 							$message = trim(fgets($Victim->listener));
 							$spy['Target']->privmsg("\x02[OmegleSpy]\x02 <".$name."> ".$message);
-							$OtherGuy->send($message);
+							$check = $OtherGuy->send($message);
+							if($check === 'spam') {
+								$spy['Target']->privmsg('The previous message was not sent because it would get us banned.');
+							}
 						break;
 						case 'error':
 							$message = trim(fgets($Victim->listener));
@@ -99,7 +102,12 @@ class Plugin_Omeglespy extends Plugin {
 			break;
 		}
 		
-		$this->spies[$Target->id][$send_to]->send($this->data['text']);
+		$check = $this->spies[$Target->id][$send_to]->send($this->data['text']);
+		if($check === 'spam') {
+			$this->reply('The message was not sent because it would get us banned.');
+			return;
+		}
+		
 		$this->reply("\x02[OmegleSpy]\x02 <".$name."> ".$this->data['text']);
 	}
 	
