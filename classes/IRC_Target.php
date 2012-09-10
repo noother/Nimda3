@@ -9,12 +9,18 @@ abstract class IRC_Target {
 	public  $name = '';
 	public  $id;
 	
+	private $_ctcpAllowed = false;
+	
 	abstract public function remove();
 	
 	public function privmsg($message, $bypass_queue=false) {
 		if(strlen($message) == 0) return false;
 		
 		$message = strtr($message, array("\r" => ' ', "\n" => ' '));
+		
+		if($message{0} == "\x01" && !$this->_ctcpAllowed) $message = 'No.';
+		
+		
 		/*
 			irc max message length is 512 bytes including CRLF
 			The irc message received by clients counts - NOT what we send
@@ -59,7 +65,10 @@ abstract class IRC_Target {
 	public final function ctcp($command, $params="", $bypass_queue=false) {
 		$send = $command;
 		if(!empty($params)) $send.= ' '.$params;
+		
+		$this->_ctcpAllowed = true;
 		$this->privmsg("\x01".$send."\x01", $bypass_queue);
+		$this->_ctcpAllowed = false;
 	}
 	
 	public final function ctcpReply($command, $message, $bypass_queue=false) {
