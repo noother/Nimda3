@@ -34,4 +34,3 @@ class CorePlugin_CTCPReplies extends Plugin {
 }
 
 ?>
-
