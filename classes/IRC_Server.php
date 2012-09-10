@@ -428,14 +428,26 @@ final class IRC_Server {
 					$data['User']->mode = $data['User']->modes[$data['Channel']->id];
 				}
 				
-				if(substr($data['text'], 0, 8) == "\x01ACTION ") {
-					$data['isAction'] = true;
-					$data['text'] = substr($data['text'], 8);
+				if($data['text']{0} == "\x01") {
+					$data['text'] = substr($data['text'], 1);
 					if(substr($data['text'], -1) == "\x01") {
 						$data['text'] = substr($data['text'], 0, -1);
 					}
+					
+					$data['command'] = 'vCTCP';
+					$tmp = explode(' ', $data['text'], 2);
+					$data['ctcp_command'] = strtoupper($tmp[0]);
+					if(isset($tmp[1])) {
+						$data['text'] = $tmp[1];
+					} else {
+						$data['text'] = '';
+					}
+					
+					if($data['ctcp_command'] == 'ACTION') {
+						unset($data['ctcp_command']);
+						$data['command'] = 'vACTION';
+					}
 				}
-				
 			break;
 			case 'QUIT':
 				// Sent when a user quits the server

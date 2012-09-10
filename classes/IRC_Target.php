@@ -48,12 +48,22 @@ abstract class IRC_Target {
 		}
 	}
 	
-	public final function sendCTCP($message, $bypass_queue=false) {
-		$this->privmsg("\x01".$message."\x01", $bypass_queue);
+	public function notice($message, $bypass_queue=false) {
+		$this->Server->sendRaw('NOTICE '.$this->name.' :'.$message, $bypass_queue);
 	}
 	
 	public final function action($message, $bypass_queue=false) {
-		$this->sendCTCP('ACTION '.$message, $bypass_queue);
+		$this->ctcp('ACTION', $message, $bypass_queue);
+	}
+	
+	public final function ctcp($command, $params="", $bypass_queue=false) {
+		$send = $command;
+		if(!empty($params)) $send.= ' '.$params;
+		$this->privmsg("\x01".$send."\x01", $bypass_queue);
+	}
+	
+	public final function ctcpReply($command, $message, $bypass_queue=false) {
+		$this->notice("\x01".$command." ".$message."\x01", $bypass_queue);
 	}
 	
 }

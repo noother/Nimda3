@@ -14,6 +14,7 @@ class Nimda {
 	public $plugins = array();
 	public $time;
 	public $MySQL;
+	public $version;
 	
 	private $CONFIG = array();
 	private $timersLastTriggered;
@@ -76,6 +77,7 @@ class Nimda {
 		if(empty($tmp)) $current_version = 0;
 		else $current_version = $this->MySQL->fetchColumn("SELECT `version` FROM `version`");
 		if($current_version === false) die("Error: Table version exists but has no entry.\n");
+		$this->version = '3.'.$current_version.'.x';
 		
 		preg_match_all('/-- \[(\d+?)\](.*?)-- \[\/\1\]/s', file_get_contents('core/sql_updates'), $updates);
 		
@@ -108,6 +110,8 @@ class Nimda {
 			$this->MySQL->multiQuery($sql);
 			echo "done\n";
 		}
+		
+		$this->version = '3.'.$latest_version.'.x';
 	}
 	
 	private function initServers() {
@@ -298,8 +302,12 @@ class Nimda {
 				case 'NOTICE':  if($User) $Plugin->onNotice(); else /* TODO: Add onServerNotice() */; break;
 				case 'PART':    if($User) $Plugin->onPart(); else $Plugin->onMePart(); break;
 				case 'PING':    $Plugin->onPing();    break;
-				case 'PRIVMSG': if(isset($data['isAction'])) { unset($Plugin->data['isAction']); $Plugin->onAction(); } else $Plugin->onPrivmsg(); break;
+				case 'PRIVMSG': $Plugin->onPrivmsg(); break;
 				case 'QUIT':    $Plugin->onQuit(); break;
+				
+				// Virtual commands
+				case 'vACTION': $Plugin->onAction(); break;
+				case 'vCTCP': $Plugin->onCTCP(); break;
 			}
 		}
 	}

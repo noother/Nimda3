@@ -481,14 +481,30 @@ abstract class Plugin {
 	
 	public function onAction() {
 		/*
-			IRC command "PRIVMSG \x01ACTION (..)\x01" (/me)
-			Triggered when a user sents an action
+			IRC command "PRIVMSG \x01ACTION (..)\x01"
+			Triggered when a user sends an action (/me)
 			
 			object User
 			object Channel (only if the ACTION is sent to a channel)
 			
 			array data [
 				string text  => The text sent by the User
+				bool isQuery => True if the action is sent in query, otherwise false
+			]
+		*/
+	}
+	
+	public function onCTCP() {
+		/*
+			IRC command "PRIVMSG \x01(..) [..]\x01"
+			Triggered when a user sends a CTCP request (PING, VERSION, etc.)
+			
+			object User
+			object Channel (only if the CTCP request is sent to a channel)
+			
+			array data [
+				string ctcp_command => the command sent (PING, VERSION, etc.)
+				string text  => The text sent with the CTCP
 				bool isQuery => True if the action is sent in query, otherwise false
 			]
 		*/
