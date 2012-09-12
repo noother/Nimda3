@@ -303,7 +303,7 @@ class Plugin_ZMachine extends Plugin {
 				$T->privmsg('Unsupported.');
 			break;
 			
-			case 'quit': case 'q':
+			case 'quit': case 'q': case 'die':
 				$this->removeSession($session_id);
 			return;
 			default:
