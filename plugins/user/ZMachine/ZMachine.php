@@ -20,7 +20,7 @@ class ZMachine {
 		$pathinfo = pathinfo(realpath($gamefile));
 		
 		$this->process = proc_open(
-			'trap "" SIGINT && stdbuf -oL '.self::DFROTZ_PATH.' -h 255 -w 255 -Z 0 '.$pathinfo['basename'].' 2>&1',
+			'trap "" 2 && stdbuf -oL '.self::DFROTZ_PATH.' -h 255 -w 255 -Z 0 '.$pathinfo['basename'].' 2>&1',
 			array(array('pipe', 'r'), array('pipe', 'w')),
 			$this->pipes,
 			$pathinfo['dirname']
