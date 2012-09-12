@@ -16,7 +16,7 @@ class CorePlugin_CTCPReplies extends Plugin {
 			break;
 			
 			case 'PING':
-				$this->User->ctcpReply('PING', $this->data['text']);
+				$this->User->ctcpReply('PING', $this->data['text'], true);
 			break;
 			
 			case 'TIME':
