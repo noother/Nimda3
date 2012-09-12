@@ -1,4 +1,4 @@
-This wrapper uses dfrotz from the frotz Z-code interpreter obtainable at http://frotz.sourceforge.net/ or your package manager.
+This wrapper needs dfrotz from the frotz Z-code interpreter. Get it from https://github.com/DavidGriffith/frotz or http://frotz.sourceforge.net/
 
 In order to use this plugin, dfrotz has to be installed.
 If dfrotz is not in your $PATH, specify an absolute path in Plugin_ZMachine.php via DFROTZ_PATH.
