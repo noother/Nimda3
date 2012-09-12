@@ -16,7 +16,6 @@ class Plugin_ZMachine extends Plugin {
 	private $games = array();
 	
 	const FILEDIR = 'plugins/user/ZMachine/files/';
-	const DFROTZ_PATH = 'dfrotz'; // supply an absolute path here if it's not in your $PATH
 	
 	function onLoad() {
 		$this->updateGames();
@@ -143,7 +142,7 @@ class Plugin_ZMachine extends Plugin {
 		if(empty($this->sessions)) $this->interval = 1;
 		$this->sessions[$session_id] = array(
 			'Target' => $this->Channel ? $this->Channel : $this->User,
-			'Game' => new ZMachine(self::FILEDIR.'games/'.$info['gamefile'], self::DFROTZ_PATH),
+			'Game' => new ZMachine(self::FILEDIR.'games/'.$info['gamefile']),
 			'game_id' => $info['id'],
 			'game_name' => $info['name']
 		);

@@ -3,7 +3,7 @@ This wrapper needs dfrotz from the frotz Z-code interpreter. Get it from https:/
 You probably need this patch to compile it on a current system: http://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/games-engines/frotz/files/frotz-2.43-glibc2.10.patch
 
 In order to use this plugin, dfrotz has to be installed.
-If dfrotz is not in your $PATH, specify an absolute path in Plugin_ZMachine.php via DFROTZ_PATH.
+If dfrotz is not in your $PATH, specify an absolute path in ZMachine.php via DFROTZ_PATH.
 
 I only package Zork I here, but there are many more text adventures out there that work.
 You can get the other Zork parts from: http://www.infocom-if.org/downloads/downloads.html

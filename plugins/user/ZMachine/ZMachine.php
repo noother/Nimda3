@@ -14,11 +14,13 @@ class ZMachine {
 	
 	public $log;
 	
-	function __construct($gamefile, $dfrotz_executable='dfrotz') {
+	const DFROTZ_PATH = 'dfrotz'; // supply an absolute path here if it's not in your $PATH
+	
+	function __construct($gamefile) {
 		$pathinfo = pathinfo(realpath($gamefile));
 		
 		$this->process = proc_open(
-			'trap "" SIGINT && stdbuf -oL '.$dfrotz_executable.' -h 255 -w 255 -Z 0 '.$pathinfo['basename'].' 2>&1',
+			'trap "" SIGINT && stdbuf -oL '.self::DFROTZ_PATH.' -h 255 -w 255 -Z 0 '.$pathinfo['basename'].' 2>&1',
 			array(array('pipe', 'r'), array('pipe', 'w')),
 			$this->pipes,
 			$pathinfo['dirname']
