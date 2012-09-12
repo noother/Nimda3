@@ -34,26 +34,21 @@ class libString {
 	static function normalizeString($string) {
 		$string = trim($string);
 		$charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
-		$replace = array(' ' => '_',
-						 "'" => '',
-						 '-' => '_'
-						);
 		
 		$string = self::convertUmlaute($string);
 		
-		$string = strtr($string,$replace);
-		
-		$newstring  = "";
-		for($x=0,$len=mb_strlen($string);$x<$len;$x++) {
-			$char = mb_substr($string,$x,1);
-			if(mb_strstr($charset,$char)) $newstring.= $char;
+		$new_string = '';
+		for($i=0;$i<strlen($string);$i++) {
+			if(strstr($charset, $string{$i})) {
+				$new_string.= $string{$i};
+			} else {
+				$new_string.= '_';
+			}
 		}
 		
-		while(strstr($newstring,'__')) $newstring = str_replace('__','_',$newstring);
+		while(false !== strstr($new_string,'__')) $new_string = str_replace('__','_',$new_string);
 		
-		$newstring = strtolower($newstring);
-		
-	return $newstring;
+	return $new_string;
 	}
 	
 	static function startsWith($needle, $haystack) {
