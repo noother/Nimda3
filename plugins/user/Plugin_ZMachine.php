@@ -261,11 +261,24 @@ class Plugin_ZMachine extends Plugin {
 	}
 	
 	private function sendCommand($session_id, $command) {
+		$command = strtolower($command);
+		
 		$s = &$this->sessions[$session_id];
 		$G = $s['Game'];
 		$T = $s['Target'];
 		
-		$command = strtolower($command);
+		$tmp = str_replace(',', '.', $command);
+		$tmp = explode('.', $tmp);
+		if(sizeof($tmp) > 1) {
+			$blacklist = array('save', 'restore', 'load', 'restart', 'reset', 'script', 'unscript', 'quit', 'q', 'die');
+			foreach($tmp as $pcmd) {
+				$pcmd = trim($pcmd);
+				if(in_array($pcmd, $blacklist)) {
+					$T->privmsg("Please don't use \x02".$pcmd."\x02 in a command chain.");
+					return;
+				}
+			}
+		}
 		
 		switch($command) {
 			case 'save':
