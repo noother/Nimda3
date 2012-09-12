@@ -518,7 +518,10 @@ final class IRC_Server {
 			else return false;
 		}
 		
-		if($this->getVar('estimated_CLIENT_FLOOD') !== -1 && $this->estimatedRecvq['size'] + strlen($this->sendQueue[0]) > $this->getVar('estimated_CLIENT_FLOOD')) return false;
+		if($this->getVar('estimated_CLIENT_FLOOD') !== -1 &&
+			($this->estimatedRecvq['size'] + strlen($this->sendQueue[0]) > $this->getVar('estimated_CLIENT_FLOOD')) ||
+			(sizeof($this->estimatedRecvq['messages']) > 5)
+		) return false;
 		
 		
 		$this->write(array_shift($this->sendQueue));
@@ -553,7 +556,7 @@ final class IRC_Server {
 		$new_recvq_speed = false;
 		if($new_client_flood < 512) {
 			// wtf network, not even 1 full msg / second - well, let's try to decrease our recvq-cleaning speed now
-			$new_client_flood = -1;
+			$new_client_flood = 1024;
 			$new_recvq_speed = $this->getVar('estimated_RECVQ_SPEED')+1;
 		}
 		
