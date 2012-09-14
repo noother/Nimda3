@@ -260,15 +260,15 @@ class Plugin_ZMachine extends Plugin {
 				'moves' => $moves,
 				'time' => $this->Bot->time
 			));
-		}
-		
-		if($data['Target']->name != $cur['name']) {
-			$data['Target']->privmsg(sprintf("\x02You've just beaten the highscore for %s which was %d points in %d moves held by %s!\x02",
-				$data['game_name'],
-				$cur['score'],
-				$cur['moves'],
-				$cur['name']
-			));
+			
+			if($data['Target']->name != $cur['name']) {
+				$data['Target']->privmsg(sprintf("\x02You've just beaten the highscore for %s which was %d points in %d moves held by %s!\x02",
+					$data['game_name'],
+					$cur['score'],
+					$cur['moves'],
+					$cur['name']
+				));
+			}
 		}
 	}
 	
