@@ -373,6 +373,9 @@ class Plugin_ZMachine extends Plugin {
 		$s = &$this->sessions[$session_id];
 		$G = $s['Game'];
 		
+		for($i=0;$i<10;$i++) {
+			$G->write('');
+		}
 		$G->write('restore');
 		$G->write('../saves/'.$filename);
 		usleep(50000);
