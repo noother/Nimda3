@@ -25,7 +25,7 @@ class ZMachine {
 			$this->pipes,
 			$pathinfo['dirname']
 		);
-		usleep(5000);
+		usleep(50000);
 		
 		$status = proc_get_status($this->process);
 		if($status['running']) {

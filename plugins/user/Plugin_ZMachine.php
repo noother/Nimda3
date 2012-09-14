@@ -16,6 +16,8 @@ class Plugin_ZMachine extends Plugin {
 	private $games = array();
 	
 	const FILEDIR = 'plugins/user/ZMachine/files/';
+	const MAX_SESSIONS = 100;
+	const MAX_IDLE_TIME = 43200; // 12h
 	
 	function onLoad() {
 		$this->updateGames();
@@ -82,6 +84,12 @@ class Plugin_ZMachine extends Plugin {
 	function onInterval() {
 		foreach($this->sessions as $session => $data) {
 			$this->process($session);
+			
+			if($this->Bot->time > $data['last_action']+self::MAX_IDLE_TIME) {
+				$data['Target']->privmsg("Stopping your \x02".$data['game_name']."\x02 session due to inactivity.");
+				$this->autosave($session);
+				$this->removeSession($session);
+			}
 		}
 	}
 	
@@ -137,6 +145,11 @@ class Plugin_ZMachine extends Plugin {
 			return;
 		}
 		
+		if(sizeof($this->sessions) >= self::MAX_SESSIONS) {
+			$this->reply('There are already '.self::MAX_SESSIONS.' sessions running..');
+			return false;
+		}
+		
 		$this->reply("Starting \x02".$info['name']."\x02.".($this->Channel ? ' Use !z <command> to interact.' : ''). " Typical commands are look, look at the mailbox, open mailbox, get leaflet, read leaflet, go south, etc. | Special commands are \x02save\x02, \x02load\x02, \x02restart\x02 & \x02quit\x02");
 		
 		if(empty($this->sessions)) $this->interval = 1;
@@ -144,7 +157,8 @@ class Plugin_ZMachine extends Plugin {
 			'Target' => $this->Channel ? $this->Channel : $this->User,
 			'Game' => new ZMachine(self::FILEDIR.'games/'.$info['gamefile']),
 			'game_id' => $info['id'],
-			'game_name' => $info['name']
+			'game_name' => $info['name'],
+			'last_action' => $this->Bot->time
 		);
 		
 		if(!$this->sessions[$session_id]['Game']->isReady) {
@@ -167,8 +181,6 @@ class Plugin_ZMachine extends Plugin {
 		}
 		
 		$this->loadAutosave($session_id);
-		
-		usleep(50000);
 		$this->process($session_id);
 		
 	return true;
@@ -326,6 +338,8 @@ class Plugin_ZMachine extends Plugin {
 		
 		usleep(5000); // Wait 5ms for the process to handle our message & send output - if it's not fast enough, output will be send to IRC on next timer interval
 		$this->process($session_id);
+		
+		$s['last_action'] = $this->Bot->time;
 	}
 	
 	private function autosave($session_id) {
@@ -335,6 +349,8 @@ class Plugin_ZMachine extends Plugin {
 		$G->write('save');
 		$G->write('../saves/auto_'.$this->getSaveName($session_id));
 		$G->write('y');
+		usleep(50000);
+		$G->getData();
 		
 		$s['Target']->privmsg("Your \x02".$s['game_name']."\x02 session has been autosaved.", true);
 	}
@@ -363,6 +379,8 @@ class Plugin_ZMachine extends Plugin {
 		unlink(self::FILEDIR.'saves/'.$filename);
 		
 		$this->sendCommand($session_id, 'look');
+		
+	return true;
 	}
 	
 	
