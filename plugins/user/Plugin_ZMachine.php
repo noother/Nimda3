@@ -150,7 +150,7 @@ class Plugin_ZMachine extends Plugin {
 			return false;
 		}
 		
-		$this->reply("Starting \x02".$info['name']."\x02.".($this->Channel ? ' Use !z <command> to interact.' : ''). " Typical commands are look, look at the mailbox, open mailbox, get leaflet, read leaflet, go south, etc. | Special commands are \x02save\x02, \x02load\x02, \x02restart\x02 & \x02quit\x02");
+		$this->reply("Starting \x02".$info['name']."\x02.".($this->Channel ? ' Use !z <command> to interact.' : ''). " Typical commands are look, look at the mailbox, open mailbox, get leaflet, read leaflet, go south, etc. | Special commands are \x02save\x02, \x02load\x02, \x02restart\x02, \x02quit\x02 & \x02return\02 (this will cause an empty line)");
 		
 		if(empty($this->sessions)) $this->interval = 1;
 		$this->sessions[$session_id] = array(
@@ -322,6 +322,10 @@ class Plugin_ZMachine extends Plugin {
 				$game = $this->sessions[$session_id]['game_name'];
 				$this->removeSession($session_id);
 				$this->startSession($session_id, $game);
+			break;
+			
+			case 'return':
+				$G->write('');
 			break;
 			
 			case 'script': case 'unscript':
