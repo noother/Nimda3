@@ -20,7 +20,7 @@ class ZMachine {
 		$pathinfo = pathinfo(realpath($gamefile));
 		
 		$this->process = proc_open(
-			'trap "" 2 && stdbuf -oL '.self::DFROTZ_PATH.' -h 255 -w 255 -Z 0 '.$pathinfo['basename'].' 2>&1',
+			'trap "" 2 && stdbuf -o0 '.self::DFROTZ_PATH.' -h 255 -w 255 -Z 0 '.$pathinfo['basename'].' 2>&1',
 			array(array('pipe', 'r'), array('pipe', 'w')),
 			$this->pipes,
 			$pathinfo['dirname']
@@ -40,8 +40,12 @@ class ZMachine {
 			$row = $this->_buffer;
 			$this->_buffer = false;
 		} else {
-			$row = fgets($this->pipes[1]);
-			if($row === false) return false;
+			$row = '';
+			while(!feof($this->pipes[1]) && '' !== $buf = fread($this->pipes[1], 1)) {
+				$row.= $buf;
+				if($buf == "\n") break;
+			}
+			if($row === '') return false;
 		}
 		
 		$row = trim($row);
