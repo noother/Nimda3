@@ -6,7 +6,7 @@ class LostChall extends ChallengeStats {
 	
 	protected $url        = 'http://lost-chall.org';
 	protected $profileUrl = 'http://lost-chall.org/user.php?user=%s';
-	protected $statsText  = '{username} solved {challs} (of {challs_total}) challenges and is on rank {rank} with {points} points at {url}';
+	protected $statsText  = '{username} solved {challs} challenges and is on rank {rank} with {points} points at {url}';
 	
 	function getStats($username, $html) {
 		if (strpos($html, 'User not found!') !== false)
@@ -19,12 +19,10 @@ class LostChall extends ChallengeStats {
 		$score = $arr[1];
 
 		$solved = substr_count($html, ' class="Stil9"');
-		$challs_total = $solved + substr_count($html, ' class="Stil5"');		
 		
 		$data = array(
 			'username'     => $username,
 			'challs' 	   => $solved,
-			'challs_total' => $challs_total,
 			'points'	   => $score,
 			'rank'		   => $rank
 		);
