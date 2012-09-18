@@ -18,8 +18,8 @@ class LostChall extends ChallengeStats {
 		preg_match('#Points: (.*?)<br#',$html, $arr);
 		$score = $arr[1];
 
-		$solved = substr_count($html, '<span class="Stil9">');
-		$challs_total = $solved + substr_count($html, '<span class="Stil5">');		
+		$solved = substr_count($html, ' class="Stil9"');
+		$challs_total = $solved + substr_count($html, ' class="Stil5"');		
 		
 		$data = array(
 			'username'     => $username,
