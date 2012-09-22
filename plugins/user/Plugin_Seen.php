@@ -13,7 +13,7 @@ class Plugin_Seen extends Plugin {
 			return;
 		}
 		
-		$data = $this->getVar($this->data['text']);
+		$data = $this->getVar(strtolower($this->data['text']));
 		if($data === false) {
 			$this->reply('I don\'t know '.$this->data['text'].'.');
 			return;
@@ -57,7 +57,7 @@ class Plugin_Seen extends Plugin {
 	function onAction() {
 		if($this->data['isQuery']) return;
 		
-		$this->saveVar($this->User->nick, array(
+		$this->saveVar($this->User->id, array(
 			'action'  => 'ACTION',
 			'server'  => $this->Server->host,
 			'channel' => $this->Channel->name,
@@ -69,7 +69,7 @@ class Plugin_Seen extends Plugin {
 	
 	
 	function onChannelMessage() {
-		$this->saveVar($this->User->nick, array(
+		$this->saveVar($this->User->id, array(
 			'action'  => 'PRIVMSG',
 			'server'  => $this->Server->host,
 			'channel' => $this->Channel->name,
@@ -80,7 +80,7 @@ class Plugin_Seen extends Plugin {
 	}
 	
 	function onJoin() {
-		$this->saveVar($this->User->nick, array(
+		$this->saveVar($this->User->id, array(
 			'action' => 'JOIN',
 			'server' => $this->Server->host,
 			'channel'=> $this->Channel->name,
@@ -90,7 +90,7 @@ class Plugin_Seen extends Plugin {
 	}
 	
 	function onPart() {
-		$this->saveVar($this->User->nick, array(
+		$this->saveVar($this->User->id, array(
 			'action'  => 'PART',
 			'server'  => $this->Server->host,
 			'channel' => $this->Channel->name,

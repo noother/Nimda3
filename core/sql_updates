@@ -123,3 +123,8 @@
 	ALTER TABLE `servers` ADD `bind` VARCHAR( 255 ) NOT NULL DEFAULT '0.0.0.0:0' AFTER `ssl`;
 	UPDATE `version` SET `version` = '8';
 -- [/8]
+
+-- [9]
+	UPDATE `memory` SET `name` = LOWER(`name`) WHERE `target` = 'seen';
+	UPDATE `version` SET `version` = '9';
+-- [/9]
