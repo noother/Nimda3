@@ -74,6 +74,7 @@ class Plugin_ZMachine extends Plugin {
 	
 	function onQuery() {
 		if(empty($this->sessions)) return;
+		if($this->data['text']{0} == '!') return;
 		
 		$session_id = $this->getSessionId();
 		if(!isset($this->sessions[$session_id])) return;
