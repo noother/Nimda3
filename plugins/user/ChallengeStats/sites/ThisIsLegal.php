@@ -13,20 +13,25 @@ class ThisIsLegal extends ChallengeStats {
 		$html = $HTTP->GET('/userscore.php?username='.urlencode($username));
 		if($html === false) return 'timeout';
 		if($html === '0') return false;
-		$info = explode(':', $html);
+		list($rank, $score, $score_total, $users_total) = explode(':', $html);
 		
 		$html = $HTTP->GET('/user/'.urlencode($username));
 		if($html === false) return 'timeout';
-		$challs = substr_count($html,'<font color=\'#00FF00\' face=\'Verdana\'>Yes</font>');
+		
+		preg_match('#Username: <font class="cf">\s+(.+?)</font>#', $html, $arr);
+		list($full, $username) = $arr;
+		
+		preg_match('#<b>% Completed&nbsp;\((\d+?)/(\d+?)\):&nbsp;</b>#', $html, $arr);
+		list($full, $challs_solved, $challs_total) = $arr;
 		
 		$data = array(
 			'username'      => $username,
-			'rank'          => $info[0],
-			'users_total'   => $info[3],
-			'challs_solved' => $challs,
-			'challs_total'  => trim($info[4]),
-			'score'			=> $info[1],
-			'score_total'	=> $info[2]
+			'rank'          => $rank,
+			'users_total'   => $users_total,
+			'challs_solved' => $challs_solved,
+			'challs_total'  => $challs_total,
+			'score'			=> $score,
+			'score_total'	=> $score_total
 		);
 		
 	return $data;
