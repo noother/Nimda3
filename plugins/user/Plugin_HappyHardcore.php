@@ -11,7 +11,7 @@ class Plugin_HappyHardcore extends Plugin {
 	function isTriggered() {
         $data = $this->getHappyHardcoreStats();
         
-        $this->reply(sprintf("Now playing on http://www.happyhardcore.com: %s (%s) - %d listeners",
+        $this->reply(sprintf("Now playing on http://www.happyhardcore.com %s (%s) - %s listeners",
 			$data['artist'].' - '.$data['title'],
 			$data['is_live'] ? 'Live Show' : $this->trackTime($data['progress']).'/'.$this->trackTime($data['length']),
 			$data['listeners']
