@@ -33,6 +33,7 @@ class Plugin_Seen extends Plugin {
 			case 'PRIVMSG':
 				$text.= 'in '.$data['channel'].' saying "'.$data['text'].'".';
 			break;
+			/*
 			case 'JOIN':
 				$text.= 'joining '.$data['channel'].'.';
 			break;
@@ -44,7 +45,7 @@ class Plugin_Seen extends Plugin {
 					$text.= '.';
 				}
 			break;
-			/*
+			
 			case 'QUIT':
 				$text.= 'quitting the server with message "'.$data['message'].'".';
 			break;
@@ -69,6 +70,8 @@ class Plugin_Seen extends Plugin {
 	
 	
 	function onChannelMessage() {
+		if(libString::startsWith("!seen", $this->data['text'])) return;
+		
 		$this->saveVar($this->User->id, array(
 			'action'  => 'PRIVMSG',
 			'server'  => $this->Server->host,
@@ -79,6 +82,7 @@ class Plugin_Seen extends Plugin {
 		));
 	}
 	
+	/*
 	function onJoin() {
 		$this->saveVar($this->User->id, array(
 			'action' => 'JOIN',
@@ -100,7 +104,6 @@ class Plugin_Seen extends Plugin {
 		));
 	}
 	
-	/*
 	function onQuit() {
 		$this->saveVar($this->User->nick, array(
 			'action'  => 'QUIT',
