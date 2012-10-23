@@ -30,13 +30,15 @@ class Plugin_Seen extends Plugin {
 			case 'ACTION':
 				$text.= 'in '.$data['channel'].' stating that he '.$data['text'].'.';
 			break;
+			
 			case 'PRIVMSG':
 				$text.= 'in '.$data['channel'].' saying "'.$data['text'].'".';
 			break;
-			/*
+			
 			case 'JOIN':
 				$text.= 'joining '.$data['channel'].'.';
 			break;
+			
 			case 'PART':
 				$text.= 'parting '.$data['channel'];
 				if($data['message'] !== false) {
@@ -49,7 +51,6 @@ class Plugin_Seen extends Plugin {
 			case 'QUIT':
 				$text.= 'quitting the server with message "'.$data['message'].'".';
 			break;
-			*/
 		}
 		
 	return $text;
