@@ -467,8 +467,12 @@ class Plugin_ChallengeObserver extends Plugin {
 		preg_match_all('#<a href="(.+?)">(.+?)</a>#', $arr[1], $arr);
 		
 		for($i=0;$i<$count&&$i<sizeof($arr[1]);$i++) {
-			$text = sprintf("\x02%s\x02 ( %s )",
+			preg_match('#>'.preg_quote($arr[2][$i]).'</a>\s+?</td>\s+?<td.+?>(.+?)</td>\s+?<td.+?>(.+?)</td>#', $html, $arr2);
+			
+			$text = sprintf("\x02%s\x02 in category \x02%s\x02 rated \x02%s\x02 ( %s )",
 				$arr[2][$i],
+				$arr2[1],
+				$arr2[2],
 				$arr[1][$i]
 			);
 			$this->sendToEnabledChannels($text);
