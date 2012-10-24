@@ -120,14 +120,19 @@ class Plugin_ChallengeObserver extends Plugin {
 			case 'Right-Answer':
 				$this->getRightAnswerChalls($challcount);
 			break;
+			/*
 			case 'SPOJ':
 				$this->getSpojChalls($challcount);
 			break;
+			*/
 			case 'wargame.kr':
 				$this->getWargameKrChalls($challcount);
 			break;
 			case 'W3Challs':
 				$this->getW3Challs($challcount);
+			break;
+			case 'wixxerd.com':
+				$this->getWixxerdChalls($challcount);
 			break;
 		}
 	}
@@ -250,12 +255,12 @@ class Plugin_ChallengeObserver extends Plugin {
 		
 	}
 	
+	/*
 	private function getSpojChalls($count) {
 		
 		$this->sendToEnabledChannels("See http://feeds.feedburner.com/SphereOnlineJudge?format=html for a list.");
 		return;
 		
-		/*
 		$html = libHTTP::GET('http://feeds.feedburner.com/SphereOnlineJudge?format=xml');
 		if($html === false) return;
 		
@@ -309,9 +314,9 @@ class Plugin_ChallengeObserver extends Plugin {
 				$count-$show_count
 			));
 		}
-		*/
 		
 	}
+	*/
 	
 	private function getRankkChalls($count) {
 		$html = libHTTP::GET('http://twitter.com/statuses/user_timeline/315747759.rss');
@@ -452,7 +457,23 @@ class Plugin_ChallengeObserver extends Plugin {
 			$this->sendToEnabledChannels($text);
 			$this->addLatestChall('wargame.kr', $text);
 		}
+	}
+	
+	private function getWixxerdChalls($count) {
+		$html = libHTTP::GET('http://www.wixxerd.com/challenges/');
+		if(!$html) return;
 		
+		preg_match('#<span.+?>New Challenges</span>(.+?)\s{3,}#', $html, $arr);
+		preg_match_all('#<a href="(.+?)">(.+?)</a>#', $arr[1], $arr);
+		
+		for($i=0;$i<$count&&$i<sizeof($arr[1]);$i++) {
+			$text = sprintf("\x02%s\x02 ( %s )",
+				$arr[2][$i],
+				$arr[1][$i]
+			);
+			$this->sendToEnabledChannels($text);
+			$this->addLatestChall('wixxerd.com', $text);
+		}
 	}
 	
 	private function sortByID($a, $b) {
