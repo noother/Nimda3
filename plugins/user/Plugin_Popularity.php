@@ -96,8 +96,8 @@ class Plugin_Popularity extends Plugin {
 	}
 	
 	private function sortByLuvs($a, $b) {
-		if($a['luvs'] == $b['luvs']) return 0;
-	return $a['luvs'] > $b['luvs'] ? -1 : 1;
+		if(sizeof($a['luvs']) == sizeof($b['luvs'])) return 0;
+	return sizeof($a['luvs']) > sizeof($b['luvs']) ? -1 : 1;
 	}
 	
 }
