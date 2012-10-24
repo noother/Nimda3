@@ -3,6 +3,7 @@
 class Plugin_Popularity extends Plugin {
 	
 	public $triggers = array('!luv', '!luvs');
+	public $helpTriggers = array('!luv');
 	public $usage = '[nick]';
 	public $helpText = '!luv <nick> Increases <nick>\'s popularity rating. !luvs <nick> shows <nick>\'s popularity rating. !luvs without an argument shows the Top10';
 	
