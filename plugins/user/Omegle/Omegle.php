@@ -13,7 +13,7 @@ class Omegle {
 	private $Stream;
 	private $proxy = false;
 	
-	private static $bannedHosts = array('ihookup.com', 'naughtybenaughty.com', 'omegleadult.info');
+	private static $bannedHosts = array('ihookup.com', 'naughtybenaughty.com', 'omegleadult.info', 'adultmegle.com');
 	
 	function __construct() {
 		$this->Stream = new HTTP('cardassia.omegle.com');
