@@ -229,8 +229,8 @@ class Plugin_ChallengeObserver extends Plugin {
 			$author = $arr[1][$i];
 			
 			$pos = strrpos($arr[2][$i], '/');
-			var_dump($pos);
 			$url = 'http://canyouhack.it'.substr($arr[2][$i], 0, $pos+1).rawurlencode(substr($arr[2][$i], $pos+1));
+			
 			$chall = $arr[3][$i];
 			
 			$text = sprintf("\x02%s\x02 by \x02%s\x02 ( %s )",
