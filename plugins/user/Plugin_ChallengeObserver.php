@@ -105,6 +105,9 @@ class Plugin_ChallengeObserver extends Plugin {
 			case 'WeChall':
 				$this->getWeChallChalls($challcount);
 			break;
+			case 'CanYouHack.It':
+				$this->getCanYouHackItChalls($challcount);
+			break;
 			case 'µContest':
 				$this->getMicrocontestChalls($challcount);
 			break;
@@ -213,6 +216,31 @@ class Plugin_ChallengeObserver extends Plugin {
 			$this->sendToEnabledChannels($text);
 			
 			$this->addLatestChall('WeChall', $text);
+		}
+	}
+	
+	private function getCanYouHackItChalls($count) {
+		$html = libHTTP::GET('http://canyouhack.it/');
+		
+		preg_match('#<div id="tabs-3">.+?<ul.+?>(.+?)</ul>.+?</div>#s', $html, $arr);
+		preg_match_all('#<li>.+?<span.+?</span>(.+?)</a>.+?<a href="(.+?)">(.+?)</a>.+?</li>#', $arr[1], $arr);
+		
+		for($i=0;$i<$count&&$i<sizeof($arr[0]);$i++) {
+			$author = $arr[1][$i];
+			
+			$pos = strrpos($arr[2][$i], '/');
+			var_dump($pos);
+			$url = 'http://canyouhack.it'.substr($arr[2][$i], 0, $pos+1).rawurlencode(substr($arr[2][$i], $pos+1));
+			$chall = $arr[3][$i];
+			
+			$text = sprintf("\x02%s\x02 by \x02%s\x02 ( %s )",
+				$chall,
+				$author,
+				$url
+			);
+			
+			$this->sendToEnabledChannels($text);
+			$this->addLatestChall('CanYouHack.It', $text);
 		}
 	}
 	
