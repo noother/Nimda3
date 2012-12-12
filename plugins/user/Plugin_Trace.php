@@ -33,7 +33,7 @@ class Plugin_Trace extends Plugin {
 			return;
 		}
 
-        $html = libHTTP::GET('http://www.geoiptool.com/de/?IP='.urlencode($host));
+        $html = libHTTP::GET('http://www.geoiptool.com/?IP='.urlencode($host));
 
 		$raw = strtr($html, array("\n" => " ", "\r" => " "));
 		preg_match('#IP-Addresse:.*?<td.*?>(.*?)</td>#',$raw,$arr);
