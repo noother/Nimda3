@@ -2,14 +2,16 @@
 
 class MySQL {
 	
-	
 	private $host;
 	private $user;
 	private $password;
 	private $db;
 	private $port;
 	
+	private $fetchModes = array('both' => MYSQLI_BOTH, 'assoc' => MYSQLI_ASSOC, 'numeric' => MYSQLI_NUM);
+	
 	private $Instance=false;
+	
 	
 	function __construct($host, $user, $password, $db, $port=3306) {
 		$this->host     = $host;
@@ -35,7 +37,8 @@ class MySQL {
 				$this->connect();
 				return $this->query($sql);
 			} else {
-				die("\nMySQL Error: ".$this->Instance->error."\n");
+				trigger_error("\nMySQL Error: ".$this->Instance->error."\n SQL: ".$sql."\n", E_USER_WARNING);
+				return false;
 			}
 		}
 		
@@ -43,26 +46,20 @@ class MySQL {
 		
 		switch($arr[1]) {
 			case 'SELECT': case 'SHOW':
-				$return = array();
+				if(!isset($this->fetchModes[$mode])) return false;
 				
-				switch($mode) {
-					case 'assoc':
-						while($row = $Result->fetch_assoc()) $return[] = $row;
-					break;
-					case 'numeric':
-						while($row = $Result->fetch_row()) $return[] = $row;
-					break;
-					case 'both':
-						while($row = $Result->fetch_array()) $return[] = $row;
-					break;
-				}
+				$return = array();
+				while($row = $Result->fetch_array($this->fetchModes[$mode])) $return[] = $row;
 			break;
+			
 			case 'INSERT':
 				$return = $this->Instance->insert_id;
 			break;
+			
 			case 'UPDATE':
 				$return = $this->Instance->affected_rows;
 			break;
+			
 			default:
 				$return = true;
 			break;
