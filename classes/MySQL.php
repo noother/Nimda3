@@ -37,7 +37,7 @@ class MySQL {
 				$this->connect();
 				return $this->query($sql);
 			} else {
-				trigger_error("\nMySQL Error: ".$this->Instance->error."\n SQL: ".$sql."\n", E_USER_WARNING);
+				trigger_error("MySQL Error: ".$this->Instance->error."\nSQL: ".$sql."\n", E_USER_WARNING);
 				return false;
 			}
 		}
@@ -71,7 +71,11 @@ class MySQL {
 	public function multiQuery($sql) {
 		$this->Instance->multi_query($sql);
 		do {
-			if($this->Instance->error) die("\nMySQL Error: ".$this->Instance->error."\n");
+			if($this->Instance->error) {
+				trigger_error("MySQL Error: ".$this->Instance->error." in multi-query\n", E_USER_WARNING);
+				return false;
+			}
+			
 			if(false !== $Result = $this->Instance->use_result()) $Result->close();
 		} while($this->Instance->more_results() && $this->Instance->next_result());
 		
