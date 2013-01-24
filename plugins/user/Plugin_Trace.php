@@ -7,7 +7,10 @@ class Plugin_Trace extends Plugin {
 	public $helpCategory = 'Internet';
 	public $helpText = "Traces an IRC user or a IP/host and gives back it's approximate location.";
 	public $usage = '[nick|host|ip]';
-    
+	
+	private $cloakedRegexps = array(
+		'/^\w+\.users\.quakenet\.org$/'
+	);
 	
 	function isTriggered() {
 		$isUser = true;
@@ -17,6 +20,13 @@ class Plugin_Trace extends Plugin {
 			if (strpos($this->data['text'], '.') === false) {
 				$target = strtolower($this->data['text']);
 				$host = isset($this->Server->users[$target]) ? $this->Server->users[$target]->host : false;
+				
+				foreach($this->cloakedRegexps as $regex) {
+					if(preg_match($regex, $host)) {
+						$this->reply("Can't trace ".$target.". Host is cloaked.");
+						return;
+					}
+				}
 			} else {
 				// if we got a non-nick treat it as IP or host
 				$host = $this->data['text'];
@@ -33,16 +43,15 @@ class Plugin_Trace extends Plugin {
 			return;
 		}
 
-        $html = libHTTP::GET('http://www.geoiptool.com/?IP='.urlencode($host));
-
-		$raw = strtr($html, array("\n" => " ", "\r" => " "));
-		preg_match('#IP-Addresse:.*?<td.*?>(.*?)</td>#',$raw,$arr);
+		$html = libHTTP::GET('http://www.geoiptool.com/?IP='.urlencode($host));
+		
+		preg_match('#IP Address:.*?<td.*?>(.*?)</td>#s', $html, $arr);
 		$ip = $arr[1];
-		preg_match('#Stadt:.*?<td.*?>(.*?)</td>#',$raw,$arr);
+		preg_match('#City:.*?<td.*?>(.*?)</td>#s', $html, $arr);
 		$city = utf8_encode($arr[1]);
-		preg_match('#Land:.*?<td.*?><a.*?>(.*?)</a>#',$raw,$arr);
+		preg_match('#Country:.*?<td.*?><a.*?>(.*?)</a>#s', $html, $arr);
 		$country = utf8_encode(trim($arr[1]));
-		preg_match('#Region.*?</td.*?><a.*?>(.*?)</a>#',$raw,$arr);
+		preg_match('#Region.*?</td.*?><a.*?>(.*?)</a>#s', $html, $arr);
 		$region = utf8_encode($arr[1]);
 
 		if ($isUser) {
