@@ -39,7 +39,7 @@ class Plugin_Trace extends Plugin {
 		}
 
 		if ($host === false) {
-			$this->reply('I don\'t know this nick');
+			$this->reply('I don\'t know this nick.');
 			return;
 		}
 
