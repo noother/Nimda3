@@ -14,6 +14,7 @@ class HTTP {
 		'accept-cookies'      => true,     // Send cookies the server gives us on future requests
 		'unstable-connection' => false,    // Try to reconnect until a connection is established
 		'connect-timeout'     => 5,        // Seconds the connection might take to establish
+		'ssl'                 => false,    // use HTTPS
 		'keep-alive'          => true,     // Keep HTTP 1.1 connections alive
 		'proxy'               => false     // Use a proxy (format 1.2.3.4:5678)
 	);
@@ -21,9 +22,15 @@ class HTTP {
 	private $lastHeader = false;
 	private $followed = 0;
 	
-	public function __construct($host, $port=80) {
+	public function __construct($host, $port=null, $ssl=false) {
 		$this->host = $host;
-		$this->port = $port;
+		
+		if($ssl) {
+			if(!isset($port)) $port = 443;
+			$this->set('ssl', true);
+		}
+		
+		$this->port = isset($port) ? $port : 80;
 	}
 	
 	public function GET($path) {
@@ -104,7 +111,7 @@ class HTTP {
 		}
 		
 		if($this->socket) fclose($this->socket);
-		$this->socket = @fsockopen($ip, $port, $errno, $errstr, $this->settings['connect-timeout']);
+		$this->socket = @fsockopen(($this->settings['ssl']?'ssl://':'').$ip, $port, $errno, $errstr, $this->settings['connect-timeout']);
 		
 		if(!$this->socket) {
 			if($this->settings['unstable-connection']) {

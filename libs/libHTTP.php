@@ -1,6 +1,6 @@
 <?php
 
-require_once("classes/HTTP.php");
+require_once('classes/HTTP.php');
 
 class libHTTP {
 
@@ -15,7 +15,7 @@ class libHTTP {
 	static private function _execute($url, $method, $post=null) {
 		$data = parse_url($url);
 		
-		if(isset($data['user']) || isset($data['pass']) || $data['scheme'] == 'https') {
+		if(isset($data['user']) || isset($data['pass'])) {
 			// TODO: not yet implemented
 			return false;
 		}
@@ -31,8 +31,7 @@ class libHTTP {
 				$HTTP = new HTTP($data['host'], (isset($data['port']) ? $data['port'] : 80));
 			break;
 			case 'https':
-				// TODO: not yet implemented
-				return false;
+				$HTTP = new HTTP($data['host'], (isset($data['port']) ? $data['port'] : 443), true);
 			break;
 			default:
 				return false;
