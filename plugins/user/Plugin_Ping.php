@@ -2,7 +2,7 @@
 
 class Plugin_Ping extends Plugin {
 	
-	public $triggers = array('!ping', '!pong', '!pang', '!peng', '!pung');
+	public $triggers = array('!ping', '!pong', '!pang', '!peng', '!pung', '!pyng');
 	
 	public $helpTriggers = array('!ping');
 	public $helpText = 'Sends back Pong! so you can see if you\'re still connected.';
@@ -23,6 +23,9 @@ class Plugin_Ping extends Plugin {
 			break;
 			case '!pung':
 				$this->reply('Pyng?');
+			break;
+			case '!pyng':
+				$this->reply('Pung!');
 			break;
 		}
 	}
