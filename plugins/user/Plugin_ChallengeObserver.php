@@ -406,13 +406,15 @@ class Plugin_ChallengeObserver extends Plugin {
 		$html = libHTTP::GET('http://www.right-answer.net/?lang=Us');
 		if(!$html) return;
 		
-		preg_match_all('#<a.+?Give (\d+?) XP.+?href="epreuves\.php\?nom=(.+?)">(.+?)</a>#s', $html, $arr);
+		preg_match('#<h1>New challenges</h1>.*?<ul.+?>(.+?)</ul>#si', $html, $arr);
+		preg_match_all('#<div id="(.+?)">.+?<a.+?href="(.+?)&PHPSESSID.+?">(.+?)<span>.+?Give (\d+?) XP#s', $arr[1], $arr);
 		
 		for($i=0;$i<$count&&$i<sizeof($arr[1]);$i++) {
-			$text = sprintf("\x02%s\x02 worth %d XP ( %s )",
+			$text = sprintf("\x02%s\x02 in category %s worth %d XP ( %s )",
 				utf8_encode($arr[3][$i]),
-				$arr[1][$i],
-				'http://www.right-answer.net/epreuves.php?nom='.urlencode($arr[2][$i])
+				utf8_encode($arr[1][$i]),
+				$arr[4][$i],
+				'http://www.right-answer.net/'.$arr[2][$i]
 			);
 			$this->sendToEnabledChannels($text);
 			$this->addLatestChall('Right-Answer', $text);
