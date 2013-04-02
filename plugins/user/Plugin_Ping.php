@@ -19,7 +19,7 @@ class Plugin_Ping extends Plugin {
 				$this->reply('Peng!');
 			break;
 			case '!peng':
-				$this->reply('Pang!');
+				$this->reply('Pang?');
 			break;
 			case '!pung':
 				$this->reply('Pyng?');
