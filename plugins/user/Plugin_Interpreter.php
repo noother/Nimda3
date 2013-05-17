@@ -38,6 +38,8 @@ class Plugin_Interpreter extends Plugin {
 		if(!isset($this->state[$this->Server->id.':'.$this->Channel->id])) return;
 		
 		$translation = libInternet::googleTranslate($this->data['text'], 'auto', $this->toLang);
+		if(empty($translation)) return;
+		
 		if(strtolower($translation) == strtolower($this->data['text'])) return;
 		
 		$this->reply('<'.libIRC::noHighlight($this->User->nick).'> '.$translation);
