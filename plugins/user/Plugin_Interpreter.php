@@ -29,7 +29,7 @@ class Plugin_Interpreter extends Plugin {
 				
 				$this->state[$this->Server->id.':'.$this->Channel->id] = true;
 				$this->toLang = $lang;
-				$this->reply('Startet Translation to '.$lang);
+				$this->reply('Started translating to '.$lang);
 			break;
 		}
 	}
