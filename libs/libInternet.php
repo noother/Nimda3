@@ -23,6 +23,7 @@ class libInternet {
 		if(!preg_match('#<span id=result_box .+?>(.+?)</div>#', $html, $arr)) return false;
 		
 		$translation = html_entity_decode(strip_tags($arr[1]));
+		$translation = preg_replace_callback('/&#([a-z0-9]+);/i', create_function('$a', 'return chr($a[1]);'), $translation);
 		
 		if($return_source_lang) {
 			if(!preg_match('#<a id=gt-otf-switch href=.+?&sl=(.+?)&#', $html, $arr)) return false;
