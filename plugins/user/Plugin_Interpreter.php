@@ -18,7 +18,7 @@ class Plugin_Interpreter extends Plugin {
 		switch($lang) {
 			case 'stop':
 			case 'off':
-				unset($this->state[$this->Server->id.':'.$this->Channel->id]);
+				unset($this->interpreters[$this->Server->id.':'.$this->Channel->id]);
 				$this->isRunning = false;
 				$this->reply('Interpreting stopped.');
 			break;
