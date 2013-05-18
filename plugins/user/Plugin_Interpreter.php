@@ -5,12 +5,11 @@ class Plugin_Interpreter extends Plugin {
 	public $triggers = array('!interpreter');
 	
 	public $helpTriggers = array('!interpreter');
-	public $usage = '[language]|stop';
-	public $helpText = 'Translates everything said into the given language or the channels default language.';
+	public $usage = '(language1 language2)|stop';
+	public $helpText = 'Acts as an Interpreter between 2 languages.';
 	
-	private $state = array();
+	private $interpreters = array();
 	private $languages = array('af', 'ar', 'az', 'be', 'bg', 'bn', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'en', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'ga', 'gl', 'gu', 'hi', 'hr', 'ht', 'hu', 'hy', 'id', 'is', 'it', 'iw', 'ja', 'ka', 'kn', 'ko', 'la', 'lt', 'lv', 'mk', 'ms', 'mt', 'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sq', 'sr', 'sv', 'sw', 'ta', 'te', 'th', 'tl', 'tr', 'uk', 'ur', 'vi', 'yi');
-	private $toLang = 'en';
 	
 	function isTriggered() {
 		if(!isset($this->data['text'])) $lang = 'en';
@@ -18,31 +17,35 @@ class Plugin_Interpreter extends Plugin {
 		
 		switch($lang) {
 			case 'stop':
+			case 'off':
 				unset($this->state[$this->Server->id.':'.$this->Channel->id]);
 				$this->isRunning = false;
+				$this->reply('Interpreting stopped.');
 			break;
 			default:
-				if(!in_array($lang, $this->languages)) {
-					$this->reply('This language is not available.');
+				$langs = explode(' ', $this->data['text'], 2);
+				if(!in_array($langs[0], $this->languages) || !in_array($langs[1], $this->languages)) {
+					$this->reply('A language is not available. Available languages are '.implode(', ', $this->languages));
 					return;
 				}
 				
-				$this->state[$this->Server->id.':'.$this->Channel->id] = true;
-				$this->toLang = $lang;
-				$this->reply('Started translating to '.$lang);
+				$this->interpreters[$this->Server->id.':'.$this->Channel->id] = $langs;
+				$this->reply('Started translating between '.$langs[0].' & '.$langs[1]);
 			break;
 		}
 	}
 	
 	function onChannelMessage() {
-		if(!isset($this->state[$this->Server->id.':'.$this->Channel->id])) return;
+		if(!isset($this->interpreters[$this->Server->id.':'.$this->Channel->id])) return;
 		
-		$translation = libInternet::googleTranslate($this->data['text'], 'auto', $this->toLang);
-		if(empty($translation)) return;
-		
-		if(strtolower($translation) == strtolower($this->data['text'])) return;
-		
-		$this->reply('<'.libIRC::noHighlight($this->User->nick).'> '.$translation);
+		foreach($this->interpreters[$this->Server->id.':'.$this->Channel->id] as $lang) {
+			$translation = libInternet::googleTranslate($this->data['text'], 'auto', $lang);
+			if(empty($translation)) continue;
+			
+			if(strtolower($translation) == strtolower($this->data['text'])) continue;;
+			
+			$this->reply('<'.libIRC::noHighlight($this->User->nick).'> '.$translation);
+		}
 	}
 	
 }
