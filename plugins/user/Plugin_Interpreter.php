@@ -7,6 +7,7 @@ class Plugin_Interpreter extends Plugin {
 	public $helpTriggers = array('!interpreter');
 	public $usage = '(language1 language2)|stop';
 	public $helpText = 'Acts as an Interpreter between 2 languages.';
+	public $helpCategory = 'Internet';
 	
 	private $interpreters = array();
 	private $languages = array('af', 'ar', 'az', 'be', 'bg', 'bn', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'en', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'ga', 'gl', 'gu', 'hi', 'hr', 'ht', 'hu', 'hy', 'id', 'is', 'it', 'iw', 'ja', 'ka', 'kn', 'ko', 'la', 'lt', 'lv', 'mk', 'ms', 'mt', 'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sq', 'sr', 'sv', 'sw', 'ta', 'te', 'th', 'tl', 'tr', 'uk', 'ur', 'vi', 'yi');
