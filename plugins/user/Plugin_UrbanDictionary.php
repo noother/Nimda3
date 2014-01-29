@@ -47,12 +47,12 @@ class Plugin_UrbanDictionary extends Plugin {
 			return $data;
 		}
 		
-		if(strstr($html, "isn't defined <a href")) {
+		if(strstr($html, "isn't defined.<br/>")) {
 			$data['undefined'] = true;
 			return $data;
 		}
 		
-		preg_match('#<div class="definition">(.+?)</div>.*?<div class="example">(.*?)</div>#s', $html, $arr);
+		preg_match('#<div class=\'meaning\'>(.+?)</div>.*?<div class=\'example\'>(.*?)</div>#s', $html, $arr);
 		
 		$definition = trim(html_entity_decode(strip_tags(br2nl($arr[1]))));
 		$definition = strtr($definition, array("\r" => ' ', "\n" => ' '));
