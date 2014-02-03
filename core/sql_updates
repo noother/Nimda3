@@ -128,3 +128,8 @@
 	UPDATE `memory` SET `name` = LOWER(`name`) WHERE `target` = 'seen';
 	UPDATE `version` SET `version` = '9';
 -- [/9]
+
+-- [10]
+	ALTER TABLE `memory` CHANGE `value` `value` MEDIUMTEXT NOT NULL;
+	UPDATE `version` SET `version` = '10';
+-- [/10]

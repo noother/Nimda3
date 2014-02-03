@@ -105,6 +105,9 @@ class Plugin_ChallengeObserver extends Plugin {
 			case 'WeChall':
 				$this->getWeChallChalls($challcount);
 			break;
+			case 'BrainQuest':
+				$this->getBrainQuestChalls($challcount);
+			break;
 			case 'CanYouHack.It':
 				$this->getCanYouHackItChalls($challcount);
 			break;
@@ -216,6 +219,35 @@ class Plugin_ChallengeObserver extends Plugin {
 			$this->sendToEnabledChannels($text);
 			
 			$this->addLatestChall('WeChall', $text);
+		}
+	}
+	
+	private function getBrainquestChalls($count) {
+		require_once('ChallengeObserver/BrainQuest.php');
+		
+		$BrainQuest = new BrainQuest;
+		$challs = $BrainQuest->getChalls();
+		if(!$challs) {
+			trigger_error('Error while checking Brainquest challs', E_USER_NOTICE);
+			return;
+		}
+		
+		if(!$this->getVar('brainquest_challs')) {
+			$this->saveVar('brainquest_challs', $challs);
+			return;
+		}
+		
+		$result = $this->compareLists($this->getVar('brainquest_challs'), $challs, 'id');
+		
+		for($i=0;$i<$count&&$i<sizeof($result);$i++) {
+			$text = sprintf("\x02%s\x02 in category \x02%s\x02 ( %s )",
+				$result[$i]['name'],
+				$result[$i]['category'],
+				$result[$i]['url']
+			);
+			
+			$this->sendToEnabledChannels($text);
+			$this->addLatestChall('BrainQuest', $text);
 		}
 	}
 	
@@ -512,6 +544,22 @@ class Plugin_ChallengeObserver extends Plugin {
 	
 	private function sortByID($a, $b) {
 		return $a['id'] > $b['id'] ? -1 : 1;
+	}
+	
+	private function compareLists($old_list, $new_list, $unique_key) {
+		$result = array();
+		
+		foreach($new_list as $new_item) {
+			foreach($old_list as $key => $old_item) {
+				if($new_item[$unique_key] == $old_item[$unique_key]) {
+					unset($old_list[$key]); // so we don't have to check this one again on next iterations
+					continue 2;
+				}
+			}
+			$result[] = $new_item;
+		}
+		
+	return $result;
 	}
 	
 }
