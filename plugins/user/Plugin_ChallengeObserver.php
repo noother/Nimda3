@@ -134,6 +134,9 @@ class Plugin_ChallengeObserver extends Plugin {
 				$this->getSpojChalls($challcount);
 			break;
 			*/
+			case 'Valhalla':
+				$this->getValhallaChalls($challcount);
+			break;
 			case 'wargame.kr':
 				$this->getWargameKrChalls($challcount);
 			break;
@@ -279,7 +282,7 @@ class Plugin_ChallengeObserver extends Plugin {
 		usort($challs, array('self', 'sortByID'));
 		
 		for($i=0;$i<$count&&$i<sizeof($challs);$i++) {
-			$text = sprintf("\x02%s\x02 in category \x02%s\x02 worth \x02%d\x02 points( %s )",
+			$text = sprintf("\x02%s\x02 in category \x02%s\x02 worth \x02%d\x02 points ( %s )",
 				$challs[$i]['name'],
 				$challs[$i]['category'],
 				$challs[$i]['points'],
@@ -482,6 +485,42 @@ class Plugin_ChallengeObserver extends Plugin {
 			
 			$this->sendToEnabledChannels($text);
 			$this->addLatestChall('Rosecode', $text);
+		}
+	}
+	
+	private function getValhallaChalls($count) {
+		$html = libHTTP::GET('http://halls-of-valhalla.org/beta/challenges');
+		preg_match_all('#<a href=\'(/challenges/.+?)\'>(.+?)</a>.+?<td>(\d+) Points</td>#s', $html, $arr);
+		
+		$new_list = array();
+		for($i=0;$i<sizeof($arr[0]);$i++) {
+			$name = $arr[2][$i];
+			preg_match('/[^\d]+/', $name, $arr2);
+			
+			$new_list[] = array(
+				'name'     => $name,
+				'category' => $arr2[0],
+				'points'   => $arr[3][$i],
+				'url'      => 'http://halls-of-valhalla.org'.$arr[1][$i]
+			);
+		}
+		
+		$old_list = $this->getVar('valhalla_challs');
+		$this->saveVar('valhalla_challs', $new_list);
+		if($old_list === false) return;
+		
+		$challs = $this->compareLists($old_list, $new_list, 'name');
+		
+		for($i=0;$i<$count&&$i<sizeof($challs);$i++) {
+			$text = sprintf("\x02%s\x02 in category \x02%s\x02 worth \x02%d\x02 points ( %s )",
+				$challs[$i]['name'],
+				$challs[$i]['category'],
+				$challs[$i]['points'],
+				$challs[$i]['url']
+			);
+			
+			$this->sendToEnabledChannels($text);
+			$this->addLatestChall('Valhalla', $text);
 		}
 	}
 	
