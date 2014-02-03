@@ -16,7 +16,8 @@ class HTTP {
 		'connect-timeout'     => 5,        // Seconds the connection might take to establish
 		'ssl'                 => false,    // use HTTPS
 		'keep-alive'          => true,     // Keep HTTP 1.1 connections alive
-		'proxy'               => false     // Use a proxy (format 1.2.3.4:5678)
+		'proxy'               => false,    // Use a proxy (format 1.2.3.4:5678)
+		'verbose'             => false     // echo all HTTP requests
 	);
 	
 	private $lastHeader = false;
@@ -132,6 +133,8 @@ class HTTP {
 				return false;
 			}
 		}
+		
+		if($this->settings['verbose']) echo $method.' '.$path."\n";
 		
 		$header = $method.' '.$path." HTTP/1.1\r\n";
 		$header.= "Host: ".$this->host."\r\n";
