@@ -111,6 +111,9 @@ class Plugin_ChallengeObserver extends Plugin {
 			case 'CanYouHack.It':
 				$this->getCanYouHackItChalls($challcount);
 			break;
+			case 'Mathchall':
+				$this->getMathchallChalls($challcount);
+			break;
 			case 'µContest':
 				$this->getMicrocontestChalls($challcount);
 			break;
@@ -264,6 +267,27 @@ class Plugin_ChallengeObserver extends Plugin {
 			
 			$this->sendToEnabledChannels($text);
 			$this->addLatestChall('CanYouHack.It', $text);
+		}
+	}
+	
+	private function getMathchallChalls($count) {
+		require_once('ChallengeObserver/Mathchall.php');
+		
+		$Mathchall = new Mathchall;
+		$challs = $Mathchall->getChalls();
+		
+		usort($challs, array('self', 'sortByID'));
+		
+		for($i=0;$i<$count&&$i<sizeof($challs);$i++) {
+			$text = sprintf("\x02%s\x02 in category \x02%s\x02 worth \x02%d\x02 points( %s )",
+				$challs[$i]['name'],
+				$challs[$i]['category'],
+				$challs[$i]['points'],
+				$challs[$i]['url']
+			);
+			
+			$this->sendToEnabledChannels($text);
+			$this->addLatestChall('Mathchall', $text);
 		}
 	}
 	
