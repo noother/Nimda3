@@ -227,23 +227,14 @@ class Plugin_ChallengeObserver extends Plugin {
 		
 		$BrainQuest = new BrainQuest;
 		$challs = $BrainQuest->getChalls();
-		if(!$challs) {
-			trigger_error('Error while checking Brainquest challs', E_USER_NOTICE);
-			return;
-		}
 		
-		if(!$this->getVar('brainquest_challs')) {
-			$this->saveVar('brainquest_challs', $challs);
-			return;
-		}
+		usort($challs, array('self', 'sortByID'));
 		
-		$result = $this->compareLists($this->getVar('brainquest_challs'), $challs, 'id');
-		
-		for($i=0;$i<$count&&$i<sizeof($result);$i++) {
+		for($i=0;$i<$count&&$i<sizeof($challs);$i++) {
 			$text = sprintf("\x02%s\x02 in category \x02%s\x02 ( %s )",
-				$result[$i]['name'],
-				$result[$i]['category'],
-				$result[$i]['url']
+				$challs[$i]['name'],
+				$challs[$i]['category'],
+				$challs[$i]['url']
 			);
 			
 			$this->sendToEnabledChannels($text);
