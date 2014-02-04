@@ -123,6 +123,9 @@ class Plugin_ChallengeObserver extends Plugin {
 			case 'Revolution Elite':
 				$this->getRevolutionEliteChalls($challcount);
 			break;
+			case 'Root-Me':
+				$this->getRootMeChalls($challcount);
+			break;
 			case 'Rosecode':
 				$this->getRosecodeChalls($challcount);
 			break;
@@ -468,6 +471,31 @@ class Plugin_ChallengeObserver extends Plugin {
 			);
 			$this->sendToEnabledChannels($text);
 			$this->addLatestChall('Right-Answer', $text);
+		}
+	}
+	
+	private function getRootMeChalls($count) {
+		require_once('ChallengeObserver/RootMe.php');
+		
+		$RootMe = new RootMe;
+		$new_list = $RootMe->getChalls();
+		
+		$old_list = $this->getVar('rootme_challs');
+		$this->saveVar('rootme_challs', $new_list);
+		if($old_list === false) return;
+		
+		$challs = $this->compareLists($old_list, $new_list, 'name');
+		
+		for($i=0;$i<$count&&$i<sizeof($challs);$i++) {
+			$text = sprintf("\x02%s\x02 in category \x02%s\x02 worth \x02%d\x02 points ( %s )",
+				$challs[$i]['name'],
+				$challs[$i]['category'],
+				$challs[$i]['points'],
+				$challs[$i]['url']
+			);
+			
+			$this->sendToEnabledChannels($text);
+			$this->addLatestChall('Root-Me', $text);
 		}
 	}
 	
