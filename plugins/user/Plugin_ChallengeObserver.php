@@ -235,9 +235,14 @@ class Plugin_ChallengeObserver extends Plugin {
 		require_once('ChallengeObserver/BrainQuest.php');
 		
 		$BrainQuest = new BrainQuest;
-		$challs = $BrainQuest->getChalls();
+		$new_list = $BrainQuest->getChalls();
+		if(!$new_list) return false;
 		
-		usort($challs, array('self', 'sortByID'));
+		$old_list = $this->getVar('brainquest_challs');
+		$this->saveVar('brainquest_challs', $new_list);
+		if($old_list === false) return;
+		
+		$challs = $this->compareLists($old_list, $new_list, 'id');
 		
 		for($i=0;$i<$count&&$i<sizeof($challs);$i++) {
 			$text = sprintf("\x02%s\x02 in category \x02%s\x02 ( %s )",

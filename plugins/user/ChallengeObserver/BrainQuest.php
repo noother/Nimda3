@@ -43,6 +43,7 @@ class BrainQuest {
 			$this->riddleCache = false;
 		} else {
 			$res = $this->HTTP->GET('/en/'.$sub);
+			if(!$res) return false;
 		}
 		preg_match_all('#<img src=\'/pic/diamant.+?</a>(.+?)</td>(.+?)(?:<tr class=\'menu_cat2013\'|$)#s', $res, $arr);
 		
