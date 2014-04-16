@@ -82,6 +82,9 @@ abstract class Plugin {
 		
 		file_put_contents($filepath, serialize($data));
 		shell_exec('/usr/bin/php ./core/Job.php '.escapeshellarg($filepath).' > /dev/null &');
+		
+		$this->Bot->jobCount++;
+		if($this->Bot->jobCount > $this->Bot->jobCountMax) $this->Bot->jobCountMax = $this->Bot->jobCount;
 	}
 	
 	public final function saveVar($name, $value) {

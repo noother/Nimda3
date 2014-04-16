@@ -16,6 +16,10 @@ class Nimda {
 	public $MySQL;
 	public $version;
 	
+	public $timerCount;
+	public $jobCount;
+	public $jobCountMax;
+	
 	private $CONFIG = array();
 	private $timersLastTriggered;
 	private $permanentVars = array();
@@ -190,12 +194,16 @@ class Nimda {
 	
 	private function triggerTimers() {
 		if($this->time >= $this->timersLastTriggered+1) {
+			$this->timerCount = 0;
 			foreach($this->plugins as $Plugin) {
 				$Plugin->Server  = false;
 				$Plugin->Channel = false;
 				$Plugin->User    = false;
 				$Plugin->data    = false;
-				$Plugin->triggerTimer();
+				if($Plugin->interval != 0) {
+					$this->timerCount++;
+					$Plugin->triggerTimer();
+				}
 			}
 			
 			$this->timersLastTriggered = $this->time;
@@ -256,6 +264,8 @@ class Nimda {
 			$Plugin->command = $command;
 			
 			$Plugin->onJobDone();
+			
+			$this->jobCount--;
 		}
 		
 	}
