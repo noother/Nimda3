@@ -12,6 +12,8 @@ class MySQL {
 	
 	private $Instance=false;
 	
+	public $queryCount = 0;
+	
 	
 	function __construct($host, $user, $password, $db, $port=3306) {
 		$this->host     = $host;
@@ -28,6 +30,8 @@ class MySQL {
 	}
 	
 	public function query($sql, $mode='assoc') {
+		$this->queryCount++;
+		
 		if(!$this->Instance) {
 			$this->connect();
 		}
@@ -69,6 +73,8 @@ class MySQL {
 	}
 	
 	public function multiQuery($sql) {
+		$this->queryCount++;
+		
 		$this->Instance->multi_query($sql);
 		do {
 			if($this->Instance->error) {
