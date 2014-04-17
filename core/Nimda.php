@@ -221,6 +221,7 @@ class Nimda {
 		foreach($jobs as $job) {
 			$data = unserialize(file_get_contents($this->tempDir.'/jobs_done/'.$job));
 			unlink($this->tempDir.'/jobs_done/'.$job);
+			$this->jobCount--;
 			
 			$plugin  = &$data['origin']['plugin'];
 			$server  = &$data['origin']['server'];
@@ -264,8 +265,6 @@ class Nimda {
 			$Plugin->command = $command;
 			
 			$Plugin->onJobDone();
-			
-			$this->jobCount--;
 		}
 		
 	}
