@@ -434,10 +434,10 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getRevolutionEliteChalls($count) {
-		$html = libHTTP::GET('http://sabrefilms.co.uk/revolutionelite/index.php');
+		$html = libHTTP::GET('https://www.sabrefilms.co.uk/revolutionelite/index.php');
 		if(!$html) return;
 		
-		preg_match('#<h5>Latest Challenge Online:</h5><a href="http://sabrefilms.co.uk/revolutionelite/challs.php\?challs=(.+?) *?"> *?(.+?) *?</a>#', $html, $arr);
+		preg_match('#<h5>Latest Challenge Online:</h5><a href="https://www.sabrefilms.co.uk/revolutionelite/challs.php\?challs=(.+?) *?"> *?(.+?) *?</a>#', $html, $arr);
 		
 		$chall_name = trim($arr[2]);
 		
@@ -449,7 +449,7 @@ class Plugin_ChallengeObserver extends Plugin {
 			}
 		}
 		$new_url = str_replace(' ', '-', $new_url);
-		$url = 'http://sabrefilms.co.uk/revolutionelite/'.$new_url.'.php';
+		$url = 'https://www.sabrefilms.co.uk/revolutionelite/'.$new_url.'.php';
 		
 		$text = sprintf("\x02%s\x02 ( %s )",
 			$chall_name,
