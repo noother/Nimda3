@@ -112,7 +112,7 @@ class HTTP {
 		}
 		
 		if($this->socket) fclose($this->socket);
-		$this->socket = @fsockopen(($this->settings['ssl']?'ssl://':'').$ip, $port, $errno, $errstr, $this->settings['connect-timeout']);
+		$this->socket = @fsockopen(($this->settings['ssl']?'ssl://'.$this->host:$ip), $port, $errno, $errstr, $this->settings['connect-timeout']);
 		
 		if(!$this->socket) {
 			if($this->settings['unstable-connection']) {
