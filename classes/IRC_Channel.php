@@ -74,6 +74,14 @@ final class IRC_Channel extends IRC_Target {
 	}
 	
 	public function setUserModes($usermodes) {
+		foreach($usermodes as $data) {
+			$this->setUserMode($data['mode'], $data['user']);
+		}
+	}
+	
+	/*
+	public function setUserModes($usermodes) {
+		// broken, servers only accept N modes at a time - need to implement that before activating this again
 		$modes_give = "";
 		$modes_take = "";
 		$users_give = "";
@@ -108,6 +116,7 @@ final class IRC_Channel extends IRC_Target {
 		
 		$this->setUserMode($modes, $users);
 	}
+	*/
 	
 	public function remove() {
 		foreach($this->users as $User) {
