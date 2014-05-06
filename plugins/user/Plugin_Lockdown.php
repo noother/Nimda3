@@ -35,7 +35,7 @@ class Plugin_Lockdown extends Plugin {
 	function onInterval() {
 		foreach($this->Bot->servers as $Server) {
 			foreach($Server->channels as $Channel) {
-				if(!$Channel->lockdownActive) continue;
+				if(!isset($Channel->lockdownActive)) continue;
 				
 				foreach($Channel->voiceQueue as $key => $User) {
 					// If he got a mode meanwhile (by chanserv probably) don't voice him again
@@ -119,7 +119,7 @@ class Plugin_Lockdown extends Plugin {
 		if($this->data['text'] != 'I am not a bot') return;
 		
 		foreach($this->Server->channels as $Channel) {
-			if(!$Channel->lockdownActive) continue;
+			if(!isset($Channel->lockdownActive)) continue;
 			if(!isset($Channel->waitingForNotice[$this->User->id])) continue;
 			
 			$Channel->setUserMode('+v', $this->User->nick);
