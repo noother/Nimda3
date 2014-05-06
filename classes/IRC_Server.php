@@ -207,6 +207,11 @@ final class IRC_Server {
 					$Channel->modes[$modes{$i}] = true;
 				}
 			break;
+			case '332':
+				// Server "get" TOPIC reply (Also on channel join)
+				$Channel = $this->getChannel($parsed['params'][1]);
+				$Channel->topic = $parsed['params'][2];
+			break;
 			case '352':
 				// Server WHO reply
 				$Channel  = $this->getChannel($parsed['params'][1]);
@@ -448,6 +453,17 @@ final class IRC_Server {
 						$data['command'] = 'vACTION';
 					}
 				}
+			break;
+			case 'TOPIC':
+				// Sent when a user changes the topic
+				$User = $this->getUser($parsed['nick']);
+				$Channel = $this->getChannel($parsed['params'][0]);
+				$Channel->topic = $parsed['params'][1];
+				
+				$data['User'] = $User;
+				$data['Channel'] = $Channel;
+				$data['topic'] = $parsed['params'][1];
+				
 			break;
 			case 'QUIT':
 				// Sent when a user quits the server

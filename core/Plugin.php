@@ -419,6 +419,21 @@ abstract class Plugin {
 		*/
 	}
 	
+	public function onTopic() {
+		/*
+			IRC command "TOPIC"
+			Triggered when a user changes the topic
+			
+			object Channel
+			object User
+			
+			array data [
+				string topic => The new channel topic
+			]
+			
+		*/
+	}
+	
 	public function onQuit() {
 		/*
 			IRC command "QUIT"

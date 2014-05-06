@@ -312,6 +312,7 @@ class Nimda {
 				case 'PART':    if($User) $Plugin->onPart(); else $Plugin->onMePart(); break;
 				case 'PING':    $Plugin->onPing();    break;
 				case 'PRIVMSG': $Plugin->onPrivmsg(); break;
+				case 'TOPIC':   $Plugin->onTopic(); break;
 				case 'QUIT':    $Plugin->onQuit(); break;
 				
 				// Virtual commands
