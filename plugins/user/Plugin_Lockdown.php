@@ -39,10 +39,10 @@ class Plugin_Lockdown extends Plugin {
 				
 				foreach($Channel->voiceQueue as $key => $User) {
 					// If he got a mode meanwhile (by chanserv probably) don't voice him again
-					if(!empty($User->modes[$Channel->id])) continue;
-					
-					$Channel->setUserMode('+v', $User->nick);
-					$Channel->voicedForLockdown[] = $User;
+					if(empty($User->modes[$Channel->id])) {
+						$Channel->setUserMode('+v', $User->nick);
+						$Channel->voicedForLockdown[] = $User;
+					}
 					unset($Channel->voiceQueue[$key]);
 				}
 				
