@@ -139,25 +139,32 @@ abstract class Plugin {
 		$identifier = 'config_'.$this->id.'_'.$name;
 		$def = $this->config[$name];
 		
+		if(!isset($def['type'])) $def['type'] = 'string';
+		
 		switch($def['type']) {
 			case 'enum':
 				if(array_search($value, $def['options']) === false) return false;
+				$Target->saveVar($identifier, $value);
 			break;
 			case 'int':
 				if(!libValidate::integer($value)) return false;
-			break;
-			case 'unsigned_int':
-				if(!libValidate::integer($value, true)) return false;
+				$Target->saveVar($identifier, (int)$value);
 			break;
 			case 'range':
 				if(!libValidate::integer($value)) return false;
 				if($value < $def['min'] || $value > $def['max']) return false;
+				$Target->saveVar($identifier, (int)$value);
+			break;
+			case 'unsigned_int':
+				if(!libValidate::integer($value, true)) return false;
+				$Target->saveVar($identifier, (int)$value);
+			break;
+			case 'string':
+				$Target->saveVar($identifier, $value);
 			break;
 			default:
 				return false; // invalid type
 		}
-		
-		$Target->saveVar($identifier, $value);
 		
 	return true;
 	}

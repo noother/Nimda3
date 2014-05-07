@@ -52,6 +52,8 @@ class CorePlugin_Config extends Plugin {
 		$this->reply('Available config variables for plugin '.$plugin_name.':');
 		
 		foreach($config as $name => $def) {
+			if(!isset($def['type'])) $def['type'] = 'string';
+			
 			$output = '%s: %s (%s) - %s';
 			
 			switch($def['type']) {
@@ -65,11 +67,14 @@ class CorePlugin_Config extends Plugin {
 				case 'int':
 					$options = 'any number';
 				break;
-				case 'unsigned_int':
-					$options = 'any natural number';
-				break;
 				case 'range':
 					$options = $def['min'].'-'.$def['max'];
+				break;
+				case 'string':
+					$options = 'anything';
+				break;
+				case 'unsigned_int':
+					$options = 'any natural number';
 				break;
 			}
 			
