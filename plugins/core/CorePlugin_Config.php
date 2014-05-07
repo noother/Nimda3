@@ -62,14 +62,20 @@ class CorePlugin_Config extends Plugin {
 					}
 					$options = substr($options, 0, -2);
 				break;
-				case 'bool':
-					$options = 'true, false';
+				case 'int':
+					$options = 'any number';
+				break;
+				case 'unsigned_int':
+					$options = 'any natural number';
+				break;
+				case 'range':
+					$options = $def['min'].'-'.$def['max'];
 				break;
 			}
 			
 			$this->reply(sprintf($output,
 				$name,
-				(is_bool($def['value']) ? ($def['value'] ? 'true' : 'false') : $def['value']),
+				$def['value'],
 				$options,
 				$def['description']
 			));

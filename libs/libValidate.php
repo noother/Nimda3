@@ -11,8 +11,12 @@ class libValidate {
 	return true;
 	}
 	
-	static function integer($mixed) {
-		if((int)$mixed != $mixed) return false;
+	static function integer($mixed, $unsigned=false) {
+		if($unsigned) {
+			if(preg_match('/[^0-9]/', $mixed)) return false;
+		} else {
+			if(preg_match('/[^0-9-]/', $mixed)) return false;
+		}
 	return true;
 	}
 	

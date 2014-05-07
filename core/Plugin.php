@@ -141,13 +141,23 @@ abstract class Plugin {
 		
 		switch($def['type']) {
 			case 'enum':
-				if(array_search($value, $def['options']) !== false) {
-					$Target->saveVar($identifier, $value);
-				} else {
-					return false;
-				}
+				if(array_search($value, $def['options']) === false) return false;
 			break;
+			case 'int':
+				if(!libValidate::integer($value)) return false;
+			break;
+			case 'unsigned_int':
+				if(!libValidate::integer($value, true)) return false;
+			break;
+			case 'range':
+				if(!libValidate::integer($value)) return false;
+				if($value < $def['min'] || $value > $def['max']) return false;
+			break;
+			default:
+				return false; // invalid type
 		}
+		
+		$Target->saveVar($identifier, $value);
 		
 	return true;
 	}
