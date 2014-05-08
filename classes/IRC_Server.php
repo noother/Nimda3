@@ -666,8 +666,11 @@ final class IRC_Server {
 		$this->Bot->savePermanent($name, $value, 'server', $this->id);
 	}
 	
-	public function getVar($name) {
-		return $this->Bot->getPermanent($name, 'server', $this->id);
+	public function getVar($name, $default=false) {
+		$value = $this->Bot->getPermanent($name, 'server', $this->id);
+		if($value === false) return $default;
+		
+	return $value;
 	}
 	
 	public function removeVar($name) {

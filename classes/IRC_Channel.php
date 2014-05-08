@@ -146,8 +146,11 @@ final class IRC_Channel extends IRC_Target {
 		$this->Bot->savePermanent($name, $value, 'channel', $this->Server->id.':'.$this->id);
 	}
 	
-	public function getVar($name) {
-		return $this->Bot->getPermanent($name, 'channel', $this->Server->id.':'.$this->id);
+	public function getVar($name, $default=false) {
+		$value = $this->Bot->getPermanent($name, 'channel', $this->Server->id.':'.$this->id);
+		if($value === false) return $default;
+		
+	return $value;
 	}
 	
 	public function removeVar($name) {

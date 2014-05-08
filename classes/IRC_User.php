@@ -97,8 +97,11 @@ final class IRC_User extends IRC_Target {
 		$this->Bot->savePermanent($name, $value, 'user', $this->id);
 	}
 	
-	public function getVar($name) {
-		return $this->Bot->getPermanent($name, 'user', $this->id);
+	public function getVar($name, $default=false) {
+		$value = $this->Bot->getPermanent($name, 'user', $this->id);
+		if($value === false) return $default;
+		
+	return $value;
 	}
 	
 	public function removeVar($name) {

@@ -91,8 +91,11 @@ abstract class Plugin {
 		$this->Bot->savePermanent($name, $value, 'plugin', $this->id);
 	}
 	
-	public final function getVar($name) {
-		return $this->Bot->getPermanent($name, 'plugin', $this->id);
+	public final function getVar($name, $default=false) {
+		$value = $this->Bot->getPermanent($name, 'plugin', $this->id);
+		if($value === false) return $default;
+		
+	return $value;
 	}
 	
 	public final function removeVar($name) {
@@ -118,13 +121,7 @@ abstract class Plugin {
 			$Target = $this->Channel;
 		}
 		
-		$config = $Target->getVar('config_'.$this->id.'_'.$name);
-		
-		if($config === false) {
-			$config = $this->config[$name]['default'];
-		}
-		
-	return $config;
+	return $Target->getVar('config_'.$this->id.'_'.$name, $this->config[$name]['default']);
 	}
 	
 	public final function setConfig($name, $value) {
