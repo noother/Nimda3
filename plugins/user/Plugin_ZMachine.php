@@ -171,16 +171,6 @@ class Plugin_ZMachine extends Plugin {
 		
 		$s = &$this->sessions[$session_id];
 		
-		$var = 'personalhighscore_'.$s['Target']->id.'_'.$s['game_id'];
-		if($this->getVar($var) === false) {
-			$this->saveVar($var, array('score' => 0, 'moves' => 0, 'time' => $this->Bot->time));
-		}
-		
-		$var = 'globalhighscore_'.$s['game_id'];
-		if($this->getVar($var) === false) {
-			$this->saveVar($var, array('name' => 'no one', 'score' => 0, 'moves' => 0, $this->Bot->time));
-		}
-		
 		$this->loadAutosave($session_id);
 		$this->process($session_id);
 		
@@ -241,7 +231,7 @@ class Plugin_ZMachine extends Plugin {
 		$data = &$this->sessions[$session_id];
 		
 		$var = 'personalhighscore_'.$data['Target']->id.'_'.$data['game_id'];
-		$cur = $this->getVar($var);
+		$cur = $this->getVar($var, array('score' => 0, 'moves' => 0));
 		if(($score > $cur['score']) || ($score == $cur['score'] && $moves < $cur['moves'])) {
 			$this->saveVar($var, array('score' => $score, 'moves' => $moves));
 		}
@@ -251,7 +241,7 @@ class Plugin_ZMachine extends Plugin {
 		$data = &$this->sessions[$session_id];
 		
 		$var = 'globalhighscore_'.$data['game_id'];
-		$cur = $this->getVar($var);
+		$cur = $this->getVar($var, array('name' => 'no one', 'score' => 0, 'moves' => 0));
 		
 		if(($score > $cur['score']) || ($score == $cur['score'] && $moves < $cur['moves'])) {
 			$this->saveVar($var, array(

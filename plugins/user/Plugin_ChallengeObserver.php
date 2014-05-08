@@ -12,8 +12,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	
 	
 	function onLoad() {
-		if(!$this->getVar('sites'))  $this->saveVar('sites', $this->getSites());
-		if(!$this->getVar('latest')) $this->saveVar('latest', array());
+		if(!$this->getVar('sites')) $this->saveVar('sites', $this->getSites());
 		
 		/*
 		$sites = $this->getSites();
@@ -24,7 +23,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	
 	function isTriggered() {
 		$latest = $this->getVar('latest');
-		if(empty($latest)) {
+		if(!$latest) {
 			$this->reply('No challenges have been collected yet.');
 			return;
 		}
@@ -153,7 +152,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function addLatestChall($site, $text) {
-		$latest = $this->getVar('latest');
+		$latest = $this->getVar('latest', array());
 		
 		if(sizeof($latest) >= 5) array_pop($latest);
 		array_unshift($latest, array('site' => $site, 'text' => $text));

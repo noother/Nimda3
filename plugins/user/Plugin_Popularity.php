@@ -45,7 +45,7 @@ class Plugin_Popularity extends Plugin {
 			return;
 		}
 		
-		$luvs = $this->getVar('luvs');
+		$luvs = $this->getVar('luvs', array());
 		
 		if(!isset($luvs[$id])) {
 			$luvs[$id] = array(
@@ -87,7 +87,7 @@ class Plugin_Popularity extends Plugin {
 	function showPopularity($nick) {
 		$id = strtolower($nick);
 		
-		$luvs = $this->getVar('luvs');
+		$luvs = $this->getVar('luvs', array());
 		if(!isset($luvs[$id])) {
 			$this->reply($nick.' didn\'t get any luvs yet. :(');
 		} else {

@@ -10,18 +10,17 @@ class Plugin_Uptime extends Plugin {
 	
 	function onLoad() {
 		$this->started = time();
-		if($this->getVar('total_uptime') === false) $this->saveVar('total_uptime', 0);
 	}
 	
 	function isTriggered() {
 		$this->reply(sprintf("Uptime: %s - Total Uptime: %s",
 			libTime::secondsToString($this->Bot->time - $this->started),
-			libTime::secondsToString($this->getVar('total_uptime') + $this->Bot->time - $this->started)
+			libTime::secondsToString($this->getVar('total_uptime', 0) + $this->Bot->time - $this->started)
 		));
 	}
 	
 	function onUnload() {
-		$this->saveVar('total_uptime', $this->getVar('total_uptime') + time() - $this->started);
+		$this->saveVar('total_uptime', $this->getVar('total_uptime', 0) + time() - $this->started);
 	}
 	
 }

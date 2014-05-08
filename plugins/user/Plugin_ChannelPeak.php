@@ -51,8 +51,9 @@ class Plugin_ChannelPeak extends Plugin {
 	}
 	
 	function onMeJoin() {
-		if(!$this->Channel->getVar('peak')) {
-			$user_count = sizeof($this->Channel->users);
+		$user_count = sizeof($this->Channel->users);
+		
+		if($user_count > $this->Channel->getVar('peak', 0)) {
 			$this->Channel->saveVar('peak', $user_count);
 			$this->Channel->saveVar('peak_date', date('Y-m-d H:i:s'));
 		}

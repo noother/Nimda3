@@ -358,16 +358,16 @@ class Plugin_DiceGame extends Plugin {
 			if($winner['nick'] != $player['nick']) $losers[] = $player;
 		}
 		
-		$this->saveVar('stats_games_completed', $this->getVar('stats_games_completed')+1);
+		$this->saveVar('stats_games_completed', $this->getVar('stats_games_completed', 0)+1);
 		
-		$max_players = $this->getVar('stats_max_players');
-		if(!$max_players || sizeof($players) > $max_players['count']) {
+		$max_players = $this->getVar('stats_max_players', array('count' => 0));
+		if(sizeof($players) > $max_players['count']) {
 			$new_max_players = array('count' => sizeof($players), 'players' => array(), 'date' => time());
 			foreach($players as $player) {
 				$new_max_players['players'][] = $player['nick'];
 			}
 			
-			if($max_players) {
+			if($max_players['count']) {
 				$this->reply(sprintf("A new largest game record has been achieved: %d players (%s). Old one was %d players (%s) %s ago",
 					$new_max_players['count'],
 					implode(', ', $new_max_players['players']),
@@ -380,10 +380,10 @@ class Plugin_DiceGame extends Plugin {
 			$this->saveVar('stats_max_players', $new_max_players);
 		}
 		
-		$max_points = $this->getVar('stats_max_points');
+		$max_points = $this->getVar('stats_max_points', array('points' => 0));
 		
-		if($max_points === false || $winner['points'] > $max_points['points']) {
-			if($max_points) {
+		if($winner['points'] > $max_points['points']) {
+			if($max_points['points']) {
 				$this->reply(sprintf("You broke the highest sum record with %d points. Old one was %s with %d points %s ago.",
 					$winner['points'],
 					$max_points['nick'],
@@ -399,8 +399,7 @@ class Plugin_DiceGame extends Plugin {
 			));
 		}
 		
-		$ranking = $this->getVar('ranking');
-		if($ranking === false) $ranking = array();
+		$ranking = $this->getVar('ranking', array());
 		
 		foreach($players as $player) {
 			$player_exists = false;
@@ -469,8 +468,7 @@ class Plugin_DiceGame extends Plugin {
 	}
 	
 	private function printPlayerStats($nick) {
-		$ranking = $this->getVar('ranking');
-		if($ranking === false) $ranking = array();
+		$ranking = $this->getVar('ranking', array());
 		$stats = false;
 		
 		if(preg_match('/[^0-9]/', $nick)) {
