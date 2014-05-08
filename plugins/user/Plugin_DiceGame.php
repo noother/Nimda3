@@ -367,13 +367,15 @@ class Plugin_DiceGame extends Plugin {
 				$new_max_players['players'][] = $player['nick'];
 			}
 			
-			$this->reply(sprintf("A new largest game record has been achieved. %d players (%s). Old one was %d players (%s) %s ago",
-				$new_max_players['count'],
-				implode(', ', $new_max_players['players']),
-				sizeof($max_players['count']),
-				implode(', ', $max_players['players']),
-				libTime::secondsToString($new_max_players['date'] - $max_players['date'])
-			));
+			if($max_players) {
+				$this->reply(sprintf("A new largest game record has been achieved: %d players (%s). Old one was %d players (%s) %s ago",
+					$new_max_players['count'],
+					implode(', ', $new_max_players['players']),
+					$max_players['count'],
+					implode(', ', $max_players['players']),
+					libTime::secondsToString($new_max_players['date'] - $max_players['date'])
+				));
+			}
 			
 			$this->saveVar('stats_max_players', $new_max_players);
 		}
@@ -381,13 +383,14 @@ class Plugin_DiceGame extends Plugin {
 		$max_points = $this->getVar('stats_max_points');
 		
 		if($max_points === false || $winner['points'] > $max_points['points']) {
-			
-			$this->reply(sprintf("You broke the highest sum record with %d points. Old one was %s with %d points %s ago.",
-				$winner['points'],
-				$max_points['nick'],
-				$max_points['points'],
-				libTime::secondsToString(time() - $max_points['time'])
-			));
+			if($max_points) {
+				$this->reply(sprintf("You broke the highest sum record with %d points. Old one was %s with %d points %s ago.",
+					$winner['points'],
+					$max_points['nick'],
+					$max_points['points'],
+					libTime::secondsToString(time() - $max_points['time'])
+				));
+			}
 			
 			$this->saveVar('stats_max_points', array(
 				'nick'   => $winner['nick'],
@@ -399,34 +402,34 @@ class Plugin_DiceGame extends Plugin {
 		$ranking = $this->getVar('ranking');
 		if($ranking === false) $ranking = array();
 		
-		$put_won = false;
 		foreach($players as $player) {
-			$check = false;
-			foreach($ranking as &$rank) {
+			$player_exists = false;
+			foreach($ranking as $key => $rank) {
 				if($rank['nick'] == $player['nick']) {
-					$rank['played']++;
-					$rank['last_played'] = time();
-					$check = true;
-				}
-			
-				if(!$put_won && $rank['nick'] == $winner['nick']) {
-					$rank['won']++;
-					$put_won = true;
+					$player_exists = true;
+					break;
 				}
 			}
-			if(!$check) {
+			
+			if(!$player_exists) {
 				$ranking[] = array(
 					'nick' => $player['nick'],
-					'played' => 1,
-					'won' => $winner['nick'] == $player['nick'] ? 1 : 0,
-					'last_played' => time()
+					'played' => 0,
+					'won' => 0,
+					'last_played' => 0
 				);
+				$key = sizeof($ranking)-1;
 			}
+			
+			$rank = &$ranking[$key];
+			
+			$rank['played']++;
+			$rank['last_played'] = time();
+			if($rank['nick'] == $winner['nick']) $rank['won']++;
 		}
 		
 		usort($ranking, array('self', 'sortByWon'));
 		$this->saveVar('ranking', $ranking);
-		
 	}
 	
 	private function printStats() {
