@@ -226,7 +226,17 @@ final class IRC_Server {
 					$Channel->addUser($User);
 				}
 				
-				$User->modes[$Channel->id] = strlen($parsed['params'][6]) > 1 ? $parsed['params'][6]{1} : '';
+				$modes = $parsed['params'][6];
+				$mode = '';
+				// Get the most significant mode, ignoring * (IRC OP) and the first 'H' char which isn't a mode
+				for($i=1;$i<strlen($modes);$i++) {
+					if($modes{$i} != '*') {
+						$mode = $modes{$i};
+						break;
+					}
+				}
+				
+				$User->modes[$Channel->id] = $mode;
 			break;
 			case '353':
 				// Server NAMES reply
