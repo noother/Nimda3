@@ -4,9 +4,9 @@ class Plugin_RFC extends Plugin {
 
     public $triggers        = array('!rfc', '!bcp', '!std', '!fyi');
     public $helpCategory    = 'Internet';
-    public $helpTriggers    = array();
+    public $helpTriggers    = array('!rfc');
     public $usage           = '<num>';
-    public $helpText        = 'Prints title and link for RFCs / BCPs / STDs / FYIs';
+    public $helpText        = 'Prints title and link for RFCs (!rfc) / BCPs (!bcp) / STDs (!std) / FYIs (!fyi)';
 
     private $cachefile;
 
