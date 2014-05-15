@@ -307,6 +307,7 @@ class Nimda {
 				case 'ERROR':   $Plugin->onMeQuit();  break;
 				case 'JOIN':    if($User) $Plugin->onJoin(); break;
 				case 'KICK':    if(isset($data['Victim'])) $Plugin->onKick(); else $Plugin->onMeKick(); break;
+				case 'MODE':    if($Channel) $Plugin->onMode(); break;
 				case 'NICK':    if($User) $Plugin->onNick(); else $Plugin->onMeNick(); break;
 				case 'NOTICE':  if($User) $Plugin->onNotice(); else /* TODO: Add onServerNotice() */; break;
 				case 'PART':    if($User) $Plugin->onPart(); else $Plugin->onMePart(); break;

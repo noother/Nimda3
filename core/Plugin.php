@@ -197,9 +197,9 @@ abstract class Plugin {
 		return "\x02Usage:\x02 ".$this->data['trigger'].(!empty($this->usage) ? ' '.$this->usage : '');
 	}
 	
-	public final function findPlugin($text) {
-		if(false === $Plugin = $this->getPluginByTrigger($text)) {
-			$Plugin = $this->getPluginById($text);
+	public final function findPlugin($string) {
+		if(false === $Plugin = $this->getPluginById($string)) {
+			$Plugin = $this->getPluginByTrigger($string);
 		}
 		
 	return $Plugin;
@@ -352,7 +352,7 @@ abstract class Plugin {
 			object User
 			
 			array data [
-				old_nick => The nick the user had before
+				string old_nick => The nick the user had before
 			]
 		*/
 	}
@@ -363,7 +363,22 @@ abstract class Plugin {
 			Triggered when the bot changes its nick
 
 			array data [
-				old_nick => The nick the bot had before
+				string old_nick => The nick the bot had before
+			]
+		*/
+	}
+	
+	public function onMode() {
+		/*
+			IRC command "MODE"
+			Triggered when a mode for a user in a channel is changed
+			
+			object User
+			object Channel
+			
+			array data [
+				string mode => The mode that has been set for Victim
+				object Victim => The user the mode change targeted
 			]
 		*/
 	}
@@ -374,7 +389,7 @@ abstract class Plugin {
 			Triggered on connect if nickname is already in use
 			
 			array data [
-				nick => The nickname that the bot has tried to use
+				string nick => The nickname that the bot has tried to use
 			]
 		*/
 	}
@@ -387,7 +402,7 @@ abstract class Plugin {
 			object User
 			
 			array data [
-				text => The text sent with the NOTICE
+				string text => The text sent with the NOTICE
 			]
 		*/
 	}

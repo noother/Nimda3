@@ -5,9 +5,12 @@ class Plugin_Lockdown extends Plugin {
 	public $triggers = array('!lockdown');
 	
 	public $helpTriggers = array('!lockdown');
-	public $helpText = 'Locks down the channel by setting the moderated flag and voicing all known users. New users are asked to reply with a text to get voice. Useful for bot invasions.';
+	public $helpText = 'Locks down the channel by setting the moderated flag and voicing all known users. New users are asked to reply with a text to get voice. Type the command again to revert channel lockdown. Useful for bot invasions.';
+	
+	public $interval = 0; // Gets activated when a channel lockdown is started and deactivated when all channel lockdowns are disabled
 	
 	private $channelLockdownCount = 0;
+	
 	
 	function isTriggered() {
 		if(!$this->Channel) {
@@ -25,27 +28,32 @@ class Plugin_Lockdown extends Plugin {
 			return;
 		}
 		
-		if(!isset($this->Channel->lockdownActive)) {
+		if(!$this->Channel->getVar('lockdown_active')) {
 			$this->startChannelLockdown();
 		} else {
 			$this->stopChannelLockdown();
 		}
 	}
 	
+	function onMeJoin() {
+		if($this->Channel->getVar('lockdown_active')) {
+			$this->channelLockdownCount++;
+			$this->interval = 5;
+		}
+	}
+	
 	function onInterval() {
 		foreach($this->Bot->servers as $Server) {
 			foreach($Server->channels as $Channel) {
-				if(!isset($Channel->lockdownActive)) continue;
+				if(!$Channel->getVar('lockdown_active')) continue;
 				
-				foreach($Channel->voiceQueue as $key => $User) {
-					// If he got a mode meanwhile (by chanserv probably) don't voice him again
-					if(empty($User->modes[$Channel->id])) {
-						$Channel->setUserMode('+v', $User->nick);
-						$Channel->voicedForLockdown[] = $User;
+				$users = array();
+				foreach($Channel->users as $User) {
+					if(empty($User->modes[$Channel->id]) && $this->findPlugin('seen')->getVar($User->id) !== false) {
+						$users[] = $User;
 					}
-					unset($Channel->voiceQueue[$key]);
 				}
-				
+				$this->voiceUsers($Channel, $users);
 			}
 		}
 	}
@@ -53,27 +61,19 @@ class Plugin_Lockdown extends Plugin {
 	private function startChannelLockdown() {
 		$this->reply('Initiating channel lockdown.');
 		
-		$this->Channel->lockdownActive = true;
+		$this->Channel->saveVar('lockdown_active', true);
 		
-		$this->Channel->voicedForLockdown = array();
+		$users = array();
 		foreach($this->Channel->users as $User) {
 			if(empty($User->modes[$this->Channel->id])) {
-				$this->Channel->voicedForLockdown[] = $User;
+				$users[] = $User;
 			}
 		}
+		$this->voiceUsers($this->Channel, $users);
 		
-		$modes = array();
-		foreach($this->Channel->voicedForLockdown as $User) {
-			$modes[] = array('mode' => '+v', 'user' => $User->nick);
-		}
-		
-		$this->Channel->setUserModes($modes);
 		$this->Channel->setMode('+m');
 		
-		$this->Channel->voiceQueue = array();
-		$this->Channel->waitingForNotice = array();
-		
-		$this->Channel->oldTopic = $this->Channel->topic;
+		$this->Channel->saveVar('lockdown_old_topic', $this->Channel->topic);
 		$this->Channel->setTopic($this->Channel->topic.' | CHANNEL LOCKDOWN ACTIVE');
 		
 		$this->channelLockdownCount++;
@@ -83,52 +83,128 @@ class Plugin_Lockdown extends Plugin {
 	private function stopChannelLockdown() {
 		$this->reply('Ending channel lockdown.');
 		
-		$modes = array();
-		foreach($this->Channel->voicedForLockdown as $User) {
-			$modes[] = array('mode' => '-v', 'user' => $User->nick);
+		$usermodes = array();
+		foreach($this->Channel->getVar('voiced_during_lockdown', array()) as $nick) {
+			$usermodes[] = array('mode' => '-v', 'user' => $nick);
 		}
-		unset($this->Channel->voicedForLockdown);
-		$this->Channel->setUserModes($modes);
+		$this->Channel->setUserModes($usermodes);
+		
 		$this->Channel->setMode('-m');
 		
-		$this->Channel->setTopic($this->Channel->oldTopic);
-		unset($this->Channel->oldTopic);
+		if($this->Channel->getVar('lockdown_old_topic')) $this->Channel->setTopic($this->Channel->getVar('lockdown_old_topic'));
 		
-		unset($this->Channel->voiceQueue);
-		unset($this->Channel->waitingForNotice);
-		unset($this->Channel->lockdownActive);
+		$this->Channel->removeVar('voiced_during_lockdown');
+		$this->Channel->removeVar('lockdown_old_topic');
+		$this->Channel->removeVar('lockdown_active');
 		
 		$this->channelLockdownCount--;
 		if($this->channelLockdownCount == 0) $this->interval = 0;
 	}
 	
 	function onJoin() {
-		if(!isset($this->Channel->lockdownActive)) return;
+		if(!$this->channelLockdownCount || !$this->Channel->getVar('lockdown_active')) return;
 		
-		$been_here_before = $this->Bot->plugins['seen']->getVar($this->User->id) !== false;
-		if($been_here_before) {
-			// Add user to to-voice queue and voice him in the next 5 seconds to prevent voicing users that get a mode by chanserv already
-			$this->Channel->voiceQueue[] = $this->User;
-		} else {
+		if($this->findPlugin('seen')->getVar($this->User->id) === false) {
 			$this->User->notice("Hi! This channel is currently under lockdown due to a spamming problem. As this is your first visit here you're currently not able to talk in the channel. Please just type \"/notice ".$this->Server->Me->nick." I am not a bot\" into your IRC client and I'll resolve this issue right away. Thank you!");
-			$this->Channel->waitingForNotice[$this->User->id] = $this->User;
 		}
 	}
 	
 	function onNotice() {
-		if($this->data['text'] != 'I am not a bot') return;
+		if(!$this->channelLockdownCount || $this->data['text'] != 'I am not a bot') return;
 		
 		foreach($this->Server->channels as $Channel) {
-			if(!isset($Channel->lockdownActive)) continue;
-			if(!isset($Channel->waitingForNotice[$this->User->id])) continue;
-			
-			$Channel->setUserMode('+v', $this->User->nick);
-			unset($Channel->waitingForNotice[$this->User->id]);
-			$Channel->voicedForLockdown[] = $this->User;
+			if($Channel->getVar('lockdown_active') && isset($Channel->users[$this->User->id]) && empty($this->User->modes[$Channel->id])) {
+				$this->voiceUser($Channel, $this->User);
+				$this->injectSeenJoin($Channel, $this->User);
+			}
 		}
+	}
+	
+	function onMode() {
+		if(!$this->channelLockdownCount || !$this->Channel->getVar('lockdown_active')) return;
+		
+		if(!isset($this->Channel->users[$this->User->id])) return; // Don't do anything if the mode was set by a non-channel-user, like ChanServ
+		
+		if($this->findPlugin('seen')->getVar($this->data['Victim']->id) === false) {
+			$this->injectSeenJoin($this->Channel, $this->data['Victim']);
+		}
+	}
+	
+	function onNick() {
+		if(!$this->channelLockdownCount) return;
+		
+		$old_id = strtolower($this->data['old_nick']);
+		
+		foreach($this->Server->channels as $Channel) {
+			if($Channel->getVar('lockdown_active')) {
+				$voiced = $Channel->getVar('voiced_during_lockdown', array());
+				if(isset($voiced[$old_id])) {
+					unset($voiced[$old_id]);
+					$voiced[$this->User->id] = $this->User->nick;
+					$Channel->saveVar('voiced_during_lockdown', $voiced);
+				}
+			}
+		}
+	}
+	
+	function onPart() {
+		if(!$this->channelLockdownCount || !$this->Channel->getVar('lockdown_active')) return;
+		
+		$voiced = $this->Channel->getVar('voiced_during_lockdown', array());
+		if(isset($voiced[$this->User->id])) {
+			unset($voiced[$this->User->id]);
+			$this->Channel->saveVar('voiced_during_lockdown', $voiced);
+		}
+	}
+	
+	function onTopic() {
+		if(!$this->channelLockdownCount || !$this->Channel->getVar('lockdown_active')) return;
+		
+		if($this->User->id != $this->Server->Me->id) $this->Channel->removeVar('lockdown_old_topic');
+	}
+	
+	function onQuit() {
+		if(!$this->channelLockdownCount) return;
+		
+		foreach($this->Server->channels as $Channel) {
+			if($Channel->getVar('lockdown_active')) {
+				$voiced = $Channel->getVar('voiced_during_lockdown', array());
+				if(isset($voiced[$this->User->id])) {
+					unset($voiced[$this->User->id]);
+					$Channel->saveVar('voiced_during_lockdown', $voiced);
+				}
+			}
+		}
+	}
+	
+	private function voiceUsers($Channel, $users) {
+		$voiced = $Channel->getVar('voiced_during_lockdown', array());
+		$usermodes = array();
+		foreach($users as $User) {
+			$usermodes[] = array('mode' => '+v', 'user' => $User->nick);
+			if(!isset($voiced[$User->id])) {
+				$voiced[$User->id] = $User->nick;
+			}
+		}
+		
+		$Channel->setUserModes($usermodes);
+		$Channel->saveVar('voiced_during_lockdown', $voiced);
+	}
+	
+	private function voiceUser($Channel, $User) {
+		$this->voiceUsers($Channel, array($User));
+	}
+	
+	private function injectSeenJoin($Channel, $User) {
+		$this->findPlugin('seen')->saveVar($User->id, array(
+			'action' => 'JOIN',
+			'server' => $this->Server->host,
+			'channel'=> $Channel->name,
+			'nick'   => $User->nick,
+			'time'   => $this->Bot->time
+		));
 	}
 	
 }
 
 ?>
-
