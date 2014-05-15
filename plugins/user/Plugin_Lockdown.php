@@ -147,6 +147,16 @@ class Plugin_Lockdown extends Plugin {
 		}
 	}
 	
+	function onKick() {
+		if(!$this->channelLockdownCount || !$this->Channel->getVar('lockdown_active')) return;
+		
+		$voiced = $this->Channel->getVar('voiced_during_lockdown', array());
+		if(isset($voiced[$this->data['Victim']->id])) {
+			unset($voiced[$this->data['Victim']->id]);
+			$this->Channel->saveVar('voiced_during_lockdown', $voiced);
+		}
+	}
+	
 	function onPart() {
 		if(!$this->channelLockdownCount || !$this->Channel->getVar('lockdown_active')) return;
 		
