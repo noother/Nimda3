@@ -479,23 +479,27 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getRootMeChalls($count) {
-		require_once('ChallengeObserver/RootMe.php');
+		$HTTP = new HTTP('www.root-me.org');
+		$html = $HTTP->GET('/en/Challenges/');
 		
-		$RootMe = new RootMe;
-		$new_list = $RootMe->getChalls();
+		preg_match('#<h3>Recently</h3>.*?<ul\s+class="ts gris">(.+?)</ul>#s', $html, $tmp);
 		
-		$old_list = $this->getVar('rootme_challs');
-		$this->saveVar('rootme_challs', $new_list);
-		if($old_list === false) return;
+		preg_match_all('#<a\s+href="(.*?/Challenges/(.+?)/.+?)".+?>(.+?)</a>#s', $tmp[1], $arr);
 		
-		$challs = $this->compareLists($old_list, $new_list, 'name');
-		
-		for($i=0;$i<$count&&$i<sizeof($challs);$i++) {
+		for($i=0;$i<$count&&$i<sizeof($arr[1]);$i++) {
+			$url      = 'http://www.root-me.org/'.$arr[1][$i];
+			$category = $arr[2][$i];
+			$name     = $arr[3][$i];
+			
+			$html = $HTTP->GET('/'.$arr[1][$i]);
+			preg_match('#<h2 class=".*?challenge-score.*?">(\d+)#', $html, $arr2);
+			$points = $arr2[1];
+			
 			$text = sprintf("\x02%s\x02 in category \x02%s\x02 worth \x02%d\x02 points ( %s )",
-				$challs[$i]['name'],
-				$challs[$i]['category'],
-				$challs[$i]['points'],
-				$challs[$i]['url']
+				$name,
+				$category,
+				$points,
+				$url
 			);
 			
 			$this->sendToEnabledChannels($text);
