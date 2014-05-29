@@ -506,7 +506,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	private function getRosecodeChalls($count) {
 		$html = libHTTP::GET('http://www.javaist.com/rosecode/');
 		if(!$html) return;
-		preg_match('#<span>New Problems</span></h2>.+?<ul.+?>(.+?)</ul>#s', $html, $tmp);
+		preg_match('#<span>Fresh Problems</span></h2>.+?<ul.+?>(.+?)</ul>#s', $html, $tmp);
 		preg_match_all('#<a href="(.+?)">(?:<font.+?</font> )?(.+?)</a>#', $tmp[1], $arr);
 		
 		for($i=0;$i<$count&&$i<sizeof($arr[0]);$i++) {
