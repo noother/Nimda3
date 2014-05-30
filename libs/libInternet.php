@@ -16,7 +16,7 @@ class libInternet {
 	}
 	
 	static function googleTranslate($text, $from='auto', $to='de', $return_source_lang=false) {
-		$HTTP = new HTTP('translate.google.com');
+		$HTTP = new HTTP('translate.google.com', 443, true);
 		$HTTP->set('useragent', 'Mozilla/5.0 (X11; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1');
 		$html = $HTTP->GET('/?sl='.$from.'&tl='.$to.'&q='.urlencode($text));
 		
