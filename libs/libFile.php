@@ -23,8 +23,8 @@ class libFile {
 			if(preg_match('/^([a-zA-Z0-9_.\*-]+?)\s+=\s+(.+)$/i',$row,$arr)) {
 				$array[$arr[1]] = $arr[2];
 			} else if(preg_match('/^([a-zA-Z0-9_.\*-]+?)\s+=$/i',$row,$arr)) {
-                 $array[$arr[1]] = null;
-            }
+				$array[$arr[1]] = null;
+			}
 		}
 		
 		fclose($fp);
