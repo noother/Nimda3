@@ -57,6 +57,8 @@ class Plugin_ChallengeObserver extends Plugin {
 				}
 				$this->sendToEnabledChannels($text);
 			} elseif($data['challs'] < $old_sites[$site]['challs']) {
+				if($data['name'] == 'SPOJ') continue; // too much spam
+				
 				$this->sendToEnabledChannels(sprintf("\x02[Challenges]\x02 \x02%s\x02 (%s) just deleted \x02%d\x02 of their challenges.",
 					$data['name'],
 					$data['url'],
@@ -64,6 +66,8 @@ class Plugin_ChallengeObserver extends Plugin {
 				));
 			} elseif($data['challs'] > $old_sites[$site]['challs']) {
 				$new_challs = $data['challs']-$old_sites[$site]['challs'];
+				if($data['name'] == 'SPOJ') continue; // too much spam
+				
 				$this->sendToEnabledChannels(sprintf("\x02[Challenges]\x02 There %s \x02%d\x02 new %s at \x02%s\x02 ( %s )",
 					$new_challs == 1 ? 'is' : 'are',
 					$new_challs,
@@ -109,6 +113,9 @@ class Plugin_ChallengeObserver extends Plugin {
 			break;
 			case 'CanYouHack.It':
 				$this->getCanYouHackItChalls($challcount);
+			break;
+			case 'HackThis!!':
+				$this->getHackThisChalls($challcount);
 			break;
 			case 'Mathchall':
 				$this->getMathchallChalls($challcount);
@@ -277,6 +284,35 @@ class Plugin_ChallengeObserver extends Plugin {
 			
 			$this->sendToEnabledChannels($text);
 			$this->addLatestChall('CanYouHack.It', $text);
+		}
+	}
+	
+	private function getHackThisChalls($count) {
+		$html = libHTTP::GET('https://www.hackthis.co.uk/levels/');
+		preg_match_all('#<a class="progress_0" href="(.+?)">.+?<span.+?>(.+?)</span>#s', substr($html, strpos($html, '<h1>Levels</h1>')), $arr);
+		
+		$new_list = array();
+		for($i=0;$i<sizeof($arr[0]);$i++) {
+			$new_list[] = array(
+				'name'     => $arr[2][$i],
+				'url'      => 'https://www.hackthis.co.uk'.$arr[1][$i]
+			);
+		}
+		
+		$old_list = $this->getVar('hackthis_challs');
+		$this->saveVar('hackthis_challs', $new_list);
+		if($old_list === false) return;
+		
+		$challs = $this->compareLists($old_list, $new_list, 'name');
+		
+		for($i=0;$i<$count&&$i<sizeof($challs);$i++) {
+			$text = sprintf("\x02%s\x02 ( %s )",
+				$challs[$i]['name'],
+				$challs[$i]['url']
+			);
+			
+			$this->sendToEnabledChannels($text);
+			$this->addLatestChall('HackThis!!', $text);
 		}
 	}
 	
