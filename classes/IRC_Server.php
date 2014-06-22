@@ -14,6 +14,7 @@ final class IRC_Server {
 	private $connectCooldown = array('cooldown' => 0, 'last_connect' => 0);
 	private $lastLifeSign = 0;
 	private $myData = array();
+	private $supports = array();
 	
 	public $Bot;
 	public $id;
@@ -184,6 +185,19 @@ final class IRC_Server {
 					$this->NickServ->privmsg('STATUS '.$this->Me->nick);
 				}
 				*/
+			break;
+			case '005':
+				// ISUPPORT
+				for($i=1;$i<sizeof($parsed['params'])-1;$i++) {
+					$tmp = explode('=', $parsed['params'][$i]);
+					$name = strtoupper($tmp[0]);
+					
+					if(sizeof($tmp) == 2) {
+						$this->supports[$name] = $tmp[1];
+					} else {
+						$this->supports[$name] = true;
+					}
+				}
 			break;
 			case '311':
 				// WHOIS reply
@@ -674,6 +688,20 @@ final class IRC_Server {
 			fclose($this->socket);
 			$this->socket = false;
 		}
+	}
+	
+	public function getSupport($name) {
+		$name = strtoupper($name);
+		
+		switch($name) {
+			case 'MODES':
+				if(!isset($this->supports[$name])) return 1;
+			break;
+		}
+		
+		if(!isset($this->supports[$name])) return false;
+		
+	return $this->supports[$name];
 	}
 	
 	public function saveVar($name, $value) {

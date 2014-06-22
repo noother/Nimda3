@@ -74,49 +74,31 @@ final class IRC_Channel extends IRC_Target {
 	}
 	
 	public function setUserModes($usermodes) {
-		foreach($usermodes as $data) {
-			$this->setUserMode($data['mode'], $data['user']);
-		}
-	}
-	
-	/*
-	public function setUserModes($usermodes) {
-		// broken, servers only accept N modes at a time - need to implement that before activating this again
-		$modes_give = "";
-		$modes_take = "";
-		$users_give = "";
-		$users_take = "";
+		$modes = "";
+		$users = "";
+		$count = 0;
+		$last_action = false;
 		
-		foreach($usermodes as $usermode) {
-			switch($usermode['mode']{0}) {
-				case '+':
-					$modes_give.= $usermode['mode']{1};
-					if(!empty($users_give)) $users_give.= ' ';
-					$users_give.= $usermode['user'];
-				break;
-				case '-':
-					$modes_take.= $usermode['mode']{1};
-					if(!empty($users_take)) $users_take.= ' ';
-					$users_take.= $usermode['user'];
-				break;
+		for($i=0;$i<sizeof($usermodes);$i++) {
+			$data = $usermodes[$i];
+			
+			if($last_action == $data['mode']{0}) {
+				$modes.= substr($data['mode'], 1);
+			} else {
+				$modes.= $data['mode'];
+				$last_action = $data['mode']{0};
+			}
+			$users.= (!empty($users)?' ':'').$data['user'];
+			
+			if(++$count == $this->Server->getSupport('MODES') || $i == sizeof($usermodes)-1) {
+				$this->Server->sendRaw('MODE '.$this->name.' '.$modes.' '.$users);
+				$count = 0;
+				$last_action = false;
+				$modes = "";
+				$users = "";
 			}
 		}
-		
-		$modes = '';
-		$users = '';
-		if(!empty($modes_take)) {
-			$modes.= '-'.$modes_take;
-			$users.= $users_take;
-		}
-		if(!empty($modes_give)) {
-			$modes.= '+'.$modes_give;
-			if(!empty($modes_take)) $users.= ' ';
-			$users.= $users_give;
-		}
-		
-		$this->setUserMode($modes, $users);
 	}
-	*/
 	
 	public function remove() {
 		foreach($this->users as $User) {
