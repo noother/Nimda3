@@ -114,6 +114,9 @@ class Plugin_ChallengeObserver extends Plugin {
 			case 'CanYouHack.It':
 				$this->getCanYouHackItChalls($challcount);
 			break;
+			case 'Hacking-Challenges':
+				$this->getHackingChallengesChalls($challcount);
+			break;
 			case 'HackThis!!':
 				$this->getHackThisChalls($challcount);
 			break;
@@ -284,6 +287,42 @@ class Plugin_ChallengeObserver extends Plugin {
 			
 			$this->sendToEnabledChannels($text);
 			$this->addLatestChall('CanYouHack.It', $text);
+		}
+	}
+	
+	private function getHackingChallengesChalls($count) {
+		$html = libHTTP::GET('http://www.hacking-challenges.de/index.php?page=hackits');
+		preg_match_all('#<td width="100%".+?>.*?&nbsp; &raquo; (.+?)\s*</td>.+?</table>#s', $html, $category_arr);
+		
+		$new_list = array();
+		for($i=0;$i<sizeof($category_arr[0]);$i++) {
+			preg_match_all('#<a href="(\?page=hackits.+?)">(.+?)</a>.+?<a href="\?page=mitglieder.+?>(.+?)</a>#s', $category_arr[0][$i], $chall_arr);
+			for($j=0;$j<sizeof($chall_arr[0]);$j++) {
+				$new_list[] = array(
+					'name'     => html_entity_decode($chall_arr[2][$j]),
+					'category' => html_entity_decode($category_arr[1][$i]),
+					'author'   => html_entity_decode($chall_arr[3][$j]),
+					'url'      => 'http://www.hacking-challenges.de/index.php'.html_entity_decode($chall_arr[1][$j])
+				);
+			}
+		}
+		
+		$old_list = $this->getVar('hackingchallenges_challs');
+		$this->saveVar('hackingchallenges_challs', $new_list);
+		if($old_list === false) return;
+		
+		$challs = $this->compareLists($old_list, $new_list, 'url');
+		
+		for($i=0;$i<$count&&$i<sizeof($challs);$i++) {
+			$text = sprintf("\x02%s\x02 by \x02%s\x02 in category \x02%s\x02 ( %s )",
+				$challs[$i]['name'],
+				$challs[$i]['author'],
+				$challs[$i]['category'],
+				$challs[$i]['url']
+			);
+			
+			$this->sendToEnabledChannels($text);
+			$this->addLatestChall('Hacking-Challenges', $text);
 		}
 	}
 	
