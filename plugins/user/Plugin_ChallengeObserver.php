@@ -479,32 +479,38 @@ class Plugin_ChallengeObserver extends Plugin {
 	*/
 	
 	private function getRankkChalls($count) {
-		$html = libHTTP::GET('http://twitter.com/statuses/user_timeline/315747759.rss');
-		if($html === false) return;
-	
-		$XML = simplexml_load_string($html);
-		if($XML === false) return;
-	
-		$items = $XML->xpath('channel/item/title');
-	
-		for($i=0,$j=0;$i<$count&&$j<sizeof($items);$j++) {
-			$string = (string)$items[$j];
+		$HTTP = new HTTP('www.rankk.org');
+		$html = $HTTP->GET('/');
+		if(!$html) return false;
 		
-			if(preg_match('/^rankk_org: Added Challenge (\d+?): (.+?) (.+)$/', $string, $arr)) {
-				$i++;
-				$num  = $arr[1];
-				$id   = $arr[2];
-				$name = $arr[3];
+		preg_match('#Added: (\d+/\d+)#', $html, $arr);
+		$id = $arr[1];
+		
+		$html = $HTTP->GET('/forum.py');
+		if(!$html) return false;
+		
+		if(preg_match('#'.preg_quote($id).': (.+?)</a>#', $html, $arr)) {
+			$title = $arr[1];
 			
-				$text = sprintf("Challenge %s: \x02%s\x02",
-					$id,
-					$name
-				);
-			
-				$this->sendToEnabledChannels($text);
-				$this->addLatestChall('Rankk', $text);
+			$lower_title = strtolower($title);
+			$charset = "abcdefghijklmnopqrstuvwxyz0123456789 -";
+			$url = "";
+			for($i=0;$i<strlen($lower_title);$i++) {
+				if(strstr($charset, $lower_title{$i}) !== false) $url.= $lower_title{$i};
 			}
+			$url = 'http://www.rankk.org/challenges/'.str_replace(' ', '-', $url).'.py';
+		} else {
+			$title = 'Unknown';
+			$url = 'http://www.rankk.org/#unknown';
 		}
+		
+		$text = sprintf("\x02%s: %s\x02 ( %s )",
+			$id,
+			$title,
+			$url
+		);
+		$this->sendToEnabledChannels($text);
+		$this->addLatestChall('Rankk', $text);
 	}
 	
 	private function getRevolutionEliteChalls($count) {
