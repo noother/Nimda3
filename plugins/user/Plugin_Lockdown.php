@@ -78,6 +78,7 @@ class Plugin_Lockdown extends Plugin {
 		
 		$this->channelLockdownCount++;
 		$this->interval = 5;
+		$this->lastInterval = $this->Bot->time;
 	}
 	
 	private function stopChannelLockdown() {
