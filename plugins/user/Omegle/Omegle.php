@@ -16,7 +16,7 @@ class Omegle {
 	private static $bannedHosts = array('ihookup.com', 'naughtybenaughty.com', 'omegleadult.info', 'adultmegle.com');
 	
 	function __construct() {
-		$this->Stream = new HTTP('cardassia.omegle.com');
+		$this->Stream = new HTTP('front6.omegle.com');
 		if($this->proxy) $this->Stream->set('proxy', $this->proxy);
 		$this->Stream->set('keep-alive', false);
 	}
