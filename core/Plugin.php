@@ -167,11 +167,19 @@ abstract class Plugin {
 	}
 	
 	public final function getEnabledChannels() {
+		return $this->getChannelsWithConfig('enabled');
+	}
+	
+	public final function sendToEnabledChannels($message) {
+		$this->sendToChannelsWithConfig('enabled', 'yes', $message);
+	}
+	
+	public final function getChannelsWithConfig($config, $value='yes') {
 		$channels = array();
 		
 		foreach($this->Bot->servers as $Server) {
 			foreach($Server->channels as $Channel) {
-				if($Channel->getVar('config_'.$this->id.'_enabled') === 'yes') {
+				if($Channel->getVar('config_'.$this->id.'_'.$config) === $value) {
 					$channels[] = $Channel;
 				}
 			}
@@ -180,8 +188,8 @@ abstract class Plugin {
 	return $channels;
 	}
 	
-	public final function sendToEnabledChannels($message) {
-		$channels = $this->getEnabledChannels();
+	public final function sendToChannelsWithConfig($config, $value, $message) {
+		$channels = $this->getChannelsWithConfig($config, $value);
 		foreach($channels as $Channel) {
 			$Channel->privmsg($message);
 		}
