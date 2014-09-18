@@ -27,7 +27,8 @@ class Nimda {
 	private $jobsDoneDP;
 	
 	function __construct() {
-		pcntl_signal(SIGINT,  array($this, 'cleanShutdown'));
+		pcntl_signal(SIGINT,   array($this, 'cleanShutdown'));
+		pcntl_signal(SIGTERM,  array($this, 'cleanShutdown'));
 		
 		$this->initBot();
 		
