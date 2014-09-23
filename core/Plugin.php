@@ -179,7 +179,7 @@ abstract class Plugin {
 		
 		foreach($this->Bot->servers as $Server) {
 			foreach($Server->channels as $Channel) {
-				if($Channel->getVar('config_'.$this->id.'_'.$config) === $value) {
+				if($Channel->getVar('config_'.$this->id.'_'.$config, $this->config[$config]['default']) === $value) {
 					$channels[] = $Channel;
 				}
 			}
