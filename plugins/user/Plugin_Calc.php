@@ -30,7 +30,7 @@ class Plugin_Calc extends Plugin {
 			return;
 		}
 		
-		if(!preg_match('#<h2 class="r" dir="ltr" style="font-size:138%;display:inline">(.*?)</h2>#s', $google, $arr)) {
+		if(!preg_match('#<h2 class="r" style="display:inline;font-size:138%">(.*?)</h2>#s', $google, $arr)) {
 			$this->reply($this->parse_error);
 			return;
 		}
