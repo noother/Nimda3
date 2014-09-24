@@ -1,4 +1,4 @@
-a<?php
+<?php
 
 require_once('ZMachine/ZMachine.php');
 
