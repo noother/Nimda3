@@ -19,7 +19,7 @@ class RevolutionElite extends ChallengeStats {
 		
 		$data = array(
 			'username'  	=> $tmp[0],
-			'rank'			=> $tmp[1],
+			'rank'			=> $tmp[1]+1,
 			'points'		=> $tmp[2],
 			'points_total'	=> $tmp[3],
 			'challs_solved' => $tmp[4],
