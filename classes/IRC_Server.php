@@ -312,7 +312,7 @@ final class IRC_Server {
 				// Sent when the server decides to close our connection
 				$data['text'] = $parsed['params'][0];
 				
-				if(libString::endsWith('(Excess Flood)', $data['text'])) {
+				if(libString::endsWith('(Excess Flood)', $data['text']) || libString::endsWith('[RecvQ exceeded]', $data['text'])) {
 					$this->onFlood();
 					$this->connectCooldown['cooldown'] = 20;
 					$this->connectCooldown['last_connect'] = time();
