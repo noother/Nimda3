@@ -21,7 +21,20 @@ class libFile {
 		while(!feof($fp)) {
 			$row = trim(fgets($fp));
 			if(preg_match('/^([a-zA-Z0-9_.\*-]+?)\s+=\s+(.+)$/i',$row,$arr)) {
-				$array[$arr[1]] = $arr[2];
+                switch ($arr[2]) {
+                    case 'null':
+                        $value = null;
+                        break;
+                    case 'false':
+                        $value = false;
+                        break;
+                    case 'true':
+                        $value = true;
+                        break;
+                    default:
+                        $value = $arr[2];
+                }
+                $array[$arr[1]] = $value;
 			}
 		}
 		
