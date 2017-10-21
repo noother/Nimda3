@@ -82,8 +82,7 @@ class Nimda {
                 die('I\'m so sorry you were led astray from the path of light. Please return to the world of RDBMS');
                 break;
             default:
-                trigger_error("Unknown database backend type {$this->CONFIG['database']}");
-                return false;
+                die("Unknown database backend type {$this->CONFIG['database']}");
                 break;
         }
 
