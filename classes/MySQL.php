@@ -1,7 +1,10 @@
 <?php
 
-class MySQL {
 	
+require_once('DatabaseInterface.php');
+
+class MySQL implements DatabaseInterface {
+
 	private $host;
 	private $user;
 	private $password;
@@ -15,15 +18,15 @@ class MySQL {
 	public $queryCount = 0;
 	
 	
-	function __construct($host, $user, $password, $db, $port=3306) {
-		$this->host     = $host;
-		$this->user     = $user;
-		$this->password = $password;
-		$this->db       = $db;
-		$this->port     = $port;
+	public function __construct($config) {
+        $this->host = $config['host'];
+        $this->user = $config['user'];
+        $this->password = $config['pass'];
+        $this->db = $config['db'];
+        $this->port = $config['port'];
 	}
 	
-	private function connect() {
+	public function connect() {
 		$this->Instance = new mysqli($this->host,$this->user,$this->password,$this->db);
 		if($this->Instance->connect_error) die($this->Instance->connect_error);
 		$this->query("set character set utf8");
@@ -101,7 +104,46 @@ class MySQL {
 		
 	return $res[0];
 	}
-	
+
+    public function showTablesLike($name) {
+        return $this->query("SHOW TABLES LIKE \"$name\";");
+    }
+
+    public function getPermanent($name, $type = 'bot', $target = 'me') {
+        $statement = $this->Instance->prepare("SELECT `value` FROM `memory` WHERE `type` = ? AND `target` = ? AND `name` = ?;");
+        $statement->bind_param('sss', $type, $target, $name);
+        $success = $statement->execute();
+        if ($success === false)
+            return false;
+        $value = null;
+        $statement->bind_result($value);
+        $statement->close();
+        return $value;
+    }
+
+    public function insertPermanent($name, $value, $type = 'bot', $target = 'me') {
+        $statement = $this->Instance->prepare("INSERT INTO `memory` (`name`, `type`, `target`, `value`, `created`, `modified`)
+				VALUES (?,?,?,?,NOW(),NOW());");
+        $statement->bind_param('ssss', $name, $type, $target, $value);
+        return $statement->execute();
+    }
+
+    public function updatePermanent($name, $value, $type = 'bot', $target = 'me') {
+        $statement = $this->Instance->prepare("UPDATE `memory` SET `value` = ?, `modified` = NOW() WHERE `name`=? AND `type`=? AND `target`=?;");
+        $statement->bind_param('ssss', $value, $name, $type, $target);
+        return $statement->execute();
+    }
+
+    public function removePermanent($name, $type = 'bot', $target = 'me') {
+        $statement = $this->Instance->prepare("DELETE FROM `memory` WHERE `type` = ? AND `target` = ? AND `name` = ?;");
+        $statement->bind_param('sss', $type, $target, $name);
+        return $statement->execute();
+    }
+
+    public function closeConnection() {
+        $this->Instance->close();
+    }
+
 }
 
 ?>
