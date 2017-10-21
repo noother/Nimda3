@@ -37,7 +37,6 @@ class SQLite implements DatabaseInterface {
     }
 
     function connect() {
-        $errorMessage = '';
         try {
             $this->Instance = new SQLite3($this->sqliteFile, $this->sqliteFlags, $this->encryptionKey);
         } catch (Exception $e) {
@@ -170,7 +169,8 @@ class SQLite implements DatabaseInterface {
     }
 
     public function closeConnection() {
-        $this->Instance->close();
+        if($this->Instance)
+            $this->Instance->close();
     }
 
     /**
