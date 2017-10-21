@@ -26,11 +26,35 @@ class Job {
 	
 	private function loadPlugin() {
 		require_once($this->data['plugin_path']);
-		
-		$c = libFile::parseConfigFile('nimda.conf');
-		$MySQL = new MySQL($c['mysql_host'], $c['mysql_user'], $c['mysql_pass'], $c['mysql_db']);
-		$this->Plugin = new $this->data['classname'](null, $MySQL);
-	}
+
+        $config = libFile::parseConfigFile('nimda.conf');
+        $database = null;
+        switch ($config['database']) {
+            case 'mysql':
+                $database = new MySQL([
+                    'host' => $config['mysql_host'],
+                    'user' => $config['mysql_user'],
+                    'pass' => $config['mysql_pass'],
+                    'db' => $config['mysql_db']
+                ]);
+                break;
+            case 'sqlite':
+                $database = new SQLite([
+                    'file' => $config['sqlite_file'],
+                    'readonly' => $config['sqlite_readonly'],
+                    'create' => $config['sqlite_create'],
+                    'encryptionKey' => $config['sqlite_encryptionKey'],
+                ]);
+                break;
+            case 'mongodb':
+                die('You changed the code to come this far, didn\'t you?');
+                break;
+            default:
+                trigger_error("Unknown database backend type {$config['DatabaseInterface']}");
+                return false;
+        }
+        $this->Plugin = new $this->data['classname'](null, $database);
+    }
 	
 	private function processData() {
 		$callback = $this->data['callback'];
