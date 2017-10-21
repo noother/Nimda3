@@ -1,0 +1,79 @@
+-- [1]
+CREATE TABLE `version` (
+  `version` INT(11) NOT NULL,
+  PRIMARY KEY (`version`)
+);
+
+INSERT INTO `version` (`version`) VALUES
+  (1);
+
+
+CREATE TABLE `servers` (
+  `id`            VARCHAR(255) COLLATE BINARY                       NOT NULL,
+  `host`          VARCHAR(255) COLLATE BINARY                       NOT NULL,
+  `port`          INT(11)                                           NOT NULL,
+  `ssl`           TINYINT(1)                                        NOT NULL,
+  `bind`          VARCHAR(255)                                      NOT NULL DEFAULT ' 0.0.0.0:0',
+  `password`      VARCHAR(255) COLLATE BINARY                       NOT NULL,
+  `my_username`   VARCHAR(255) COLLATE BINARY                       NOT NULL DEFAULT 'Nimda',
+  `my_hostname`   VARCHAR(255) COLLATE BINARY                       NOT NULL DEFAULT 'Nimda',
+  `my_servername` VARCHAR(255) COLLATE BINARY                       NOT NULL DEFAULT 'Nimda',
+  `my_realname`   VARCHAR(255) COLLATE BINARY                       NOT NULL DEFAULT 'Nimda',
+  `active`        INT(11)                                           NOT NULL DEFAULT '1'
+);
+CREATE INDEX servers_active
+  ON servers (active);
+
+INSERT INTO `servers` (`id`, `host`, `port`, `ssl`, `password`, `my_username`, `my_hostname`, `my_servername`, `my_realname`, `active`)
+VALUES
+  ('freenode', 'irc.freenode.net', 7000, 1, '', 'Nimda3OfDBX12', 'Nimda3', 'Nimda3', 'noother''s new bot', 1);
+
+
+CREATE TABLE `server_channels` (
+  `id`        INTEGER PRIMARY KEY                              AUTOINCREMENT,
+  `server_id` VARCHAR(255) COLLATE BINARY NOT NULL,
+  `channel`   VARCHAR(255) COLLATE BINARY NOT NULL,
+  `key`       VARCHAR(255) COLLATE BINARY NOT NULL,
+  `active`    INT(11)                     NOT NULL             DEFAULT '1'
+);
+CREATE INDEX server_channels_server_id
+  ON server_channels (server_id);
+CREATE INDEX server_channels_active
+  ON server_channels (active);
+
+INSERT INTO `server_channels` (`server_id`, `channel`, `key`, `active`) VALUES
+  ('freenode', '#nimda', '', 1);
+
+CREATE TABLE `memory` (
+  `id`       INTEGER PRIMARY KEY AUTOINCREMENT,
+  `name`     VARCHAR(255) COLLATE BINARY NOT NULL,
+  `type`     VARCHAR(7) COLLATE BINARY   NOT NULL,
+  `target`   VARCHAR(255) COLLATE BINARY NOT NULL,
+  `value`    TEXT COLLATE BINARY         NOT NULL,
+  `created`  DATETIME                    NOT NULL,
+  `modified` DATETIME                    NOT NULL
+);
+CREATE INDEX memory_type
+  ON memory (type);
+CREATE INDEX memory_name
+  ON memory (name);
+CREATE INDEX memory_target
+  ON memory (target);
+
+CREATE TABLE `roulette` (
+  `id`            INTEGER PRIMARY KEY                              AUTOINCREMENT,
+  `serverchannel` VARCHAR(255) COLLATE BINARY NOT NULL,
+  `nick`          VARCHAR(255) COLLATE BINARY NOT NULL,
+  `played`        INT(11)                     NOT NULL             DEFAULT '0',
+  `started`       INT(11)                     NOT NULL             DEFAULT '0',
+  `lost`          INT(11)                     NOT NULL             DEFAULT '0',
+  `clicks`        INT(11)                     NOT NULL             DEFAULT '0',
+  `last_played`   DATETIME                    NOT NULL             DEFAULT '0000-00-00 00:00:00'
+);
+CREATE INDEX roulette_serverchannel
+  ON roulette (serverchannel);
+
+UPDATE version
+SET version = 1;
+-- [/1]
+
