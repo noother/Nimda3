@@ -133,3 +133,8 @@
 	ALTER TABLE `memory` CHANGE `value` `value` MEDIUMTEXT NOT NULL;
 	UPDATE `version` SET `version` = '10';
 -- [/10]
+
+-- [11]
+	ALTER TABLE `servers` ADD `sasl` BOOLEAN NOT NULL DEFAULT '0' AFTER `ssl`;
+	UPDATE `version` SET `version` = '11';
+-- [/11]

@@ -23,18 +23,20 @@ final class IRC_Server {
 	public $host         = '';
 	public $port         = 0;
 	public $isSSL        = false;
+	public $useSASL      = false;
 	public $bind         = '';
 	public $Me;
 	//public $NickServ;
 	//public $nickservIdentifyCommand = false;
 	
-	public function __construct($Bot, $name, $host, $port, $ssl=false, $bind='0.0.0.0:0') {
+	public function __construct($Bot, $name, $host, $port, $ssl=false, $bind='0.0.0.0:0', $useSASL = false) {
 		$this->Bot          = $Bot;
 		$this->id           = $name;
 		$this->host         = $host;
 		$this->port         = $port;
 		$this->isSSL        = $ssl;
 		$this->bind         = $bind;
+		$this->useSASL      = $useSASL;
 		
 		if($this->getVar('estimated_CLIENT_FLOOD') === false) $this->saveVar('estimated_CLIENT_FLOOD', -1);
 		if($this->getVar('estimated_RECVQ_SPEED') === false)  $this->saveVar('estimated_RECVQ_SPEED', 1);
@@ -74,17 +76,49 @@ final class IRC_Server {
 		stream_set_blocking($this->socket, 0);
 		
 		$d = &$this->myData;
-		if(isset($d['pass']) && !empty($d['pass'])) {
-			$this->sendRaw('PASS '.$d['pass'], true);
+		
+		if ($this->useSASL) {
+			$this->sendRaw('CAP REQ :sasl', true);
+		} else {
+			if(isset($d['pass']) && !empty($d['pass'])) {
+				$this->sendRaw('PASS '.$d['pass'], true);
+			}
 		}
+		
 		$this->sendRaw('USER '.$d['username'].' '.$d['hostname'].' '.$d['servername'].' :'.$d['realname'], true);
 		$this->sendRaw('NICK '.$d['nick'], true);
+		
+		if ($this->useSASL) {
+			$this->waitFor(function($msg) {
+				$parts = explode(' ', $msg['raw']);
+				return count($parts) > 3 && $parts[1] === 'CAP' && $parts[3] === 'ACK';
+			});
+			
+			$this->sendRaw('AUTHENTICATE PLAIN', true);
+			
+			$this->waitFor(function($msg) {
+				return strpos($msg['raw'], 'AUTHENTICATE +') !== false;
+			});
+			
+			$auth = base64_encode(implode(chr(0), [$d['username'], $d['username'], $d['pass']]));
+			$this->sendRaw('AUTHENTICATE ' . $auth, true);
+			$this->sendRaw('AUTHENTICATE +', true);
+			$this->sendRaw('CAP END', true);
+		}
 		
 		$this->lastLifeSign   = microtime(true);
 		$this->estimatedRecvq = array('messages' => array(), 'size' => 0, 'last_message_removed' => 0);
 		$this->connectCooldown = array('cooldown' => 0, 'last_connect' => time());
 	
 	return true;
+	}
+	
+	private function waitFor($callback) {
+		do {
+			$msg = $this->readMessage();
+		} while ($msg === false || !$callback($msg));
+		
+		return $msg;
 	}
 	
 	private function read() {
