@@ -416,7 +416,7 @@ class Plugin_ChallengeObserver extends Plugin {
 			$charset = "abcdefghijklmnopqrstuvwxyz0123456789 -";
 			$url = "";
 			for($i=0;$i<strlen($lower_title);$i++) {
-				if(strstr($charset, $lower_title{$i}) !== false) $url.= $lower_title{$i};
+				if(strstr($charset, $lower_title[$i]) !== false) $url.= $lower_title[$i];
 			}
 			$url = 'http://www.rankk.org/challenges/'.str_replace(' ', '-', $url).'.py';
 		} else {
@@ -444,8 +444,8 @@ class Plugin_ChallengeObserver extends Plugin {
 		$url = strtolower($arr[1]);
 		$new_url = '';
 		for($i=0;$i<strlen($url);$i++) {
-			if(preg_match('/[a-z0-9 ]/', $url{$i})) {
-				$new_url.= $url{$i};
+			if(preg_match('/[a-z0-9 ]/', $url[$i])) {
+				$new_url.= $url[$i];
 			}
 		}
 		$new_url = str_replace(' ', '-', $new_url);

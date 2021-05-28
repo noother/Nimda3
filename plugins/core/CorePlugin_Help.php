@@ -34,7 +34,7 @@ class CorePlugin_Help extends Plugin {
 			else continue;
 			
 			foreach($triggers as &$trigger) {
-				if($trigger{0} == '!') $trigger = substr($trigger, 1);
+				if($trigger[0] == '!') $trigger = substr($trigger, 1);
 			}
 			
 			if(!isset($categories[$Plugin->helpCategory])) $categories[$Plugin->helpCategory] = array();

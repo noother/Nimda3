@@ -215,7 +215,7 @@ abstract class Plugin {
 	
 	public final function getPluginByTrigger($trigger) {
 		foreach($this->Bot->plugins as $Plugin) {
-			if(array_search($trigger, $Plugin->triggers) !== false || ($trigger{0} != '!' && array_search('!'.$trigger, $Plugin->triggers) !== false)) {
+			if(array_search($trigger, $Plugin->triggers) !== false || ($trigger[0] != '!' && array_search('!'.$trigger, $Plugin->triggers) !== false)) {
 				$Plugin->Server  = $this->Server;
 				$Plugin->Channel = $this->Channel;
 				$Plugin->User    = $this->User;
@@ -610,7 +610,7 @@ abstract class Plugin {
 					unset($this->data['text']);
 					$this->isTriggered();
 					break;
-				} elseif($this->data['text']{$trigger_len} == ' ') {
+				} elseif($this->data['text'][$trigger_len] == ' ') {
 					$this->data['trigger'] = $trigger;
 					$this->data['text']    = substr($this->data['text'], $trigger_len+1);
 					$this->isTriggered();

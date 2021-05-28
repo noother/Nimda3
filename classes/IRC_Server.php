@@ -127,7 +127,7 @@ final class IRC_Server {
 		
 		$message = fgets($this->socket);
 		if(!$message) return false;
-		while($message{strlen($message)-1} != "\n") $message.= fgets($this->socket);
+		while($message[strlen($message)-1] != "\n") $message.= fgets($this->socket);
 		
 		$message = trim($message);
 		echo '>> '.$message."\n";
@@ -253,7 +253,7 @@ final class IRC_Server {
 				$modes = $parsed['params'][2];
 				$Channel->modes = array();
 				for($i=1;$i<strlen($modes);$i++) {
-					$Channel->modes[$modes{$i}] = true;
+					$Channel->modes[$modes[$i]] = true;
 				}
 			break;
 			case '332':
@@ -279,8 +279,8 @@ final class IRC_Server {
 				$mode = '';
 				// Get the most significant mode, ignoring * (IRC OP) and the first 'H' char which isn't a mode
 				for($i=1;$i<strlen($modes);$i++) {
-					if($modes{$i} != '*') {
-						$mode = $modes{$i};
+					if($modes[$i] != '*') {
+						$mode = $modes[$i];
 						break;
 					}
 				}
@@ -382,15 +382,15 @@ final class IRC_Server {
 						$modes = $parsed['params'][1];
 						$action = '';
 						for($i=0;$i<strlen($modes);$i++) {
-							if($modes{$i} == '+') $action = 'add';
-							elseif($modes{$i} == '-') $action = 'rm';
+							if($modes[$i] == '+') $action = 'add';
+							elseif($modes[$i] == '-') $action = 'rm';
 							else {
 								switch($action) {
 									case 'add':
-										$Channel->modes[$modes{$i}] = true;
+										$Channel->modes[$modes[$i]] = true;
 									break;
 									case 'rm':
-										unset($Channel->modes[$modes{$i}]);
+										unset($Channel->modes[$modes[$i]]);
 									break;
 								}
 							}
@@ -496,7 +496,7 @@ final class IRC_Server {
 					$data['User']->mode = $data['User']->modes[$data['Channel']->id];
 				}
 				
-				if($data['text']{0} == "\x01") {
+				if($data['text'][0] == "\x01") {
 					$data['text'] = substr($data['text'], 1);
 					if(substr($data['text'], -1) == "\x01") {
 						$data['text'] = substr($data['text'], 0, -1);

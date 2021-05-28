@@ -48,7 +48,7 @@ class ZMachine {
 			if($row === '') return false;
 		}
 		
-		if($row{0} == ')') $row = substr($row, 1);
+		if($row[0] == ')') $row = substr($row, 1);
 		$row = trim($row);
 		
 		// Z-Games usually use proper capitalization, so let's assume, that if a line starts with a small letter, that line belongs to the previous line and only got sent in a new line because of the 255 chars line length limit. (We can handle more nowadays..)

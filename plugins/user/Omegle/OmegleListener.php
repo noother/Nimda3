@@ -25,7 +25,7 @@ class OmegleListener extends Omegle {
 						$message = $item[1];
 						$safe_message = "";
 						for($i=0;$i<strlen($message);$i++) {
-							if(ord($message{$i}) > 31 && ord($message{$i}) < 127) $safe_message.= $message{$i};
+							if(ord($message[$i]) > 31 && ord($message[$i]) < 127) $safe_message.= $message[$i];
 						}
 						echo "message\n".$safe_message."\n";
 					break;

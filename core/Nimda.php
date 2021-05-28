@@ -211,10 +211,10 @@ class Nimda {
 		}
 	}
 	
-	private function triggerJobs() {
+	private function triggerJobs(): void {
 		$jobs = array();
 		while(false !== $file = readdir($this->jobsDoneDP)) {
-			if($file{0} == '.') continue;
+			if($file[0] == '.') continue;
 			$jobs[] = $file;
 		}
 		rewinddir($this->jobsDoneDP);

@@ -82,11 +82,11 @@ final class IRC_Channel extends IRC_Target {
 		for($i=0;$i<sizeof($usermodes);$i++) {
 			$data = $usermodes[$i];
 			
-			if($last_action == $data['mode']{0}) {
+			if($last_action == $data['mode'][0]) {
 				$modes.= substr($data['mode'], 1);
 			} else {
 				$modes.= $data['mode'];
-				$last_action = $data['mode']{0};
+				$last_action = $data['mode'][0];
 			}
 			$users.= (!empty($users)?' ':'').$data['user'];
 			

@@ -18,7 +18,7 @@ abstract class IRC_Target {
 		
 		$message = strtr($message, array("\r" => ' ', "\n" => ' '));
 		
-		if($message{0} == "\x01" && !$this->_ctcpAllowed) $message = 'No.';
+		if($message[0] == "\x01" && !$this->_ctcpAllowed) $message = 'No.';
 		
 		
 		/*

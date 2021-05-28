@@ -39,8 +39,8 @@ class libString {
 		
 		$new_string = '';
 		for($i=0;$i<strlen($string);$i++) {
-			if(strstr($charset, $string{$i})) {
-				$new_string.= $string{$i};
+			if(strstr($charset, $string[$i])) {
+				$new_string.= $string[$i];
 			} else {
 				$new_string.= '_';
 			}
