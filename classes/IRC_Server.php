@@ -115,6 +115,7 @@ final class IRC_Server {
 	
 	private function waitFor($callback) {
 		do {
+			usleep(100000);
 			$msg = $this->readMessage();
 		} while ($msg === false || !$callback($msg));
 		
