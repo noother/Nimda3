@@ -138,3 +138,13 @@
 	ALTER TABLE `servers` ADD `sasl` BOOLEAN NOT NULL DEFAULT '0' AFTER `ssl`;
 	UPDATE `version` SET `version` = '11';
 -- [/11]
+
+-- [12]
+	-- only update if default server hasn't been changed
+	UPDATE `servers` SET `id`='wechall', `host` = 'irc.wechall.net', `port` = 6697 WHERE `id`='freenode' AND `my_username` = 'Nimda3';
+
+	UPDATE `server_channels` SET `server_id` = 'wechall' WHERE `server_id` = 'freenode' AND `channel` = '#nimda';
+	DELETE FROM `memory` WHERE target = 'freenode:#nimda';
+
+	UPDATE `version` SET `version` = '12';
+-- [/12]
