@@ -1,6 +1,4 @@
 <?php
-	declare(ticks=1);
-	mb_internal_encoding('UTF-8');
 	libxml_use_internal_errors(true);
 	
 	require_once('functions.php');

@@ -27,6 +27,7 @@ class Nimda {
 	private $jobsDoneDP;
 	
 	function __construct() {
+		pcntl_async_signals(true);
 		pcntl_signal(SIGINT,   array($this, 'cleanShutdown'));
 		pcntl_signal(SIGTERM,  array($this, 'cleanShutdown'));
 		
@@ -408,7 +409,7 @@ class Nimda {
 	return true;
 	}
 	
-	public function cleanShutdown() {
+	public function cleanShutdown(int $signo, mixed $siginfo): void {
 		echo "Shutting down cleanly\n";
 		die();
 	}
