@@ -4,7 +4,6 @@ require_once('defaults.php');
 
 require_once('core/Plugin.php');
 
-require_once('classes/MySQL.php');
 require_once('classes/IRC_Server.php');
 
 
@@ -13,7 +12,8 @@ class Nimda {
 	public $servers = array();
 	public $plugins = array();
 	public $time;
-	public $MySQL;
+	/** @var  DatabaseInterface */
+	public $database;
 	public $version;
 	
 	public $timerCount;
@@ -60,13 +60,32 @@ class Nimda {
 	
 	private function initBot() {
 		$this->CONFIG = libFile::parseConfigFile('nimda.conf');
-		$this->MySQL = new MySQL(
-			$this->CONFIG['mysql_host'],
-			$this->CONFIG['mysql_user'],
-			$this->CONFIG['mysql_pass'],
-			$this->CONFIG['mysql_db']
-		);
-		
+
+        switch ($this->CONFIG['database']) {
+            case 'mysql':
+                $this->database = new MySQL([
+                    'host' => $this->CONFIG['mysql_host'],
+                    'user' => $this->CONFIG['mysql_user'],
+                    'pass' => $this->CONFIG['mysql_pass'],
+                    'db' => $this->CONFIG['mysql_db']
+                ]);
+                break;
+            case 'sqlite':
+                $this->database = new SQLite([
+                    'file' => $this->CONFIG['sqlite_file'],
+                    'readonly' => $this->CONFIG['sqlite_readonly'],
+                    'create' => $this->CONFIG['sqlite_create'],
+                    'encryptionKey' => $this->CONFIG['sqlite_encryptionKey'],
+                ]);
+                break;
+            case 'mongodb':
+                die('I\'m so sorry you were led astray from the path of light. Please return to the world of RDBMS');
+                break;
+            default:
+                die("Unknown database backend type {$this->CONFIG['database']}");
+                break;
+        }
+
 		$this->autoUpdateSQL();
 		
 		$this->createTempDir();
@@ -78,14 +97,20 @@ class Nimda {
 	
 	private function autoUpdateSQL() {
 		echo "Checking for updates..\n";
-		$tmp = $this->MySQL->query('SHOW TABLES LIKE "version"');
-		if(empty($tmp)) $current_version = 0;
-		else $current_version = $this->MySQL->fetchColumn("SELECT `version` FROM `version`");
+		$tmp = $this->database->showTablesLike('version');
+		if(count($tmp) == 0 || $tmp == false) $current_version = 0;
+		else $current_version = $this->database->fetchColumn("SELECT `version` FROM `version`");
 		if($current_version === false) die("Error: Table version exists but has no entry.\n");
 		$this->version = '3.'.$current_version.'.x';
-		
-		preg_match_all('/-- \[(\d+?)\](.*?)-- \[\/\1\]/s', file_get_contents('core/sql_updates'), $updates);
-		
+
+		$update_file = '';
+		if($this->CONFIG['database'] == 'mysql')
+			$update_file = 'core/sql_updates';
+		else
+			$update_file = 'core/sqlite_updates';
+
+		preg_match_all('/-- \[(\d+?)\](.*?)-- \[\/\1\]/s', file_get_contents($update_file), $updates);
+
 		$latest_version = max($updates[1]);
 		if($current_version >= $latest_version) return;
 		
@@ -96,7 +121,7 @@ class Nimda {
 			
 			switch($i) {
 				case 7:
-					$res = $this->MySQL->query("SELECT `id`, `value` FROM `memory` WHERE is_array = 0");
+					$res = $this->database->query("SELECT `id`, `value` FROM `memory` WHERE is_array = 0");
 					foreach($res as $row) {
 						if(preg_match('/^[0-9]+$/', $row['value'])) {
 							$new_value = (int)$row['value'];
@@ -106,13 +131,13 @@ class Nimda {
 							$new_value = $row['value'];
 						}
 						
-						$this->MySQL->query("UPDATE `memory` SET `value` = '".addslashes(serialize($new_value))."' WHERE id='".$row['id']."'");
+						$this->database->query("UPDATE `memory` SET `value` = '".addslashes(serialize($new_value))."' WHERE id='".$row['id']."'");
 					}
 				break;
 			}
 			
 			$sql = $updates[2][$i-1];
-			$this->MySQL->multiQuery($sql);
+			$this->database->multiQuery($sql);
 			echo "done\n";
 		}
 		
@@ -120,7 +145,7 @@ class Nimda {
 	}
 	
 	private function initServers() {
-		$servers = $this->MySQL->query('SELECT * FROM servers WHERE active=1');
+		$servers = $this->database->query('SELECT * FROM servers WHERE active=1');
 		if(empty($servers)) die('Error: No servers defined (check mysql table `servers`)'."\n");
 		foreach($servers as $data) {
 			$this->connectServer($data);
@@ -183,7 +208,7 @@ class Nimda {
 			echo 'Loading '.($file['isCore']?'core':'user').' plugin '.$plugin_name.'..'."\n";
 			
 			require_once('plugins/'.($file['isCore']?'core/':'user/').$file['filename']);
-			$Plugin = new $classname($this, $this->MySQL);
+			$Plugin = new $classname($this, $this->database);
 			$Plugin->onLoad();
 			$this->plugins[$Plugin->id] = $Plugin;
 		}
@@ -330,33 +355,10 @@ class Nimda {
 		$sql_value = serialize($value);
 		
 		if(false !== $this->getPermanent($name, $type, $target)) {
-			$sql = "
-				UPDATE
-					`memory`
-				SET
-					`value` = '".addslashes($sql_value)."',
-					`modified` = NOW()
-				WHERE
-					`type`   = '".addslashes($type)."' AND
-					`target` = '".addslashes($target)."' AND
-					`name`   = '".addslashes($name)."'
-			";
-		} else {
-			$sql = "
-				INSERT INTO
-					`memory` (`name`, `type`, `target`, `value`, `created`, `modified`)
-				VALUES (
-					'".addslashes($name)."',
-					'".addslashes($type)."',
-					'".addslashes($target)."',
-					'".addslashes($sql_value)."',
-					NOW(),
-					NOW()
-			)";
-		}
-		
-		$this->MySQL->query($sql);
-		
+            $this->database->updatePermanent($name, $sql_value, $type, $target);
+        } else {
+            $this->database->insertPermanent($name, $sql_value, $type, $target);
+        }
 		$this->permanentVars[$type][$target][$name] = $value;
 	}
 	
@@ -364,18 +366,8 @@ class Nimda {
 		if(isset($this->permanentVars[$type][$target][$name])) {
 			return $this->permanentVars[$type][$target][$name];
 		}
-		
-		$value = $this->MySQL->fetchColumn("
-			SELECT
-				`value`
-			FROM
-				`memory`
-			WHERE
-				`type`   = '".addslashes($type)."' AND
-				`target` = '".addslashes($target)."' AND
-				`name`   = '".addslashes($name)."'
-		");
-		
+		$value = $this->database->getPermanent($name,$type,$target);
+
 		if($value === false) {
 			$this->permanentVars[$type][$target][$name] = false;
 			return false;
@@ -392,17 +384,7 @@ class Nimda {
 		if(isset($this->permanentVars[$type][$target][$name])) {
 			unset($this->permanentVars[$type][$target][$name]);
 		}
-		
-		$sql = "
-			DELETE FROM
-				`memory`
-			WHERE
-				`type`   = '".addslashes($type)."' AND
-				`target` = '".addslashes($target)."' AND
-				`name`   = '".addslashes($name)."'
-		";
-		
-		$res = $this->MySQL->query($sql);
+        $res = $this->database->removePermanent($name, $type, $target);
 		if(!$res) return false; // nothing deleted
 		
 	return true;
@@ -416,6 +398,7 @@ class Nimda {
 	public function __destruct() {
 		$this->unloadPlugins();
 		$this->removeTempDir();
+		$this->database->closeConnection();
 	}
 	
 }

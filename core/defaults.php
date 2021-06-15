@@ -7,6 +7,7 @@
 	
 	require_once('classes/HTTP.php');
 	require_once('classes/MySQL.php');
+	require_once('classes/SQLite.php');
 	
 	require_once('libs/libArray.php');
 	require_once('libs/libConvert.php');
