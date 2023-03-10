@@ -13,6 +13,13 @@ class MySQL {
 	private $Instance=false;
 	
 	public $queryCount = 0;
+
+	private $reconnectCount = 0;
+
+    /**
+     * How many times should Nimda attempt to reconnect to the MySQL server
+     */
+	const MAX_RECONNECT_COUNT = 5;
 	
 	
 	function __construct($host, $user, $password, $db, $port=3306) {
@@ -38,14 +45,19 @@ class MySQL {
 		
 		if(false === $Result = $this->Instance->query($sql)) {
 			if($this->Instance->error == 'MySQL server has gone away') {
-				$this->connect();
+                if ($this->reconnectCount >= self::MAX_RECONNECT_COUNT) {
+                    trigger_error("Failed to reach MySQL server after {$this->reconnectCount} times, giving up.", E_USER_WARNING);
+                    return false;
+                }
+                $this->connect();
+                $this->reconnectCount++;
 				return $this->query($sql);
 			} else {
 				trigger_error("MySQL Error: ".$this->Instance->error."\nSQL: ".$sql."\n", E_USER_WARNING);
 				return false;
 			}
 		}
-		
+		$this->reconnectCount = 0;
 		preg_match('/^\s*(\w+)/', strtoupper($sql), $arr);
 		
 		switch($arr[1]) {
