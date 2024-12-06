@@ -24,7 +24,7 @@ class MySQL {
 	}
 	
 	private function connect() {
-		$this->Instance = new mysqli($this->host,$this->user,$this->password,$this->db);
+		$this->Instance = new mysqli($this->host,$this->user,$this->password,$this->db, $this->port);
 		if($this->Instance->connect_error) die($this->Instance->connect_error);
 		$this->query("set character set utf8");
 	}

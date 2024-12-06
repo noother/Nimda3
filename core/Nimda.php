@@ -65,7 +65,8 @@ class Nimda {
 			$this->CONFIG['mysql_host'],
 			$this->CONFIG['mysql_user'],
 			$this->CONFIG['mysql_pass'],
-			$this->CONFIG['mysql_db']
+			$this->CONFIG['mysql_db'],
+			$this->CONFIG['mysql_port'],
 		);
 		
 		$this->autoUpdateSQL();
