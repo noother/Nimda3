@@ -1,10 +1,8 @@
 <?php
 
-require_once('IRC_Channel.php');
-require_once('IRC_User.php');
+namespace Nimda\Irc;
 
-final class IRC_Server {
-	
+final class Server {
 	private $socket = false;
 	private $sendQueue = array();
 	private $estimatedRecvq = array('messages' => array(), 'size' => 0, 'last_message_removed' => 0);
@@ -155,7 +153,7 @@ final class IRC_Server {
 	}
 	
 	private function addUser($nick) {
-		$User = new IRC_User($nick, $this);
+		$User = new User($nick, $this);
 		$this->users[$User->id] = $User;
 	}
 	
@@ -166,7 +164,7 @@ final class IRC_Server {
 	}
 	
 	private function addChannel($channel) {
-		$Channel = new IRC_Channel($channel, $this);
+		$Channel = new Channel($channel, $this);
 		$this->channels[$Channel->id] = $Channel;
 	return $Channel;
 	}
@@ -204,12 +202,12 @@ final class IRC_Server {
 				$data['my_nick']         = $parsed['params'][0];
 				$data['welcome_message'] = $parsed['params'][1];
 				
-				$this->Me       = new IRC_User($data['my_nick'], $this);
+				$this->Me       = new User($data['my_nick'], $this);
 				$this->users[$this->Me->id] = $this->Me;
 				$this->sendWhois($this->Me->nick);
 				
 				/*
-				$this->NickServ = new IRC_User('NickServ', $this);
+				$this->NickServ = new User('NickServ', $this);
 				$this->users[$this->NickServ->id] = $this->NickServ;
 				
 				

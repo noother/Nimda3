@@ -1,10 +1,8 @@
 <?php
 
-require_once('IRC_Server.php');
+namespace Nimda\Irc;
 
-
-abstract class IRC_Target {
-	
+abstract class Target {
 	protected $Server;
 	public  $name = '';
 	public  $id;

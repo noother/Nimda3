@@ -1,7 +1,8 @@
 #!/usr/bin/php
 <?php
-require_once('core/Nimda.php');
 
-	new Nimda;
+require_once('vendor/autoload.php');
 
-?>
+use Nimda\Nimda;
+
+(new Nimda())->run();

@@ -1,9 +1,9 @@
 <?php
 
-require_once('IRC_Target.php');
+namespace Nimda\Irc;
 
 
-final class IRC_User extends IRC_Target {
+final class User extends Target {
 	
 	public $nick     = '';
 	public $user     = '';

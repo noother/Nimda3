@@ -3,7 +3,10 @@
         "psr-4": {
             "Nimda\\": "src/",
             "noother\\": "vendor/noother/"
-        }
+        },
+        "files": [
+            "src/functions.php"
+        ]
     },
     "require": {
         "php": ">=8.0"

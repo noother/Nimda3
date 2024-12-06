@@ -1,12 +1,13 @@
 <?php
 
+use noother\Database\MySQL;
+
 require_once('core/defaults.php');
 require_once('core/Plugin.php');
 
 
 
 class Job {
-	
 	private $datafile;
 	private $data;
 	private $Plugin;
@@ -27,8 +28,8 @@ class Job {
 	private function loadPlugin() {
 		require_once($this->data['plugin_path']);
 		
-		$c = libFile::parseConfigFile('nimda.conf');
-		$MySQL = new MySQL($c['mysql_host'], $c['mysql_user'], $c['mysql_pass'], $c['mysql_db']);
+		$c = json_decode(file_get_contents('config/config.json'), true);
+		$MySQL = new MySQL($c['mysql']['host'], $c['mysql']['user'], $c['mysql']['pass'], $c['mysql']['db'], $c['mysql']['port']);
 		$this->Plugin = new $this->data['classname'](null, $MySQL);
 	}
 	

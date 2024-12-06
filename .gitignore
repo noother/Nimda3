@@ -1,4 +1,4 @@
-nimda.conf
+config/config.json
 plugins/user/ZMachine/files/saves/*.sav
 vendor/*
 !vendor/noother/

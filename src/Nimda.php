@@ -1,48 +1,50 @@
 <?php
 
-require_once('defaults.php');
+namespace Nimda;
+
+require_once('core/defaults.php');
 
 require_once('core/Plugin.php');
 
-require_once('classes/IRC_Server.php');
-
 use noother\Database\MySQL;
+use Nimda\Irc\Server;
 
 class Nimda {
-	
 	public $servers = array();
 	public $plugins = array();
 	public $time;
 	public $MySQL;
 	public $version;
-	
+
 	public $timerCount;
 	public $jobCount;
 	public $jobCountMax;
-	
+
 	private $CONFIG = array();
 	private $timersLastTriggered;
 	private $permanentVars = array();
 	private $tempDir;
 	private $jobsDoneDP;
-	
-	function __construct() {
+
+	public function __construct() {
 		pcntl_async_signals(true);
 		pcntl_signal(SIGINT,   array($this, 'cleanShutdown'));
 		pcntl_signal(SIGTERM,  array($this, 'cleanShutdown'));
-		
+	}
+
+	public function run(): never {
 		$this->initBot();
-		
+
 		while(true) {
 			if(empty($this->servers)) {
 				echo 'No servers to read from - Qutting'."\n";
 				break;
 			}
-			
+
 			$this->time = time();
 			$this->triggerTimers();
 			$this->triggerJobs();
-			
+
 			$check = false;
 			foreach($this->servers as $Server) {
 				if(false !== $data = $Server->tick()) {
@@ -54,19 +56,20 @@ class Nimda {
 					}
 				}
 			}
+
 			if(!$check) usleep(20000);
-			
 		}
 	}
-	
-	private function initBot() {
-		$this->CONFIG = libFile::parseConfigFile('nimda.conf');
+
+	private function initBot(): void {
+		$this->CONFIG = json_decode(file_get_contents('config/config.json'), true);
+
 		$this->MySQL = new MySQL(
-			$this->CONFIG['mysql_host'],
-			$this->CONFIG['mysql_user'],
-			$this->CONFIG['mysql_pass'],
-			$this->CONFIG['mysql_db'],
-			$this->CONFIG['mysql_port'],
+			$this->CONFIG['mysql']['host'],
+			$this->CONFIG['mysql']['user'],
+			$this->CONFIG['mysql']['pass'],
+			$this->CONFIG['mysql']['db'],
+			$this->CONFIG['mysql']['port'],
 		);
 		
 		$this->autoUpdateSQL();
@@ -131,7 +134,7 @@ class Nimda {
 	
 	public function connectServer($data) {
 		// Expects 1 full row of mysql table `servers`
-		$Server = new IRC_Server($this, $data['id'], $data['host'], $data['port'], $data['ssl'], $data['bind'], $data['sasl']);
+		$Server = new Server($this, $data['id'], $data['host'], $data['port'], $data['ssl'], $data['bind'], $data['sasl']);
 		if(!empty($data['password'])) $Server->setPass($data['password']);
 		$Server->setUser(
 			$data['my_username'],
@@ -145,7 +148,7 @@ class Nimda {
 	}
 	
 	private function createTempDir() {
-		$this->tempDir = sys_get_temp_dir().'/nimda-'.libCrypt::getRandomHash();
+		$this->tempDir = sys_get_temp_dir().'/nimda-'.md5(rand());
 		mkdir($this->tempDir);
 		chmod($this->tempDir, 0700);
 		mkdir($this->tempDir.'/cache');
@@ -162,15 +165,15 @@ class Nimda {
 			$Plugin->onUnload();
 		}
 	}
-	
+
 	public function getTempDir() {
 		return $this->tempDir;
 	}
-	
+
 	private function initPlugins() {
-		$userplugin_files = libFilesystem::getFiles('plugins/user/', 'php');
-		$coreplugin_files = libFilesystem::getFiles('plugins/core/', 'php');
-		
+		$userplugin_files = glob('plugins/user/*.php');
+		$coreplugin_files = glob('plugins/core/*.php');
+
 		$files = array();
 		foreach($coreplugin_files as $file) {
 			$files[] = array('filename' => $file, 'isCore' => true);
@@ -178,19 +181,19 @@ class Nimda {
 		foreach($userplugin_files as $file) {
 			$files[] = array('filename' => $file, 'isCore' => false);
 		}
-		
+
 		foreach($files as $file) {
-			$classname = substr($file['filename'], 0, -4);
+			$classname = pathinfo($file['filename'], PATHINFO_FILENAME);
 			list($crap, $plugin_name) = explode('_', $classname, 2);
 			echo 'Loading '.($file['isCore']?'core':'user').' plugin '.$plugin_name.'..'."\n";
-			
-			require_once('plugins/'.($file['isCore']?'core/':'user/').$file['filename']);
+
+			require_once($file['filename']);
 			$Plugin = new $classname($this, $this->MySQL);
 			$Plugin->onLoad();
 			$this->plugins[$Plugin->id] = $Plugin;
 		}
 	}
-	
+
 	private function initJobs() {
 		$this->jobsDoneDP = opendir($this->getTempDir().'/jobs_done');
 	}

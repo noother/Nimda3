@@ -1,10 +1,8 @@
 <?php
 
-require_once('IRC_Target.php');
+namespace Nimda\Irc;
 
-
-final class IRC_Channel extends IRC_Target {
-	
+final class Channel extends Target {
 	public $topic = '';
 	public $modes = array();
 	public $users = array();

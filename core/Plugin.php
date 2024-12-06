@@ -62,7 +62,7 @@ abstract class Plugin {
 	}
 	
 	public final function addJob($callback, $data=null) {
-		$filename = libCrypt::getRandomHash().'.nimdajob';
+		$filename = md5(rand()).'.nimdajob';
 		$data = array(
 			'classname'         => get_class($this),
 			'origin'            => array(
