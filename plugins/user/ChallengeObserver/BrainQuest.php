@@ -1,5 +1,7 @@
 <?php
 
+use noother\Network\HTTP;
+
 class BrainQuest {
 	
 	private $username = '';
@@ -10,7 +12,7 @@ class BrainQuest {
 	private $HTTP;
 	
 	function __construct() {
-		$this->HTTP = new HTTP('www.brainquest.sk');
+		$this->HTTP = new HTTP('www.brainquest.sk', true);
 	}
 	
 	function login() {

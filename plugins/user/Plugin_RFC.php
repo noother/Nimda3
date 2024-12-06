@@ -1,5 +1,7 @@
 <?php
 
+use noother\Network\HTTP;
+
 class Plugin_RFC extends Plugin {
 
     public $triggers        = array('!rfc', '!bcp', '!std', '!fyi');
@@ -38,7 +40,7 @@ class Plugin_RFC extends Plugin {
 
         $this->cachefile = $data['cachefile'];
 
-        $HTTP = new HTTP('www.ietf.org');
+        $HTTP = new HTTP('www.ietf.org', true);
 
         if (($index = $this->getCache()) === false) {
             echo "fetching new data\n";

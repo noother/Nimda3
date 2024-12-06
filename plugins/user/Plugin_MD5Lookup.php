@@ -1,5 +1,7 @@
 <?php
 
+use noother\Network\SimpleHTTP;
+
 class Plugin_MD5Lookup extends Plugin {
 	
 	public $triggers = array('!md5lookup', '!md5crack');
@@ -57,7 +59,7 @@ class Plugin_MD5Lookup extends Plugin {
 	}
 	
 	private function checkMD5MyAddr($hash) {
-		$html = libHTTP::POST('http://md5.my-addr.com/md5_decrypt-md5_cracker_online/md5_decoder_tool.php', array('md5' => $hash));
+		$html = SimpleHTTP::POST('http://md5.my-addr.com/md5_decrypt-md5_cracker_online/md5_decoder_tool.php', array('md5' => $hash));
 		if($html === false) return false;
 		
 		if(preg_match('#Hashed string</span>: (.*?)</div>#', $html, $arr)) {
@@ -68,7 +70,7 @@ class Plugin_MD5Lookup extends Plugin {
 	}
 	
 	private function checkMD5Decryption($hash) {
-		$html = libHTTP::POST('http://md5decryption.com/', array('hash' => $hash, 'submit' => 'Decrypt It!'));
+		$html = SimpleHTTP::POST('http://md5decryption.com/', array('hash' => $hash, 'submit' => 'Decrypt It!'));
 		if($html === false) return false;
 		
 		if(preg_match('#Decrypted Text: </b>(.*?)</font>#', $html, $arr)) {
@@ -79,7 +81,7 @@ class Plugin_MD5Lookup extends Plugin {
 	}
 	
 	private function checkMD5OnlineNet($hash) {
-		$html = libHTTP::POST('http://md5online.net/', array('pass' => $hash, 'option' => 'hash2text'));
+		$html = SimpleHTTP::POST('http://md5online.net/', array('pass' => $hash, 'option' => 'hash2text'));
 		if($html === false) return false;
 		
 		if(preg_match('#<br>pass : <b>(.*?)</b>#', $html, $arr)) {
@@ -90,7 +92,7 @@ class Plugin_MD5Lookup extends Plugin {
 	}
 	
 	private function checkMD5OnlineOrg($hash) {
-		$html = libHTTP::POST('http://md5online.org/', array('md5' => $hash, 'action' => 'decrypt', 'a' => '123456')); // csrf token is not validated
+		$html = SimpleHTTP::POST('http://md5online.org/', array('md5' => $hash, 'action' => 'decrypt', 'a' => '123456')); // csrf token is not validated
 		if($html === false) return false;
 		
 		if(preg_match('#Found : <b>(.+?)</b>#', $html, $arr)) {

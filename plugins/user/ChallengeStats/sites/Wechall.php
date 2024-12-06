@@ -1,5 +1,7 @@
 <?php
 
+use noother\Network\HTTP;
+
 class Wechall extends ChallengeStats {
 	
 	public $triggers = array('!wcc');
@@ -9,7 +11,7 @@ class Wechall extends ChallengeStats {
 	
 	function getStats($username, $html) {
 		
-		$HTTP = new HTTP('www.wechall.net');
+		$HTTP = new HTTP('www.wechall.net', true);
 		$html = $HTTP->GET('/wechallchalls.php?username='.urlencode($username));
 		if($html === false) return 'timeout';
 		if(libString::startsWith('The user', $html)) return false;

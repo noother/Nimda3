@@ -1,5 +1,7 @@
 <?php
 
+use noother\Network\HTTP;
+
 class ThisIsLegal extends ChallengeStats {
 	
 	public $triggers = array('!til', '!thisislegal');
@@ -9,7 +11,7 @@ class ThisIsLegal extends ChallengeStats {
 	
 	function getStats($username, $html) {
 		
-		$HTTP = new HTTP('www.thisislegal.com');
+		$HTTP = new HTTP('www.thisislegal.com', true);
 		$html = $HTTP->GET('/userscore.php?username='.urlencode($username));
 		if($html === false) return 'timeout';
 		if($html === '0') return false;

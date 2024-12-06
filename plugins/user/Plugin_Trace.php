@@ -1,5 +1,7 @@
 <?php
 
+use noother\Network\SimpleHTTP;
+
 class Plugin_Trace extends Plugin {
 	
 	public $triggers = array('!trace');
@@ -43,7 +45,7 @@ class Plugin_Trace extends Plugin {
 			return;
 		}
 
-		$html = libHTTP::GET('http://www.geoiptool.com/?IP='.urlencode($host));
+		$html = SimpleHTTP::GET('http://www.geoiptool.com/?IP='.urlencode($host));
 		
 		preg_match('#IP Address:.*?<td.*?>(.*?)</td>#s', $html, $arr);
 		$ip = $arr[1];

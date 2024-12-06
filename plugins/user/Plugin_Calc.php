@@ -6,6 +6,7 @@
  * adapted for Nimda3 by livinskull
  */
 
+use noother\Network\SimpleHTTP;
 
 class Plugin_Calc extends Plugin {
 	
@@ -24,7 +25,7 @@ class Plugin_Calc extends Plugin {
 			return;
 		}
 
-		$google = libHTTP::GET('http://www.google.com/search?q='.urlencode($this->data['text']).'&hl=de&safe=off');
+		$google = SimpleHTTP::GET('http://www.google.com/search?q='.urlencode($this->data['text']).'&hl=de&safe=off');
 		if($google === false) {
 			$this->reply($this->connection_error);
 			return;

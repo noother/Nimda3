@@ -1,5 +1,7 @@
 <?php
 
+use noother\Network\SimpleHTTP;
+
 class Plugin_Wiki extends Plugin {
 	
 	public $triggers = array('!wiki', '!wikipedia', '!wiki-en', '!wiki-de', '!stupi');
@@ -68,7 +70,7 @@ class Plugin_Wiki extends Plugin {
 	function getWikiText($term, $server, $path, $notfound) {
 		$term = str_replace(" ","_",$term);
 		$term[0] = strtoupper($term[0]);
-		$html = libHTTP::GET('http://'.$server.$path.str_replace("%23","#",urlencode($term)));
+		$html = SimpleHTTP::GET('http://'.$server.$path.str_replace("%23","#",urlencode($term)));
 		$content = str_replace(array("\r", "\n"), ' ', $html);
 		while(strstr($content, '  ')) $content = str_replace('  ', ' ', $content);
 

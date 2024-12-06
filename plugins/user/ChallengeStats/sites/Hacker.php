@@ -1,5 +1,7 @@
 <?php
 
+use noother\Network\HTTP;
+
 class Hacker extends ChallengeStats {
 	
 	public $triggers = array('!hacker');
@@ -9,7 +11,7 @@ class Hacker extends ChallengeStats {
 	
 	function getStats($username, $html) {
 		
-		$HTTP = new HTTP('www.hacker.org');
+		$HTTP = new HTTP('www.hacker.org', true);
 		
 		if(false === $top = $this->getCache()) {
 			$top = $HTTP->GET('/challenge/top.php');

@@ -1,0 +1,11 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Nimda\\": "src/",
+            "noother\\": "vendor/noother/"
+        }
+    },
+    "require": {
+        "php": ">=8.0"
+    }
+}

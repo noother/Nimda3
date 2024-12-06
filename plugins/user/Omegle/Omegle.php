@@ -1,8 +1,9 @@
 <?php
 
-require_once('classes/HTTP.php');
 require_once('libs/libInternet.php');
 require_once('libs/libString.php');
+
+use noother\Network\HTTP;
 
 class Omegle {
 	
@@ -16,7 +17,7 @@ class Omegle {
 	private static $bannedHosts = array('ihookup.com', 'naughtybenaughty.com', 'omegleadult.info', 'adultmegle.com');
 	
 	function __construct() {
-		$this->Stream = new HTTP('front6.omegle.com');
+		$this->Stream = new HTTP('front6.omegle.com', true);
 		if($this->proxy) $this->Stream->set('proxy', $this->proxy);
 		$this->Stream->set('keep-alive', false);
 	}

@@ -1,5 +1,7 @@
 <?php
 
+use noother\Network\SimpleHTTP;
+
 class Plugin_UrbanDictionary extends Plugin {
 	
 	public $triggers = array('!wtf', '!define', '!urban', '!ud', '!urban-dictionary');
@@ -41,7 +43,7 @@ class Plugin_UrbanDictionary extends Plugin {
 	public function getDefinition($term) {
 		$data = array('term' => $term);
 		
-		$html = libHTTP::GET('http://www.urbandictionary.com/define.php?term='.urlencode($term));
+		$html = SimpleHTTP::GET('http://www.urbandictionary.com/define.php?term='.urlencode($term));
 		if($html === false) {
 			$data['timeout'] = true;
 			return $data;

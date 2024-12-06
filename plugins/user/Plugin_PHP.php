@@ -1,5 +1,7 @@
 <?php
 
+use noother\Network\HTTP;
+
 class Plugin_PHP extends Plugin {
 	
 	public $triggers = array('!php', '!phpmanual');
@@ -32,7 +34,7 @@ class Plugin_PHP extends Plugin {
 	}
 	
 	private function fetchFunctionDescription($func) {
-		$HTTP = new HTTP('php.net');
+		$HTTP = new HTTP('php.net', true);
 		$html = $HTTP->GET('/'.$this->getConfig('language').'/'.$func);
 		
 		if($html === false) {

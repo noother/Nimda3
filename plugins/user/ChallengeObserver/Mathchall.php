@@ -1,5 +1,7 @@
 <?php
 
+use noother\Network\HTTP;
+
 class Mathchall {
 	
 	private $HTTP;

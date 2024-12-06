@@ -1,5 +1,7 @@
 <?php
 
+use noother\Network\SimpleHTTP;
+
 class Plugin_HappyHardcore extends Plugin {
 	
 	public $triggers = array('!hc', '!hhc', '!happyhardcore', '!happy-hardcore');
@@ -25,7 +27,7 @@ class Plugin_HappyHardcore extends Plugin {
 	}
 	
 	private function getHappyHardcoreStats() {
-		$html = libHTTP::GET('http://www.happyhardcore.com/radio/player/tools/timequery.asp');
+		$html = SimpleHTTP::GET('http://www.happyhardcore.com/radio/player/tools/timequery.asp');
 		preg_match_all('/station\.(.+?)\s*=\s*\'?(.*?)\'?\s*;/', $html, $arr);
 		
 		$raw_data = array();

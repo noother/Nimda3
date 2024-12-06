@@ -1,5 +1,7 @@
 <?php
 
+use noother\Network\SimpleHTTP;
+
 abstract class ChallengeStats {
 	
 	private $cachedir;
@@ -23,7 +25,7 @@ abstract class ChallengeStats {
 		if(empty($this->triggers)) return false;
 		
 		if($this->profileUrl !== false) {
-			$html = libHTTP::GET(sprintf($this->profileUrl, urlencode($username)));
+			$html = SimpleHTTP::GET(sprintf($this->profileUrl, urlencode($username)));
 		} else {
 			$html = null;
 		}

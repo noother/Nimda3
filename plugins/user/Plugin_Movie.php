@@ -1,5 +1,7 @@
 <?php
 
+use noother\Network\HTTP;
+
 class Plugin_Movie extends Plugin {
 	
 	public $triggers = array('!movie', '!tmdb', '!film');
@@ -26,7 +28,7 @@ class Plugin_Movie extends Plugin {
 			return;
 		}
 		
-		$HTTP = new HTTP('api.themoviedb.org');
+		$HTTP = new HTTP('api.themoviedb.org', true);
 		
 		$html = $HTTP->GET('/2.1/Movie.search/'.$this->getConfig('language').'/xml/'.$this->api_key.'/'.urlencode($this->data['text']));
 		$XML = simplexml_load_string($html);

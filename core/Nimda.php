@@ -4,9 +4,9 @@ require_once('defaults.php');
 
 require_once('core/Plugin.php');
 
-require_once('classes/MySQL.php');
 require_once('classes/IRC_Server.php');
 
+use noother\Database\MySQL;
 
 class Nimda {
 	

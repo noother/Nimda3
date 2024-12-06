@@ -1,5 +1,8 @@
 <?php
 
+use noother\Network\HTTP;
+use noother\Network\SimpleHTTP;
+
 class Plugin_ChallengeObserver extends Plugin {
 	
 	public $interval = 60;
@@ -77,7 +80,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	
 	private function getSites() {
 		$sites = array();
-		$html = libHTTP::GET('http://www.wechall.net/index.php?mo=WeChall&me=API_Site&no_session=1');
+		$html = SimpleHTTP::GET('http://www.wechall.net/index.php?mo=WeChall&me=API_Site&no_session=1');
 		if($html === false) return false;
 		
 		$lines = explode("\n", $html);
@@ -205,7 +208,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getCanYouHackItChalls($count) {
-		$html = libHTTP::GET('http://canyouhack.it/');
+		$html = SimpleHTTP::GET('http://canyouhack.it/');
 		if(!$html) return false;
 		
 		preg_match_all('#</span>(.+?) - <a href="(/Hacking-Challenges/.+?/([^/]+)/)">\s*(.+?)\s#', $html, $arr);
@@ -229,7 +232,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getHackingChallengesChalls($count) {
-		$html = libHTTP::GET('http://www.hacking-challenges.de/index.php?page=hackits');
+		$html = SimpleHTTP::GET('http://www.hacking-challenges.de/index.php?page=hackits');
 		if(!$html) return false;
 		
 		preg_match_all('#<td width="100%".+?>.*?&nbsp; &raquo; (.+?)\s*</td>.+?</table>#s', $html, $category_arr);
@@ -267,7 +270,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getHackThisChalls($count) {
-		$html = libHTTP::GET('https://www.hackthis.co.uk/levels/');
+		$html = SimpleHTTP::GET('https://www.hackthis.co.uk/levels/');
 		if(!$html) return false;
 		
 		preg_match_all('#<a class="progress_0" href="(.+?)">.+?<span.+?>(.+?)</span>#s', substr($html, strpos($html, '<h1>Levels</h1>')), $arr);
@@ -298,7 +301,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getHappySecurityChalls($count) {
-		$html = libHTTP::GET('http://www.happy-security.de/index.php?modul=hacking-zone');
+		$html = SimpleHTTP::GET('http://www.happy-security.de/index.php?modul=hacking-zone');
 		if(!$html) return false;
 		
 		preg_match_all('#<td valign=top nowrap colspan=8> &nbsp;&raquo; <b>(.+?)</b>(.+?)</tr></table>#s', $html, $categories);
@@ -363,7 +366,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getMicrocontestChalls($count) {
-		$html = libHTTP::GET('http://www.microcontest.com/contests.php?all&lang=en');
+		$html = SimpleHTTP::GET('http://www.microcontest.com/contests.php?all&lang=en');
 		if(!$html) return false;
 		
 		preg_match_all('#<a href="contest.php\?id=(\d+?)">(.+?) \(\d+\)</a>.*?<a href="contests.php.+?>(.*?)</a>.*?<td.+?>(\d+?)</td>#s', $html, $arr);
@@ -399,7 +402,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getRankkChalls($count) {
-		$HTTP = new HTTP('www.rankk.org');
+		$HTTP = new HTTP('www.rankk.org', true);
 		$html = $HTTP->GET('/');
 		if(!$html) return false;
 		
@@ -434,7 +437,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getRevolutionEliteChalls($count) {
-		$html = libHTTP::GET('https://www.sabrefilms.co.uk/revolutionelite/index.php');
+		$html = SimpleHTTP::GET('https://www.sabrefilms.co.uk/revolutionelite/index.php');
 		if(!$html) return false;
 		
 		if(!preg_match('#<h5>Latest Challenge Online:</h5><a href="https://www.sabrefilms.co.uk/revolutionelite/challs.php\?challs=(.+?) *?"> *?(.+?) *?</a>#', $html, $arr)) return false;
@@ -460,7 +463,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getRightAnswerChalls($count) {
-		$html = libHTTP::GET('http://www.right-answer.net/?lang=Us');
+		$html = SimpleHTTP::GET('http://www.right-answer.net/?lang=Us');
 		if(!$html) return false;
 		
 		if(!preg_match('#<h1>New challenges</h1>.*?<ul.+?>(.+?)</ul>#si', $html, $arr)) return false;
@@ -480,7 +483,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getRootMeChalls($count) {
-		$HTTP = new HTTP('www.root-me.org');
+		$HTTP = new HTTP('www.root-me.org', true);
 		$html = $HTTP->GET('/en/Challenges/');
 		if(!$html) return false;
 		
@@ -510,7 +513,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getRosecodeChalls($count) {
-		$html = libHTTP::GET('http://www.javaist.com/rosecode/');
+		$html = SimpleHTTP::GET('http://www.javaist.com/rosecode/');
 		if(!$html) return false;
 		
 		if(!preg_match('#<span>Fresh Problems</span></h2>.+?<ul.+?>(.+?)</ul>#s', $html, $tmp)) return false;
@@ -528,7 +531,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getValhallaChalls($count) {
-		$html = libHTTP::GET('http://halls-of-valhalla.org/beta/challenges');
+		$html = SimpleHTTP::GET('http://halls-of-valhalla.org/beta/challenges');
 		if(!$html) return false;
 		
 		preg_match_all('#<a href=\'(/challenges/.+?)\'>(.+?)</a>.+?<td>(\d+) Points</td>#s', $html, $arr);
@@ -566,7 +569,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getW3Challs($count) {
-		$HTTP = new HTTP('w3challs.com');
+		$HTTP = new HTTP('w3challs.com', true);
 		$html = $HTTP->GET('/');
 		if(!$html) return false;
 		
@@ -603,7 +606,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getWargameKrChalls($count) {
-		$html = libHTTP::GET('http://www.wargame.kr/page/challenge_ajax.php?type=regtime');
+		$html = SimpleHTTP::GET('http://www.wargame.kr/page/challenge_ajax.php?type=regtime');
 		if(!$html) return false;
 		
 		preg_match_all('#<li .+?<a.+?href=\'(.+?)\'.+?<strong>(.+?)</strong>.+?Point : (\d+?) p#', $html, $arr);
@@ -621,7 +624,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getWeChallChalls($count) {
-		$html = libHTTP::GET('http://www.wechall.net/challs/by/chall_date/DESC/page-1');
+		$html = SimpleHTTP::GET('http://www.wechall.net/challs/by/chall_date/DESC/page-1');
 		if(!$html) return false;
 		
 		if(!preg_match_all('#<a href="(/challenge/.*?)".*?>(.*?)<.*?href=.*?>(.*?)<#', $html, $arr)) {
@@ -645,7 +648,7 @@ class Plugin_ChallengeObserver extends Plugin {
 	}
 	
 	private function getWixxerdChalls($count) {
-		$html = libHTTP::GET('http://www.wixxerd.com/challenges/');
+		$html = SimpleHTTP::GET('http://www.wixxerd.com/challenges/');
 		if(!$html) return false;
 		
 		if(!preg_match('#<span.+?>New Challenges</span>(.+?)\s{3,}#', $html, $arr)) return false;

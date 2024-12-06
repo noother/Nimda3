@@ -1,12 +1,12 @@
 <?php
 
-require_once('libs/libHTTP.php');
-
+use noother\Network\HTTP;
+use noother\Network\SimpleHTTP;
 
 class libInternet {
 	
 	static function googleResults($string) {
-		$html = libHTTP::GET('http://www.google.com/search?q='.urlencode($string).'&hl=en&safe=off');
+		$html = SimpleHTTP::GET('http://www.google.com/search?q='.urlencode($string).'&hl=en&safe=off');
 		
 		if(preg_match('#<div.+?>(?:About )?([\d,]+) results</div>#', $html, $arr)) {
 			return (int)str_replace(',', '', $arr[1]);
@@ -16,7 +16,7 @@ class libInternet {
 	}
 	
 	static function googleTranslate($text, $from='auto', $to='de', $return_source_lang=false) {
-		$HTTP = new HTTP('translate.google.com', 443, true);
+		$HTTP = new HTTP('translate.google.com', true);
 		$HTTP->set('useragent', 'Mozilla/5.0 (X11; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1');
 		$html = $HTTP->GET('/?sl='.$from.'&tl='.$to.'&q='.urlencode($text));
 		
@@ -48,7 +48,7 @@ class libInternet {
 	static function getYoutubeData($youtube_id) {
 		if(empty($youtube_id)) return false;
 		
-		$html = libHTTP::GET('http://gdata.youtube.com/feeds/api/videos/'.$youtube_id);
+		$html = SimpleHTTP::GET('https://gdata.youtube.com/feeds/api/videos/'.$youtube_id);
 		$xml = simplexml_load_string($html);
 		if($xml === false) return false;
 		
@@ -85,12 +85,12 @@ class libInternet {
 	}
 	
 	static function tinyURL($longurl) {
-		return libHTTP::GET('http://tinyurl.com/api-create.php?url='.urlencode($longurl));
+		return SimpleHTTP::GET('http://tinyurl.com/api-create.php?url='.urlencode($longurl));
 	}
 	
 	static function tinyURLDecode($tinyurl) {
 		$parts = parse_url($tinyurl);
-		$HTTP = new HTTP('tinyurl.com');
+		$HTTP = new HTTP('tinyurl.com', true);
 		$HTTP->set('auto-follow', false);
 		$HTTP->GET($parts['path']);
 		$header = $HTTP->getHeader();

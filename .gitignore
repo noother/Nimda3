@@ -1,3 +1,4 @@
 nimda.conf
 plugins/user/ZMachine/files/saves/*.sav
-
+vendor/*
+!vendor/noother/

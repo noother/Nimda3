@@ -1,5 +1,7 @@
 <?php
 
+use noother\Network\SimpleHTTP;
+
 class Plugin_LastFM extends Plugin {
 	
 	public $triggers = array('!np', '!lastfm', '!lfm');
@@ -39,7 +41,7 @@ class Plugin_LastFM extends Plugin {
 	function getRecentTracks($nick) {
 		
 		if ($this->apiKey !== false) {
-			$ret = libHTTP::GET('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks'
+			$ret = SimpleHTTP::GET('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks'
 				.'&user='.urlencode($nick)
 				.'&api_key='.$this->apiKey);
 			
@@ -57,7 +59,7 @@ class Plugin_LastFM extends Plugin {
 			return $res;
 		} else {
 
-			$ret = libHTTP::GET('http://ws.audioscrobbler.com/2.0/user/' . urlencode($nick) . '/recenttracks.rss');
+			$ret = SimpleHTTP::GET('http://ws.audioscrobbler.com/2.0/user/' . urlencode($nick) . '/recenttracks.rss');
 			$xml = simplexml_load_string($ret);
 			
 			if (!$xml)
