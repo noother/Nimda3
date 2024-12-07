@@ -45,7 +45,7 @@ class ConfigPlugin extends Plugin {
 	
 	private function _listConfig($Plugin) {
 		$config = $Plugin->getConfigList();
-		list($crap, $plugin_name) = explode('_', get_class($Plugin), 2);
+		$plugin_name = $Plugin->getName();
 		
 		if(empty($config)) {
 			$this->reply('Plugin '.$plugin_name.' doesn\'t have any config variables');
@@ -92,7 +92,7 @@ class ConfigPlugin extends Plugin {
 	}
 	
 	private function _showConfig($Plugin, $name) {
-		list($crap, $plugin_name) = explode('_', get_class($Plugin), 2);
+		$plugin_name = $Plugin->getName();
 		
 		$value = $Plugin->getConfig($name);
 		if($value === false) {
@@ -110,7 +110,7 @@ class ConfigPlugin extends Plugin {
 	}
 	
 	private function _setConfig($Plugin, $name, $value) {
-		list($crap, $plugin_name) = explode('_', get_class($Plugin), 2);
+		$plugin_name = $Plugin->getName();
 		
 		if($Plugin->setConfig($name, $value)) {
 			$this->reply(sprintf(

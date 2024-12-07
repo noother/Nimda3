@@ -28,8 +28,10 @@ abstract class Plugin {
 	
 	
 	public function __construct($Bot, $MySQL) {
-		list($crap, $crap, $type, $classname) = explode('\\', static::class);
-		$this->id           = strtolower($type.'_'.substr($classname, 0, -6)); // ex, core_help / user_decide
+		$type = explode('\\', static::class)[2];
+		$classname = $this->getName();
+
+		$this->id           = strtolower("{$type}_{$classname}"); // ex, core_help / user_decide
 		$this->Bot          = $Bot;
 		$this->MySQL        = $MySQL;
 		$this->lastInterval = time();
@@ -41,7 +43,11 @@ abstract class Plugin {
 			'description' => 'Determines if this Plugin is enabled for this channel / user'
 		);
 	}
-	
+
+	public function getName(): string {
+		return substr((new \ReflectionClass($this))->getShortName(), 0, -6); // Remove "Plugin" from the end
+	}
+
 	protected final function reply($string) {
 		switch($this->command) {
 			case 'PRIVMSG':

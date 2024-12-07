@@ -2,7 +2,6 @@
 
 namespace Nimda\Plugin\User\ChallengeStats;
 
-use noother\Library\Psr4;
 use noother\Network\SimpleHTTP;
 
 abstract class ChallengeStats {
@@ -21,6 +20,10 @@ abstract class ChallengeStats {
 	
 	public final function __construct($cachedir=null) {
 		if(isset($cachedir)) $this->cachedir = $cachedir;
+	}
+
+	public function getName(): string {
+		return (new \ReflectionClass($this))->getShortName();
 	}
 	
 	public final function getData($username) {
@@ -61,7 +64,7 @@ abstract class ChallengeStats {
 	}
 	
 	protected final function getCache($lifetime=86400) {
-		$path = $this->cachedir.'/challstats_'.get_class($this);
+		$path = $this->cachedir.'/challstats_'.$this->getName();
 		if(file_exists($path) && time() - filemtime($path) < $lifetime) {
 			return file_get_contents($path);
 		}
@@ -70,7 +73,7 @@ abstract class ChallengeStats {
 	}
 	
 	protected final function putCache($data) {
-		$path = $this->cachedir.'/challstats_'.get_class($this);
+		$path = $this->cachedir.'/challstats_'.$this->getName();
 		file_put_contents($path, $data);
 		clearstatcache();
 	}
