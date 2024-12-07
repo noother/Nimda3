@@ -1,4 +1,5 @@
 {
+	"master": "noother",
 	"mysql": {
 		"host": "localhost",
 		"port": 3306,

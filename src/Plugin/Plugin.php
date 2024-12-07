@@ -14,7 +14,8 @@ abstract class Plugin {
 	public $data = array();
 	public $command;
 	public $lastInterval;
-	
+	public $originalInstance;
+
 	// You can override the following properties in plugins
 	protected $config = array();
 	protected $enabledByDefault = true;
@@ -25,8 +26,7 @@ abstract class Plugin {
 	public $helpText = 'There is no help available for this command.';
 	public $hideFromHelp = false;
 	public $usage = false;
-	
-	
+
 	public function __construct($Bot, $MySQL) {
 		$type = explode('\\', static::class)[2];
 		$classname = $this->getName();
@@ -46,6 +46,30 @@ abstract class Plugin {
 
 	public function getName(): string {
 		return substr((new \ReflectionClass($this))->getShortName(), 0, -6); // Remove "Plugin" from the end
+	}
+
+	public function reload(): void {
+		$Reflector = new \ReflectionClass($this->originalInstance ?? $this);
+
+		$old_filename = $Reflector->getFilename();
+		$old_shortname = $Reflector->getShortName();
+		echo "Reloading $old_shortname\n";
+		$old_content = file_get_contents($old_filename);
+
+		$new_shortname = $old_shortname.'_rehashed_'.md5(rand());
+		$new_classname = $Reflector->getNamespaceName().'\\'.$new_shortname;
+		$new_filename = "tmp/rehashed/$new_shortname.php";
+		$new_content = preg_replace("/$old_shortname\s+extends\s+Plugin/", "$new_shortname extends Plugin", $old_content);
+
+		file_put_contents($new_filename, $new_content);
+		require_once($new_filename);
+
+		$this->onUnload();
+
+		$Plugin = new $new_classname($this->Bot, $this->MySQL);
+		$Plugin->id = $this->id;
+		$Plugin->originalInstance = $this->originalInstance ?? $this;
+		$this->Bot->plugins[$this->id] = $Plugin;
 	}
 
 	protected final function reply($string) {

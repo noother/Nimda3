@@ -11,12 +11,12 @@ class Nimda {
 	public $time;
 	public $MySQL;
 	public $version;
+	public $CONFIG = [];
 
 	public $timerCount;
 	public $jobCount;
 	public $jobCountMax;
 
-	private $CONFIG = array();
 	private $timersLastTriggered;
 	private $permanentVars = array();
 	private $jobsDoneDP;
@@ -141,8 +141,8 @@ class Nimda {
 		$this->servers[$Server->id] = $Server;
 	}
 
-	private function cleanupJobs() {
-		$files = glob('tmp/{jobs,jobs_done}/*', GLOB_BRACE);
+	private function cleanupTemp() {
+		$files = glob('tmp/{jobs,jobs_done,rehashed}/*', GLOB_BRACE);
 		foreach($files as $file) {
 			unlink($file);
 		}
@@ -397,7 +397,7 @@ class Nimda {
 	
 	public function __destruct() {
 		$this->unloadPlugins();
-		$this->cleanupJobs();
+		$this->cleanupTemp();
 	}
 	
 }
