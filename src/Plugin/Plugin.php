@@ -58,11 +58,12 @@ abstract class Plugin {
 
 		$new_shortname = $old_shortname.'_rehashed_'.md5(rand());
 		$new_classname = $Reflector->getNamespaceName().'\\'.$new_shortname;
-		$new_filename = "tmp/rehashed/$new_shortname.php";
+		$new_filename = "tmp/$new_shortname.php";
 		$new_content = preg_replace("/$old_shortname\s+extends\s+Plugin/", "$new_shortname extends Plugin", $old_content);
 
 		file_put_contents($new_filename, $new_content);
 		require_once($new_filename);
+		unlink($new_filename);
 
 		$this->onUnload();
 

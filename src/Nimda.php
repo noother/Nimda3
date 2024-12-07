@@ -142,7 +142,7 @@ class Nimda {
 	}
 
 	private function cleanupTemp() {
-		$files = glob('tmp/{jobs,jobs_done,rehashed}/*', GLOB_BRACE);
+		$files = glob('tmp/{jobs,jobs_done}/*', GLOB_BRACE);
 		foreach($files as $file) {
 			unlink($file);
 		}
