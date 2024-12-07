@@ -69,6 +69,9 @@ abstract class Plugin {
 		$Plugin = new $new_classname($this->Bot, $this->MySQL);
 		$Plugin->id = $this->id;
 		$Plugin->originalInstance = $this->originalInstance ?? $this;
+
+		$Plugin->onLoad();
+
 		$this->Bot->plugins[$this->id] = $Plugin;
 	}
 

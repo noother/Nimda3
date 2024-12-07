@@ -5,7 +5,7 @@ namespace Nimda\Plugin\Core;
 use Nimda\Plugin\Plugin;
 
 class RehashPlugin extends Plugin {
-	public $triggers = array('!reload', '!rehash');
+	public $triggers = array('!rehash', '!reload');
 	public $usage = '<plugin_name|trigger>';
 	public $helpText = 'Reload the code of a plugin by doing magic';
 
