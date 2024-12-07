@@ -1,0 +1,8 @@
+#!/usr/bin/php
+<?php
+
+require_once('vendor/autoload.php');
+
+use Nimda\Job;
+
+(new Job($argv[1]))->run();

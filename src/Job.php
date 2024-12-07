@@ -1,20 +1,23 @@
 <?php
 
+namespace Nimda;
+
 use noother\Database\MySQL;
 
 require_once('core/Plugin.php');
-
-
 
 class Job {
 	private $datafile;
 	private $data;
 	private $Plugin;
-	
+
 	public function __construct($datafile) {
 		$this->datafile = $datafile;
 		$this->loadData();
 		$this->loadPlugin();
+	}
+
+	public function run() {
 		$result = $this->processData();
 		$this->writeJobDone($result);
 		$this->removeDatafile();
@@ -53,7 +56,5 @@ class Job {
 	}
 	
 }
-
-new Job($argv[1]);
 
 ?>

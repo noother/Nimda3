@@ -87,7 +87,7 @@ class Nimda {
 		if($current_version === false) die("Error: Table version exists but has no entry.\n");
 		$this->version = '3.'.$current_version.'.x';
 		
-		preg_match_all('/-- \[(\d+?)\](.*?)-- \[\/\1\]/s', file_get_contents('sql_updates'), $updates);
+		preg_match_all('/-- \[(\d+?)\](.*?)-- \[\/\1\]/s', file_get_contents('sql_updates.sql'), $updates);
 		
 		$latest_version = max($updates[1]);
 		if($current_version >= $latest_version) return;
