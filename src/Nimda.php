@@ -2,10 +2,8 @@
 
 namespace Nimda;
 
-require_once('core/Plugin.php');
-
 use noother\Database\MySQL;
-use Nimda\Irc\Server;
+use Nimda\IRC\Server;
 
 class Nimda {
 	public $servers = array();
@@ -21,7 +19,6 @@ class Nimda {
 	private $CONFIG = array();
 	private $timersLastTriggered;
 	private $permanentVars = array();
-	private $tempDir;
 	private $jobsDoneDP;
 
 	public function __construct() {
@@ -71,8 +68,7 @@ class Nimda {
 		);
 		
 		$this->autoUpdateSQL();
-		
-		$this->createTempDir();
+
 		$this->initJobs();
 		$this->initPlugins();
 		$this->initServers();
@@ -144,48 +140,31 @@ class Nimda {
 		
 		$this->servers[$Server->id] = $Server;
 	}
-	
-	private function createTempDir() {
-		$this->tempDir = sys_get_temp_dir().'/nimda-'.md5(rand());
-		mkdir($this->tempDir);
-		chmod($this->tempDir, 0700);
-		mkdir($this->tempDir.'/cache');
-		mkdir($this->tempDir.'/jobs');
-		mkdir($this->tempDir.'/jobs_done');
+
+	private function cleanupJobs() {
+		$files = glob('tmp/{jobs,jobs_done}/*', GLOB_BRACE);
+		foreach($files as $file) {
+			unlink($file);
+		}
 	}
-	
-	private function removeTempDir() {
-		shell_exec('rm -R '.$this->tempDir);
-	}
-	
+
 	private function unloadPlugins() {
 		foreach($this->plugins as $Plugin) {
 			$Plugin->onUnload();
 		}
 	}
 
-	public function getTempDir() {
-		return $this->tempDir;
-	}
-
 	private function initPlugins() {
-		$userplugin_files = glob('plugins/user/*.php');
-		$coreplugin_files = glob('plugins/core/*.php');
-
-		$files = array();
-		foreach($coreplugin_files as $file) {
-			$files[] = array('filename' => $file, 'isCore' => true);
-		}
-		foreach($userplugin_files as $file) {
-			$files[] = array('filename' => $file, 'isCore' => false);
-		}
-
+		$files = glob('src/Plugin/*/*.php');
 		foreach($files as $file) {
-			$classname = pathinfo($file['filename'], PATHINFO_FILENAME);
-			list($crap, $plugin_name) = explode('_', $classname, 2);
-			echo 'Loading '.($file['isCore']?'core':'user').' plugin '.$plugin_name.'..'."\n";
+			$classname = 'Nimda\\'.str_replace('/', '\\', substr($file, 4, -4)); // remove src/ from the beginning & .php from the end
 
-			require_once($file['filename']);
+			$tmp = explode('\\', $classname);
+			$type = $tmp[2];
+			$name = substr($tmp[3], 0, -6); // Remove Plugin from the end
+			echo "Loading $type plugin $name..\n";
+
+			require_once($file);
 			$Plugin = new $classname($this, $this->MySQL);
 			$Plugin->onLoad();
 			$this->plugins[$Plugin->id] = $Plugin;
@@ -193,7 +172,7 @@ class Nimda {
 	}
 
 	private function initJobs() {
-		$this->jobsDoneDP = opendir($this->getTempDir().'/jobs_done');
+		$this->jobsDoneDP = opendir('tmp/jobs_done');
 	}
 	
 	private function triggerTimers() {
@@ -223,8 +202,8 @@ class Nimda {
 		rewinddir($this->jobsDoneDP);
 		
 		foreach($jobs as $job) {
-			$data = unserialize(file_get_contents($this->tempDir.'/jobs_done/'.$job));
-			unlink($this->tempDir.'/jobs_done/'.$job);
+			$data = json_decode(file_get_contents('tmp/jobs_done/'.$job), true);
+			unlink('tmp/jobs_done/'.$job);
 			$this->jobCount--;
 			
 			$plugin  = &$data['origin']['plugin'];
@@ -418,7 +397,7 @@ class Nimda {
 	
 	public function __destruct() {
 		$this->unloadPlugins();
-		$this->removeTempDir();
+		$this->cleanupJobs();
 	}
 	
 }
