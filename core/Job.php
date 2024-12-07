@@ -2,7 +2,6 @@
 
 use noother\Database\MySQL;
 
-require_once('core/defaults.php');
 require_once('core/Plugin.php');
 
 

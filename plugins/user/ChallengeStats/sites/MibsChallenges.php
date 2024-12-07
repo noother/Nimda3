@@ -8,7 +8,7 @@ class MibsChallenges extends ChallengeStats {
 	protected $profileUrl = 'http://mibs-challenges.de/userinfo.php?profile=%s';
 	
 	function getStats($username, $html) {
-		if(libString::startsWith('This user doesn\'t exist!', $html)) return false;
+		if(str_starts_with($html, 'This user doesn\'t exist!')) return false;
 		
 		preg_match('/^(.+?) has solved (\d+) out of (\d+) challenges.(?: He is at position (\d+?) out of (\d+)!)?$/', $html, $arr);
 	

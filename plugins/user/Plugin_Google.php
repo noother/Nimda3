@@ -1,5 +1,7 @@
 <?php
 
+use noother\Library\Internet;
+
 class Plugin_Google extends Plugin {
 	
 	public $triggers = array('!google');
@@ -25,7 +27,7 @@ class Plugin_Google extends Plugin {
 		
 		$this->reply(sprintf('%s (Results: %s)',
 			"http://www.google.com/search?q=".urlencode($this->data['text'])."&hl=".$this->getConfig('language')."&safe=off",
-			number_format(libInternet::googleResults($this->data['text']), 0, ',', '.')
+			number_format(Internet::googleResults($this->data['text']), 0, ',', '.')
 		));
 	}
 	

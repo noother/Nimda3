@@ -1,5 +1,8 @@
 <?php
 
+use noother\Library\Internet;
+use noother\Library\IRC;
+
 class Plugin_Interpreter extends Plugin {
 	
 	public $triggers = array('!interpreter');
@@ -40,12 +43,12 @@ class Plugin_Interpreter extends Plugin {
 		if(!isset($this->interpreters[$this->Server->id.':'.$this->Channel->id])) return;
 		
 		foreach($this->interpreters[$this->Server->id.':'.$this->Channel->id] as $lang) {
-			$translation = libInternet::googleTranslate($this->data['text'], 'auto', $lang);
+			$translation = Internet::googleTranslate($this->data['text'], 'auto', $lang);
 			if(empty($translation)) continue;
 			
 			if(strtolower($translation) == strtolower($this->data['text'])) continue;;
 			
-			$this->reply('<'.libIRC::noHighlight($this->User->nick).'> '.$translation);
+			$this->reply('<'.IRC::noHighlight($this->User->nick).'> '.$translation);
 		}
 	}
 	

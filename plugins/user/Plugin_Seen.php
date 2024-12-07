@@ -1,5 +1,7 @@
 <?php
 
+use noother\Library\Time;
+
 class Plugin_Seen extends Plugin {
 	
 	public $triggers = array('!seen');
@@ -23,7 +25,7 @@ class Plugin_Seen extends Plugin {
 	}
 	
 	private function assembleText($data) {
-		$text = 'I\'ve last seen '.$data['nick'].' '.libTime::secondsToString(time()-$data['time']).' ago ';
+		$text = 'I\'ve last seen '.$data['nick'].' '.Time::secondsToString(time()-$data['time']).' ago ';
 		if($data['server'] != $this->Server->host) $text.= 'on '.$data['server'].' ';
 		
 		switch($data['action']) {
@@ -71,7 +73,7 @@ class Plugin_Seen extends Plugin {
 	
 	
 	function onChannelMessage() {
-		if(libString::startsWith("!seen", $this->data['text'])) return;
+		if(str_starts_with($this->data['text'], '!seen')) return;
 		
 		$this->saveVar($this->User->id, array(
 			'action'  => 'PRIVMSG',

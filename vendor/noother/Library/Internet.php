@@ -1,9 +1,11 @@
 <?php
 
+namespace noother\Library;
+
 use noother\Network\HTTP;
 use noother\Network\SimpleHTTP;
 
-class libInternet {
+class Internet {
 	
 	static function googleResults($string) {
 		$html = SimpleHTTP::GET('http://www.google.com/search?q='.urlencode($string).'&hl=en&safe=off');

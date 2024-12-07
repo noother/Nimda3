@@ -1,5 +1,9 @@
 <?php
 
+use noother\Library\IRC;
+use noother\Library\Strings;
+use noother\Library\Time;
+
 class Plugin_DiceGame extends Plugin {
 	
 	public $triggers = array('!dice');
@@ -199,7 +203,7 @@ class Plugin_DiceGame extends Plugin {
 		
 		$text = '';
 		foreach($this->game['players'] as $player) {
-			$text.= libIRC::noHighlight($player['nick']).': '.$player['points'].' points, ';
+			$text.= IRC::noHighlight($player['nick']).': '.$player['points'].' points, ';
 		}
 		
 		$text = substr($text, 0, -2).'.';
@@ -373,7 +377,7 @@ class Plugin_DiceGame extends Plugin {
 					implode(', ', $new_max_players['players']),
 					$max_players['count'],
 					implode(', ', $max_players['players']),
-					libTime::secondsToString($new_max_players['date'] - $max_players['date'])
+					Time::secondsToString($new_max_players['date'] - $max_players['date'])
 				));
 			}
 			
@@ -388,7 +392,7 @@ class Plugin_DiceGame extends Plugin {
 					$winner['points'],
 					$max_points['nick'],
 					$max_points['points'],
-					libTime::secondsToString(time() - $max_points['time'])
+					Time::secondsToString(time() - $max_points['time'])
 				));
 			}
 			
@@ -439,7 +443,7 @@ class Plugin_DiceGame extends Plugin {
 		
 		$max_players = $this->getVar('stats_max_players');
 		foreach($max_players['players'] as &$player) {
-			$player = libIRC::noHighlight($player);
+			$player = IRC::noHighlight($player);
 		}
 		
 		$max_points = $this->getVar('stats_max_points');
@@ -447,19 +451,19 @@ class Plugin_DiceGame extends Plugin {
 		$ranking = $this->getVar('ranking');
 		$top5 = array();
 		for($i=0;$i<5&&$i<sizeof($ranking);$i++) {
-			$top5[] = libIRC::noHighlight($ranking[$i]['nick']).' ('.$ranking[$i]['won'].')';
+			$top5[] = IRC::noHighlight($ranking[$i]['nick']).' ('.$ranking[$i]['won'].')';
 		}
 		$top5 = implode(', ', $top5);
 		
 		$this->reply(sprintf("%s %s been completed. The largest game ever was played by %d players (%s) on %s. The highest sum ever was achieved by \x02%s\x02 on %s with %d points. Top5: %s",
-			libString::plural('dice game', $this->getVar('stats_games_completed')),
-			libString::plural('have', $this->getVar('stats_games_completed')),
+			Strings::plural('dice game', $this->getVar('stats_games_completed')),
+			Strings::plural('have', $this->getVar('stats_games_completed')),
 			
 			$max_players['count'],
 			implode(', ', $max_players['players']),
 			date('Y-m-d H:i:s', $max_players['date']),
 			
-			libIRC::noHighlight($max_points['nick']),
+			IRC::noHighlight($max_points['nick']),
 			date('Y-m-d H:i:s', $max_points['time']),
 			$max_points['points'],
 			
@@ -496,20 +500,20 @@ class Plugin_DiceGame extends Plugin {
 	
 		$text = sprintf("%s has played %s, won %d and lost %d. %s is on rank %d of %d. %s's last game was %s ago.",
 			$stats['nick'],
-			libString::plural('game', $stats['played']),
+			Strings::plural('game', $stats['played']),
 			$stats['won'],
 			$stats['played'] - $stats['won'],
 			$stats['nick'],
 			$stats['rank'],
 			sizeof($ranking),
 			$stats['nick'],
-			libTime::secondsToString(time() - $stats['last_played'])
+			Time::secondsToString(time() - $stats['last_played'])
 		);
 		
 		if($stats['rank'] != 1) {
 			$text.= sprintf(" %s needs to win %s to rankup.",
 				$stats['nick'],
-				libString::plural('more game', ($ranking[$stats['rank']-2]['won'] - $stats['won'])+1)
+				Strings::plural('more game', ($ranking[$stats['rank']-2]['won'] - $stats['won'])+1)
 			);
 		}
 		

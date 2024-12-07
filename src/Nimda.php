@@ -2,8 +2,6 @@
 
 namespace Nimda;
 
-require_once('core/defaults.php');
-
 require_once('core/Plugin.php');
 
 use noother\Database\MySQL;

@@ -1,8 +1,7 @@
 <?php
 
-require_once('libs/libInternet.php');
-require_once('libs/libString.php');
-
+use noother\Library\Internet;
+use noother\Library\Strings;
 use noother\Network\HTTP;
 
 class Omegle {
@@ -82,11 +81,11 @@ class Omegle {
 	}
 	
 	private function checkSpam($text) {
-		$links = libString::getUrls($text);
+		$links = Strings::getUrls($text);
 		foreach($links as $link) {
 			$parts = parse_url($link);
 			if($parts['host'] == 'tinyurl.com' && isset($parts['path']) && !isset($path['query']) && ctype_alnum(substr($parts['path'], 1))) {
-				if($this->checkSpam(libInternet::tinyURLDecode($link))) return true;
+				if($this->checkSpam(Internet::tinyURLDecode($link))) return true;
 			} else {
 				preg_match('/[^\.]+\.[^\.]+$/', $parts['host'], $arr);
 				$domain = $arr[0];

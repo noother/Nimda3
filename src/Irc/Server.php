@@ -311,11 +311,11 @@ final class Server {
 				// Sent when the server decides to close our connection
 				$data['text'] = $parsed['params'][0];
 				
-				if(libString::endsWith('(Excess Flood)', $data['text']) || libString::endsWith('[RecvQ exceeded]', $data['text'])) {
+				if(str_ends_with($data['text'], '(Excess Flood)') || str_ends_with($data['text'], '[RecvQ exceeded]')) {
 					$this->onFlood();
 					$this->connectCooldown['cooldown'] = 20;
 					$this->connectCooldown['last_connect'] = time();
-				} elseif(libString::endsWith('throttled', $data['text'])) {
+				} elseif(str_ends_with($data['text'], 'throttled')) {
 					$this->connectCooldown['cooldown']     = 60;
 					$this->connectCooldown['last_connect'] = time();
 				}

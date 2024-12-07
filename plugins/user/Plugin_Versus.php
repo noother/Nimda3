@@ -1,5 +1,7 @@
 <?php
 
+use noother\Library\Internet;
+
 class Plugin_Versus extends Plugin {
 	
 	public $triggers = array('!vs');
@@ -27,8 +29,8 @@ class Plugin_Versus extends Plugin {
 			if(str_word_count($terms[$i]) == 1) $terms[$i] = '"'.$terms[$i].'"';
 		}
 		
-		$word1Hits = libInternet::googleResults($terms[0]);
-		$word2Hits = libInternet::googleResults($terms[1]);
+		$word1Hits = Internet::googleResults($terms[0]);
+		$word2Hits = Internet::googleResults($terms[1]);
 		
 		if ($word1Hits + $word2Hits == 0){
 			$zero = array('zero', 'oh', 'null', 'nil', 'nought');

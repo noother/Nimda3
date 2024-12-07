@@ -1,6 +1,8 @@
 <?php
 
-class libString {
+namespace noother\Library;
+
+class Strings {
 	
 	static function isUTF8($string) {
 		return (utf8_encode(utf8_decode($string)) == $string);
@@ -50,15 +52,7 @@ class libString {
 		
 	return $new_string;
 	}
-	
-	static function startsWith($needle, $haystack) {
-		return substr($haystack, 0, strlen($needle)) == $needle;
-	}
-	
-	static function endsWith($needle, $haystack) {
-		return substr($haystack, -strlen($needle)) == $needle;
-	}
-	
+
 	static function plural($word, $num) {
 		$num = (int)($num);
 		

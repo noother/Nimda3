@@ -11,12 +11,13 @@ class Plugin_ChallengeStats extends Plugin {
 	
 	function onLoad() {
 		require_once('ChallengeStats/ChallengeStats.php');
-		
-		$files = libFilesystem::getFiles('plugins/user/ChallengeStats/sites/', 'php');
+
+		$files = glob('plugins/user/ChallengeStats/sites/*.php');
 		foreach($files as $file) {
-			require_once('ChallengeStats/sites/'.$file);
-			
-			$classname = substr($file, 0, -4);
+			$info = pathinfo($file);
+			require_once($file);
+
+			$classname = $info['filename'];
 			$Class     = new $classname($this);
 			$c = 0;
 			foreach($Class->triggers as $trigger) {
@@ -26,7 +27,7 @@ class Plugin_ChallengeStats extends Plugin {
 			}
 		}
 	}
-	
+
 	function getHelpText() {
 		$trigger = $this->data['trigger'];
 		if(!isset($this->links[$trigger])) {

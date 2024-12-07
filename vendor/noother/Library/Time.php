@@ -1,8 +1,8 @@
 <?php
 
-class libTime {
-	
-	
+namespace noother\Library;
+
+class Time {
 	static function secondsToString($seconds) {
 		$minutes = (int)($seconds/60);
 		$seconds = $seconds-$minutes*60;

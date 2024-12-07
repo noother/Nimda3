@@ -2,6 +2,8 @@
 
 require_once('ZMachine/ZMachine.php');
 
+use noother\Library\Strings;
+
 class Plugin_ZMachine extends Plugin {
 	
 	public $triggers = array('!zmachine', '!adventure', '!z');
@@ -15,7 +17,7 @@ class Plugin_ZMachine extends Plugin {
 	private $sessions = array();
 	private $games = array();
 	
-	const FILEDIR = 'plugins/user/ZMachine/files/';
+	const FILEDIR = 'plugins/user/ZMachine/files';
 	const MAX_SESSIONS = 100;
 	const MAX_IDLE_TIME = 43200; // 12h
 	
@@ -95,12 +97,12 @@ class Plugin_ZMachine extends Plugin {
 	}
 	
 	private function updateGames() {
-		$files = libFilesystem::getFiles(self::FILEDIR, 'conf');
-		$additions = array();
-		
+		$files = glob(self::FILEDIR.'/*.conf');
+		$additions = [];
+
 		foreach($files as $file) {
-			$config = libFile::parseConfigFile(self::FILEDIR.$file);
-			if(file_exists(self::FILEDIR.'games/'.$config['gamefile'])) {
+			$config = parse_ini_file($file);
+			if(file_exists(self::FILEDIR.'/games/'.$config['gamefile'])) {
 				if(!isset($this->games[$config['id']])) $additions[] = $config['name'];
 				$this->games[$config['id']] = $config;
 			}
@@ -156,7 +158,7 @@ class Plugin_ZMachine extends Plugin {
 		if(empty($this->sessions)) $this->interval = 1;
 		$this->sessions[$session_id] = array(
 			'Target' => $this->Channel ? $this->Channel : $this->User,
-			'Game' => new ZMachine(self::FILEDIR.'games/'.$info['gamefile']),
+			'Game' => new ZMachine(self::FILEDIR.'/games/'.$info['gamefile']),
 			'game_id' => $info['id'],
 			'game_name' => $info['name'],
 			'last_action' => $this->Bot->time
@@ -294,7 +296,7 @@ class Plugin_ZMachine extends Plugin {
 			break;
 			
 			case 'restore': case 'load':
-				if(file_exists(self::FILEDIR.'saves/'.$this->getSaveName($session_id))) {
+				if(file_exists(self::FILEDIR.'/saves/'.$this->getSaveName($session_id))) {
 					$G->write('restore');
 					$G->write('../saves/'.$this->getSaveName($session_id));
 					usleep(50000);
@@ -342,14 +344,14 @@ class Plugin_ZMachine extends Plugin {
 	
 	private function getSaveName($session_id) {
 		$name = $this->sessions[$session_id]['game_id'].':'.$session_id;
-		$file = libString::normalizeString($name).'_'.crc32($name).'.sav';
+		$file = Strings::normalizeString($name).'_'.crc32($name).'.sav';
 		
 	return $file;
 	}
 	
 	private function loadAutosave($session_id) {
 		$filename = 'auto_'.$this->getSaveName($session_id);
-		if(!file_exists(self::FILEDIR.'saves/'.$filename)) return false;
+		if(!file_exists(self::FILEDIR.'/saves/'.$filename)) return false;
 		 
 		$s = &$this->sessions[$session_id];
 		$G = $s['Game'];
@@ -364,7 +366,7 @@ class Plugin_ZMachine extends Plugin {
 		
 		$s['Target']->privmsg('Your autosave has been autoloaded. \\o/');
 		$s['Target']->privmsg("\xc2\xa0");
-		unlink(self::FILEDIR.'saves/'.$filename);
+		unlink(self::FILEDIR.'/saves/'.$filename);
 		
 		$this->sendCommand($session_id, 'look');
 		

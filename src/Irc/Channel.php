@@ -2,6 +2,8 @@
 
 namespace Nimda\Irc;
 
+use noother\Library\IRC;
+
 final class Channel extends Target {
 	public $topic = '';
 	public $modes = array();
@@ -29,7 +31,7 @@ final class Channel extends Target {
 	
 	public function privmsg($message, $bypass_queue=false) {
 		if(isset($this->modes['c'])) {
-			$message = libIRC::stripControlChars($message);
+			$message = IRC::stripControlChars($message);
 		}
 		parent::privmsg($message, $bypass_queue);
 	}

@@ -14,7 +14,7 @@ class Wechall extends ChallengeStats {
 		$HTTP = new HTTP('www.wechall.net', true);
 		$html = $HTTP->GET('/wechallchalls.php?username='.urlencode($username));
 		if($html === false) return 'timeout';
-		if(libString::startsWith('The user', $html)) return false;
+		if(str_starts_with($html, 'The user')) return false;
 		
 		preg_match('/^(.+?) solved (\d+?) of (\d+?) Challenges with (\d+?) of (\d+?) possible points \(([\d\.]+?)%\). Rank for the site WeChall: (\d+)$/', $html, $arr);
 		

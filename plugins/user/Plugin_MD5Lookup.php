@@ -1,5 +1,6 @@
 <?php
 
+use noother\Library\Validate;
 use noother\Network\SimpleHTTP;
 
 class Plugin_MD5Lookup extends Plugin {
@@ -17,7 +18,7 @@ class Plugin_MD5Lookup extends Plugin {
 			return;
 		}
 		
-		if(!libValidate::md5Hash($this->data['text'])) {
+		if(!Validate::md5Hash($this->data['text'])) {
 			$this->reply('This is not an MD5 hash.');
 			return;
 		}

@@ -1,5 +1,8 @@
 <?php
 
+use noother\Library\IRC;
+use noother\Library\Strings;
+
 class Plugin_Roulette extends Plugin {
 	
 	public $triggers = array('!roulette');
@@ -189,12 +192,12 @@ class Plugin_Roulette extends Plugin {
 		$this->reply(sprintf(
 			"\x02Roulette %sstats:\x02 %s completed, %s fired at %s. Luckiest: %s (%.2f%% clicks). Unluckiest: %s (%.2f%% clicks).",
 				$global ? "global" : "",
-				libString::plural('game', $stats['played']),
-				libString::plural('shot', $stats['shots']),
-				libString::plural('player', $stats['playercount']),
-				libIRC::noHighlight($luckiest['nick']),
+				Strings::plural('game', $stats['played']),
+				Strings::plural('shot', $stats['shots']),
+				Strings::plural('player', $stats['playercount']),
+				IRC::noHighlight($luckiest['nick']),
 				$luckiest['percentage'],
-				libIRC::noHighlight($unluckiest['nick']),
+				IRC::noHighlight($unluckiest['nick']),
 				$unluckiest['percentage']
 		));
 	}
@@ -234,13 +237,13 @@ class Plugin_Roulette extends Plugin {
 		
 		$this->reply(sprintf('%s has played %s, won %d and lost %d. %s started %s, pulled the trigger %s and found the chamber empty on %s.',
 			$data['nick'],
-			libString::plural('game', $data['played']),
+			Strings::plural('game', $data['played']),
 			$data['played']-$data['lost'],
 			$data['lost'],
 			$data['nick'],
-			libString::plural('game', $data['started']),
-			libString::plural('time', $data['clicks']+$data['lost']),
-			libString::plural('occasion', $data['clicks'])
+			Strings::plural('game', $data['started']),
+			Strings::plural('time', $data['clicks']+$data['lost']),
+			Strings::plural('occasion', $data['clicks'])
 		));	
 	}
 	

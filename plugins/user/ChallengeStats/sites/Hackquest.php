@@ -1,5 +1,7 @@
 <?php
 
+use noother\Library\Time;
+
 class Hackquest extends ChallengeStats {
 	
 	public $triggers = array('!hq', '!hackquest');
@@ -41,7 +43,7 @@ class Hackquest extends ChallengeStats {
 			'challs' 	=> $solved,
 			'score'		=> $rankpoints,
 			'visits'	=> $visited,
-			'time'		=> libTime::secondsToString($timeSpent),
+			'time'		=> Time::secondsToString($timeSpent),
 			'last_online' => $lastOnline
 		);
 		

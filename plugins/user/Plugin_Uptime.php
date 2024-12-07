@@ -1,5 +1,7 @@
 <?php
 
+use noother\Library\Time;
+
 class Plugin_Uptime extends Plugin {
 	
 	public $triggers = array('!uptime');
@@ -14,8 +16,8 @@ class Plugin_Uptime extends Plugin {
 	
 	function isTriggered() {
 		$this->reply(sprintf("Uptime: %s - Total Uptime: %s",
-			libTime::secondsToString($this->Bot->time - $this->started),
-			libTime::secondsToString($this->getVar('total_uptime', 0) + $this->Bot->time - $this->started)
+			Time::secondsToString($this->Bot->time - $this->started),
+			Time::secondsToString($this->getVar('total_uptime', 0) + $this->Bot->time - $this->started)
 		));
 	}
 	

@@ -1,5 +1,7 @@
 <?php
 
+use noother\Library\Time;
+
 class CorePlugin_Botstats extends Plugin {
 	
 	public $triggers = array('!botstats', '!perf');
@@ -13,7 +15,7 @@ class CorePlugin_Botstats extends Plugin {
 	}
 	
 	function isTriggered() {
-		$uptime = libTime::secondsToString($this->Bot->time - $this->started);
+		$uptime = Time::secondsToString($this->Bot->time - $this->started);
 		
 		$servercount = sizeof($this->Bot->servers);
 		$channelcount = 0;

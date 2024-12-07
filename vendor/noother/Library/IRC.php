@@ -1,7 +1,8 @@
 <?php
 
-class libIRC {
+namespace noother\Library;
 
+class IRC {
 	public static $unicodeLookalikes = array(
 		'A' => "\xce\x91", 'B' => "\xce\x92", 'C' => "\xd0\xa1", 'E' => "\xce\x95", 'F' => "\xcf\x9c",
 		'H' => "\xce\x97", 'I' => "\xce\x99", 'J' => "\xd0\x88", 'K' => "\xce\x9a", 'M' => "\xce\x9c",

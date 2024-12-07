@@ -8,7 +8,7 @@ class Netforce extends ChallengeStats {
 	protected $profileUrl = 'http://net-force.nl/wechall/userscore.php?username=%s';
 	
 	function getStats($username, $html) {
-		if(libString::startsWith('::', $html)) return false;
+		if(str_starts_with($html, '::')) return false;
 		
 		$tmp = explode(':', $html);
 		

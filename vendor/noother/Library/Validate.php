@@ -1,6 +1,8 @@
 <?php
 
-class libValidate {
+namespace noother\Library;
+
+class Validate {
 	
 	static function date($string) {
 		return $string == date('Y-m-d',strtotime($string));
@@ -23,17 +25,6 @@ class libValidate {
 	static function strongPassword($password) {
 		if(strlen($password) < 6) return false;
 	return true;
-	}
-	
-	static function creditCard($number) {
-		for($x=0;$x<strlen($number);$x+=2) {
-			$double = $number[$x]*2;
-			if($double > 9) $double = libMath::checksum($double);
-			$number[$x] = $double;
-		}
-	
-		if(!(libMath::checksum($number)%10)) return true;
-	return false;
 	}
 	
 	static function md5Hash($hash) {

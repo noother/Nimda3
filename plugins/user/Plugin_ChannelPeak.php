@@ -1,5 +1,7 @@
 <?php
 
+use noother\Library\Time;
+
 class Plugin_ChannelPeak extends Plugin {
 	
 	public $triggers = array('!peak');
@@ -26,7 +28,7 @@ class Plugin_ChannelPeak extends Plugin {
 				$this->Channel->name,
 				$this->Channel->getVar('peak'),
 				$this->Channel->getVar('peak_date'),
-				libTime::secondsToString(libTime::getSecondsDifference(date('r'), $this->Channel->getVar('peak_date')))
+				Time::secondsToString(Time::getSecondsDifference(date('r'), $this->Channel->getVar('peak_date')))
 		));
 	}
 	
@@ -41,7 +43,7 @@ class Plugin_ChannelPeak extends Plugin {
 						$user_count,
 						$this->Channel->getVar('peak'),
 						$this->Channel->getVar('peak_date'),
-						libTime::secondsToString(libTime::getSecondsDifference(date('r'), $this->Channel->getVar('peak_date')))
+						Time::secondsToString(Time::getSecondsDifference(date('r'), $this->Channel->getVar('peak_date')))
 				));
 			}
 			

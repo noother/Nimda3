@@ -1,5 +1,7 @@
 <?php
 
+use noother\Library\Validate;
+
 abstract class Plugin {
 	
 	public $id;
@@ -73,7 +75,7 @@ abstract class Plugin {
 				'command'           => ($this->command ? $this->command : false)
 			),
 			'callback'          => $callback,
-			'plugin_path'       => 'plugins/'.(libString::startsWith('CorePlugin', get_class($this))?'core':'user').'/'.get_class($this).'.php',
+			'plugin_path'       => 'plugins/'.(str_starts_with(get_class($this), 'CorePlugin')?'core':'user').'/'.get_class($this).'.php',
 			'job_done_filename' => $this->Bot->getTempDir().'/jobs_done/'.$filename,
 			'data'              => $data
 		);
@@ -144,16 +146,16 @@ abstract class Plugin {
 				$Target->saveVar($identifier, $value);
 			break;
 			case 'int':
-				if(!libValidate::integer($value)) return false;
+				if(!Validate::integer($value)) return false;
 				$Target->saveVar($identifier, (int)$value);
 			break;
 			case 'range':
-				if(!libValidate::integer($value)) return false;
+				if(!Validate::integer($value)) return false;
 				if($value < $def['min'] || $value > $def['max']) return false;
 				$Target->saveVar($identifier, (int)$value);
 			break;
 			case 'unsigned_int':
-				if(!libValidate::integer($value, true)) return false;
+				if(!Validate::integer($value, true)) return false;
 				$Target->saveVar($identifier, (int)$value);
 			break;
 			case 'string':
@@ -604,7 +606,7 @@ abstract class Plugin {
 		foreach($this->triggers as $trigger) {
 			$trigger_len = strlen($trigger);
 			
-			if(libString::startsWith($trigger, $this->data['text'])) {
+			if(str_starts_with($this->data['text'], $trigger)) {
 				if($trigger_len == strlen($this->data['text'])) {
 					$this->data['trigger'] = $trigger;
 					unset($this->data['text']);

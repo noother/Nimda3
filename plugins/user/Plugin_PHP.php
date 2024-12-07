@@ -1,5 +1,6 @@
 <?php
 
+use noother\Library\Strings;
 use noother\Network\HTTP;
 
 class Plugin_PHP extends Plugin {
@@ -53,7 +54,7 @@ class Plugin_PHP extends Plugin {
 			$decl = str_replace($func, "\x02".$func."\x02", $decl);
 			$output =  $decl.' - '.html_entity_decode($match[2]).' ( http://php.net/'.$func.' )';
 			
-			$this->reply(libString::isUTF8($output)?$output:utf8_encode($output));
+			$this->reply(Strings::isUTF8($output)?$output:utf8_encode($output));
 		} else {    // if several possibilities
 			$output = '';
 
@@ -66,7 +67,7 @@ class Plugin_PHP extends Plugin {
 			} else
 				$output = $this->notfoundtext.' http://php.net/search.php?show=wholesite&pattern='.$func;
 
-			$this->reply(libString::isUTF8($output)?$output:utf8_encode($output));
+			$this->reply(Strings::isUTF8($output)?$output:utf8_encode($output));
 		}
 	}
 	

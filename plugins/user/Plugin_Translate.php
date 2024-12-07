@@ -1,5 +1,7 @@
 <?php
 
+use noother\Library\Internet;
+
 class Plugin_Translate extends Plugin {
 	
 	protected $config = array(
@@ -49,7 +51,7 @@ class Plugin_Translate extends Plugin {
 			break;
 		}
 		
-		if(false === $translation = libInternet::googleTranslate($this->data['text'], $sl, $tl, $sl=='auto'?true:false)) {
+		if(false === $translation = Internet::googleTranslate($this->data['text'], $sl, $tl, $sl=='auto'?true:false)) {
 			$this->reply("\x02Something weird occurred \x02");
 			return;
 		}

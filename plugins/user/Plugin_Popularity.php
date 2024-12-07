@@ -1,5 +1,7 @@
 <?php
 
+use noother\Library\IRC;
+
 class Plugin_Popularity extends Plugin {
 	
 	public $triggers = array('!luv', '!luvs');
@@ -79,7 +81,7 @@ class Plugin_Popularity extends Plugin {
 		
 		$top10 = array();
 		for($i=0;$i<10&&$i<sizeof($luvs);$i++) {
-			$top10[] = libIRC::noHighlight($luvs[$i]['nick']).' ('.sizeof($luvs[$i]['luvs']).')';
+			$top10[] = IRC::noHighlight($luvs[$i]['nick']).' ('.sizeof($luvs[$i]['luvs']).')';
 		}
 		$this->reply('Popularity ranking: '.implode(', ', $top10));
 	}
