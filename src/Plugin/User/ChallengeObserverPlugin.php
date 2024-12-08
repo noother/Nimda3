@@ -81,7 +81,7 @@ class ChallengeObserverPlugin extends Plugin {
 		$class = 'noother\\ChallengeSite\\'.self::SITES[$site]['class'];
 		if(self::SITES[$site]['requires_login']??false) {
 			$login = $this->Bot->CONFIG['logins'][$site] ?? null;
-			if(!isset($login) || $login['user'] == 'CHANGE_ME' || $login['password'] == 'CHANGE_ME') return null;
+			if(!isset($login) || in_array($login['user'], ['CHANGE_ME']) || in_array($login['password'], ['CHANGE_ME', 'PUT_BEARER_TOKEN'])) return null;
 		}
 
 		$ChallengeSite = new $class($login['user']??null, $login['password']??null);
