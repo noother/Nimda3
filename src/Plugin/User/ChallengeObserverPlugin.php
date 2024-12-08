@@ -17,7 +17,7 @@ class ChallengeObserverPlugin extends Plugin {
 	];
 
 	public $interval = 60;
-	public $triggers = ['!latest', '!recent', '!latest_challs', '!recent_challs', '!new_challs'];
+	public $triggers = ['!latest', '!recent', '!latest_challs', '!recent_challs', '!new_challs', '!update_challs'];
 	public $enabledByDefault = false;
 
 	public $helpTriggers = ['!latest'];
@@ -29,6 +29,11 @@ class ChallengeObserverPlugin extends Plugin {
 	}
 
 	public function isTriggered() {
+		if($this->data['trigger'] == '!update_challs' && $this->User->nick == $this->Bot->CONFIG['master']) {
+			$this->addJob('getDiff', $this->data['text']);
+			return;
+		}
+
 		$latest = $this->getVar('latest');
 		if(!$latest) return $this->reply('No challenges have been collected yet.');
 
