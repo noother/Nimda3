@@ -9,8 +9,6 @@ class HackTheBoxApi extends RestApiClient {
 	private const API_URL = 'https://labs.hackthebox.com/api';
 
 	private $Cache;
-	private $username;
-	private $password;
 
 	public function __construct(string $bearer_token) {
 		parent::__construct(self::API_URL);
