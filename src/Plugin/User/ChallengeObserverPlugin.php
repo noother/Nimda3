@@ -3,7 +3,6 @@
 namespace Nimda\Plugin\User;
 
 use Nimda\Plugin\Plugin;
-use noother\Network\HTTP;
 use noother\Network\SimpleHTTP;
 
 class ChallengeObserverPlugin extends Plugin {
@@ -17,7 +16,7 @@ class ChallengeObserverPlugin extends Plugin {
 	];
 
 	//public $interval = 60;
-	public $triggers = ['!latest', '!recent', '!latest_challs', '!recent_challs', '!new_challs', '!test_challs'];
+	public $triggers = ['!latest', '!recent', '!latest_challs', '!recent_challs', '!new_challs'];
 	public $enabledByDefault = false;
 
 	public $helpTriggers = ['!latest'];
@@ -29,11 +28,6 @@ class ChallengeObserverPlugin extends Plugin {
 	}
 
 	public function isTriggered() {
-		if($this->data['trigger'] == '!test_challs') {
-			$this->addJob('getDiff', $this->data['text']);
-			return;
-		}
-
 		$latest = $this->getVar('latest');
 		if(!$latest) return $this->reply('No challenges have been collected yet.');
 
