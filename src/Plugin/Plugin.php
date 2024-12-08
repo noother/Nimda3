@@ -31,7 +31,8 @@ abstract class Plugin {
 		$type = explode('\\', static::class)[2];
 		$classname = $this->getName();
 
-		$this->id           = strtolower("{$type}_{$classname}"); // ex, core_help / user_decide
+		if(!isset($this->originalInstance)) $this->originalInstance = $this;
+		$this->id           = strtolower($classname);
 		$this->Bot          = $Bot;
 		$this->MySQL        = $MySQL;
 		$this->lastInterval = time();
@@ -49,7 +50,7 @@ abstract class Plugin {
 	}
 
 	public function reload(): void {
-		$Reflector = new \ReflectionClass($this->originalInstance ?? $this);
+		$Reflector = new \ReflectionClass($this->originalInstance);
 
 		$old_filename = $Reflector->getFilename();
 		$old_shortname = $Reflector->getShortName();
@@ -69,7 +70,7 @@ abstract class Plugin {
 
 		$Plugin = new $new_classname($this->Bot, $this->MySQL);
 		$Plugin->id = $this->id;
-		$Plugin->originalInstance = $this->originalInstance ?? $this;
+		$Plugin->originalInstance = $this->originalInstance;
 
 		$Plugin->onLoad();
 
@@ -101,7 +102,7 @@ abstract class Plugin {
 	public final function addJob($callback, $data=null) {
 		$filename = md5(rand()).'.json';
 		$data = array(
-			'classname'         => static::class,
+			'classname'         => $this->originalInstance::class,
 			'origin'            => array(
 				'plugin'            => $this->id,
 				'server'            => ($this->Server ? $this->Server->id : false),
@@ -117,7 +118,7 @@ abstract class Plugin {
 		$filepath = 'tmp/jobs/'.$filename;
 		
 		file_put_contents($filepath, json_encode($data));
-		shell_exec('./startjob '.escapeshellarg($filepath).' > /dev/null &');
+		shell_exec('./startjob '.escapeshellarg($filepath).' >/dev/null &');
 		
 		$this->Bot->jobCount++;
 		if($this->Bot->jobCount > $this->Bot->jobCountMax) $this->Bot->jobCountMax = $this->Bot->jobCount;
