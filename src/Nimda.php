@@ -111,7 +111,8 @@ class Nimda {
 			}
 			
 			$sql = $updates[2][$i-1];
-			$this->MySQL->multiQuery($sql);
+			$sqls = explode(';', $sql);
+			$this->MySQL->multiQuery($sqls);
 			echo "done\n";
 		}
 		
