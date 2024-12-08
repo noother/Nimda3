@@ -15,7 +15,7 @@ class ChallengeObserverPlugin extends Plugin {
 		'WeChall'     => ['class' => 'WeChall'],
 	];
 
-	//public $interval = 60;
+	public $interval = 60;
 	public $triggers = ['!latest', '!recent', '!latest_challs', '!recent_challs', '!new_challs'];
 	public $enabledByDefault = false;
 
@@ -62,7 +62,7 @@ class ChallengeObserverPlugin extends Plugin {
 				$this->sendToEnabledChannels($text);
 				continue;
 			} elseif($data['challs'] != $old_sites[$site]['challs']) {
-				$this->announceChanges($data['name']);
+				$this->addJob('getDiff', $site);
 			}
 		}
 
