@@ -95,7 +95,7 @@ final class Server {
 			$this->sendRaw('AUTHENTICATE PLAIN', true);
 			
 			$this->waitFor(function($msg) {
-				return strpos($msg['raw'], 'AUTHENTICATE +') !== false;
+				return strpos($msg['raw'], 'AUTHENTICATE :+') !== false;
 			});
 			
 			$auth = base64_encode(implode(chr(0), [$d['username'], $d['username'], $d['pass']]));
