@@ -9,6 +9,7 @@
 	},
 	"logins": {
 		"BrainQuest": {"user": "CHANGE_ME", "password": "CHANGE_ME"},
-		"HackMyVM": {"user": "CHANGE_ME", "password": "CHANGE_ME"}
+		"HackMyVM": {"user": "CHANGE_ME", "password": "CHANGE_ME"},
+		"Hack The Box": {"user": "whatever", "password": "PUT_BEARER_TOKEN"}
 	}
 }
