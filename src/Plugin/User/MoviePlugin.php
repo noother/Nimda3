@@ -6,7 +6,10 @@ use Nimda\Plugin\Plugin;
 use noother\Network\HTTP;
 
 class MoviePlugin extends Plugin {
-	
+	// TODO: broken
+	public $enabledByDefault = false;
+	public $hideFromHelp = true;
+
 	public $triggers = array('!movie', '!tmdb', '!film');
 	public $usage = '<movie>';
 	

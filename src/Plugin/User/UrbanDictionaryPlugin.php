@@ -6,7 +6,10 @@ use Nimda\Plugin\Plugin;
 use noother\Network\SimpleHTTP;
 
 class UrbanDictionaryPlugin extends Plugin {
-	
+	// TODO: broken
+	public $enabledByDefault = false;
+	public $hideFromHelp = true;
+
 	public $triggers = array('!wtf', '!define', '!urban', '!ud', '!urban-dictionary');
 	public $usage = '<term>';
 	

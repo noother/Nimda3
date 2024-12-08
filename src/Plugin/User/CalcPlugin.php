@@ -13,7 +13,7 @@ use noother\Network\SimpleHTTP;
 
 class CalcPlugin extends Plugin {
 	// TODO: broken
-	protected $enabledByDefault = false;
+	public $enabledByDefault = false;
 	public $hideFromHelp = true;
 
 	public $triggers = array('!calc','!math');

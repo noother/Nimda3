@@ -18,7 +18,7 @@ class ReversePlugin extends Plugin {
 			return;
 		}
 
-		$this->reply(mb_strrev($this->data['text']));
+		$this->reply($this->User->nick.': '.mb_strrev($this->data['text']));
 	}
 	
 }

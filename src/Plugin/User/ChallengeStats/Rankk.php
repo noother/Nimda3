@@ -4,7 +4,9 @@ namespace Nimda\Plugin\User\ChallengeStats;
 
 class Rankk extends ChallengeStats {
 	
-	public $triggers = array('!rk', '!rankk', '!pyramid');
+	// TODO: broken
+	//public $triggers = array('!rk', '!rankk', '!pyramid');
+	public $triggers = [];
 	
 	protected $url        = 'http://www.rankk.org';
 	protected $profileUrl = 'http://www.rankk.org/user/%s';

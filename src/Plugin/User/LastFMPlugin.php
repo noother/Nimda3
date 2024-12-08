@@ -6,7 +6,10 @@ use Nimda\Plugin\Plugin;
 use noother\Network\SimpleHTTP;
 
 class LastFMPlugin extends Plugin {
-	
+	// TODO: broken
+	public $enabledByDefault = false;
+	public $hideFromHelp = true;
+
 	public $triggers = array('!np', '!lastfm', '!lfm');
 	public $usage = '[nick]';
 	

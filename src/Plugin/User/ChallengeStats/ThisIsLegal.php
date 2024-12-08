@@ -5,8 +5,9 @@ namespace Nimda\Plugin\User\ChallengeStats;
 use noother\Network\HTTP;
 
 class ThisIsLegal extends ChallengeStats {
-	
-	public $triggers = array('!til', '!thisislegal');
+	// TODO: broken
+	//public $triggers = array('!til', '!thisislegal');
+	public $triggers = [];
 	
 	protected $url       = 'http://www.thisislegal.com';
 	protected $statsText = '{username} solved {challs_solved} (of {challs_total}) challenges and is on rank {rank} (of {users_total}) with {score} (of {score_total}) points at {url}';

@@ -7,7 +7,10 @@ use noother\Library\Internet;
 use noother\Library\IRC;
 
 class InterpreterPlugin extends Plugin {
-	
+	// TODO: broken
+	public $enabledByDefault = false;
+	public $hideFromHelp = true;
+
 	public $triggers = array('!interpreter');
 	
 	public $helpTriggers = array('!interpreter');

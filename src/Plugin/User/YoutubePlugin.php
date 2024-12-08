@@ -6,7 +6,10 @@ use Nimda\Plugin\Plugin;
 use noother\Library\Internet;
 
 class YoutubePlugin extends Plugin {
-	
+	// TODO: broken
+	public $enabledByDefault = false;
+	public $hideFromHelp = true;
+
 	public $helpCategory = 'Internet';
 	public $helpText = "Observes the channel for youtube links and prints back information about it if found.";
 	

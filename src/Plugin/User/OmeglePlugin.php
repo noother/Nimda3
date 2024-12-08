@@ -6,7 +6,10 @@ use Nimda\Plugin\Plugin;
 use Nimda\Plugin\User\Omegle\Chatter;
 
 class OmeglePlugin extends Plugin {
-	
+	// TODO: broken
+	public $enabledByDefault = false;
+	public $hideFromHelp = true;
+
 	public $triggers = array('!chat', '!omegle', '!stopchat', '!stopomegle');
 	
 	public $helpTriggers = array('!chat');

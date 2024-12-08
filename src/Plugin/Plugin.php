@@ -18,7 +18,7 @@ abstract class Plugin {
 
 	// You can override the following properties in plugins
 	protected $config = array();
-	protected $enabledByDefault = true;
+	public $enabledByDefault = true;
 	public $triggers = array();
 	public $interval = 0;
 	public $helpTriggers = false;

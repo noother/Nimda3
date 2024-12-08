@@ -6,7 +6,10 @@ use Nimda\Plugin\Plugin;
 use noother\Network\SimpleHTTP;
 
 class TracePlugin extends Plugin {
-	
+	// TODO: broken
+	public $enabledByDefault = false;
+	public $hideFromHelp = true;
+
 	public $triggers = array('!trace');
 	
 	public $helpCategory = 'Internet';

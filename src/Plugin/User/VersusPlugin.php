@@ -6,7 +6,10 @@ use Nimda\Plugin\Plugin;
 use noother\Library\Internet;
 
 class VersusPlugin extends Plugin {
-	
+	// TODO: broken
+	public $enabledByDefault = false;
+	public $hideFromHelp = true;
+
 	public $triggers = array('!vs');
 	public $usage = '<word1>,<word2>';
 	

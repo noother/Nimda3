@@ -6,7 +6,10 @@ use Nimda\Plugin\Plugin;
 use noother\Network\SimpleHTTP;
 
 class WikiPlugin extends Plugin {
-	
+	// TODO: broken
+	public $enabledByDefault = false;
+	public $hideFromHelp = true;
+
 	public $triggers = array('!wiki', '!wikipedia', '!wiki-en', '!wiki-de', '!stupi');
 	public $usage = '<term>';
 	

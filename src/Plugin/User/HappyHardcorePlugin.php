@@ -6,7 +6,10 @@ use Nimda\Plugin\Plugin;
 use noother\Network\SimpleHTTP;
 
 class HappyHardcorePlugin extends Plugin {
-	
+	// TODO: broken
+	public $enabledByDefault = false;
+	public $hideFromHelp = true;
+
 	public $triggers = array('!hc', '!hhc', '!happyhardcore', '!happy-hardcore');
 	
 	public $helpTriggers = array('!hc');

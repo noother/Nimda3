@@ -3,8 +3,9 @@
 namespace Nimda\Plugin\User\ChallengeStats;
 
 class W3challs extends ChallengeStats {
-	
-	public $triggers = array('!w3c', '!w3challs');
+	// TODO: broken
+	//public $triggers = array('!w3c', '!w3challs');
+	public $triggers = [];
 	
 	protected $url        = 'http://w3challs.com';
 	protected $profileUrl = 'http://w3challs.com/profile/%s';

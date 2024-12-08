@@ -6,7 +6,10 @@ use Nimda\Plugin\Plugin;
 use noother\Library\Internet;
 
 class TranslatePlugin extends Plugin {
-	
+	// TODO: broken
+	public $enabledByDefault = false;
+	public $hideFromHelp = true;
+
 	protected $config = array(
 		'language' => array(
 			'type' => 'enum',

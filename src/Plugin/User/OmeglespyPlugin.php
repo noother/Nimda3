@@ -6,7 +6,10 @@ use Nimda\Plugin\Plugin;
 use Nimda\Plugin\User\Omegle\Omegle;
 
 class OmeglespyPlugin extends Plugin {
-	
+	// TODO: broken
+	public $enabledByDefault = false;
+	public $hideFromHelp = true;
+
 	public $triggers = array('!omeglespy', '!chatspy', '!eavesdrop', '!stopspy', '!alice', '!bob');
 	
 	public $helpTriggers = array('!omeglespy');

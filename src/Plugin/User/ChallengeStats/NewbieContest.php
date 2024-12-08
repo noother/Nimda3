@@ -4,7 +4,9 @@ namespace Nimda\Plugin\User\ChallengeStats;
 
 class NewbieContest extends ChallengeStats {
 	
-	public $triggers = array('!nbc', '!newbiecontest');
+	// TODO: broken
+	//public $triggers = array('!nbc', '!newbiecontest');
+	public $triggers = [];
 	
 	protected $url        = 'http://www.newbiecontest.org';
 	protected $profileUrl = 'http://www.newbiecontest.org/userscore.php?username=%s';

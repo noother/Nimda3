@@ -3,8 +3,9 @@
 namespace Nimda\Plugin\User\ChallengeStats;
 
 class RevolutionElite extends ChallengeStats {
-	
-	public $triggers = array('!rev', '!revolution', '!revolutionelite');
+	// TODO: broken
+	//public $triggers = array('!rev', '!revolution', '!revolutionelite');
+	public $triggers = [];
 	
 	protected $url        = 'http://revolutionelite.co.uk';
 	protected $profileUrl = 'https://www.sabrefilms.co.uk/revolutionelite/w3ch4ll/userscore.php?username=%s';

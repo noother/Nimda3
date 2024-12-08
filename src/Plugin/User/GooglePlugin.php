@@ -6,7 +6,10 @@ use Nimda\Plugin\Plugin;
 use noother\Library\Internet;
 
 class GooglePlugin extends Plugin {
-	
+	// TODO: broken
+	public $enabledByDefault = false;
+	public $hideFromHelp = true;
+
 	public $triggers = array('!google');
 	
 	public $usage = '<search_term>';
