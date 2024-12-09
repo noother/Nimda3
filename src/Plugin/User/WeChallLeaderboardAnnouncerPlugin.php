@@ -77,6 +77,8 @@ class WeChallLeaderboardAnnouncerPlugin extends Plugin {
 
 		$winners = [];
 		foreach($diff as $user => $user_diff) {
+			if(!isset($user_diff['points'])) continue; // Don't send message if points didn't change to prevent mass announcement in case a user gets deleted
+
 			$rankups = ($user_diff['rank']??0)*-1;
 			if($rankups <= 0) continue; // Only send messages for winners
 
