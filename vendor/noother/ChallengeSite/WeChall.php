@@ -6,6 +6,11 @@ class WeChall extends ChallengeSite {
 	protected const DOMAIN = 'www.wechall.net';
 	protected const SANITYCHECK_MIN_CHALLS = 150;
 
+	protected function login(string $username, string $password): void {
+		$this->HTTP->setCookie('WC', 'i_like_cookies');
+		$this->HTTP->POST('/login', ['username' => $username, 'password' => $password, 'login' => 'Login']);
+	}
+
 	public function doGetChallenges(): array {
 		$res = $this->HTTP->GET('/all_challs/');
 		preg_match('#<table class="wc_chall_table">.+?</table>#s', $res, $arr);
@@ -33,8 +38,22 @@ class WeChall extends ChallengeSite {
 		return $challs;
 	}
 
-	protected function login(string $username, string $password): void {
-		$this->HTTP->setCookie('WC', 'i_like_cookies');
-		$this->HTTP->POST('/login', ['username' => $username, 'password' => $password, 'login' => 'Login']);
+	public function getLeaderboard(int $pages=1): array {
+		$html = '';
+		for($page=1;$page<=$pages;$page++) {
+			$html.= $this->HTTP->GET("/ranking/page-$page");
+		}
+
+		preg_match_all('#<tr id="rank_(\d+)".+?<a href="/profile/.+?>(.+?)</a>.+?"gwf_num">.+?"gwf_num">(\d+)</td>#s', $html, $arr, PREG_SET_ORDER);
+		$leaderboard = [];
+		foreach($arr as $item) {
+			$leaderboard[] = [
+				'rank'   => (int)$item[1],
+				'user'   => $item[2],
+				'points' => (int)$item[3],
+			];
+		}
+
+		return $leaderboard;
 	}
 }
