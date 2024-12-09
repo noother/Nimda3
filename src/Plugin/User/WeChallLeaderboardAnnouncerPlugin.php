@@ -49,7 +49,7 @@ class WeChallLeaderboardAnnouncerPlugin extends Plugin {
 
 		$winners = $this->getWinners($old_leaderboard, $new_leaderboard);
 		foreach($winners as $winner) {
-			$message = sprintf("\x02[Leaderboard]\x02 %s %s %s and is now on rank %d (from %d) with %d points. He needs %d more points %s. %s",
+			$message = sprintf("\x02[Leaderboard]\x02 \x02%s\x02 %s \x02%s\x02 and is now on rank \x02%d\x02 (from %d) with \x02%d\x02 points. He needs \x02%d\x02 more points %s. %s",
 				$winner['user'],
 				self::VERBS[array_rand(self::VERBS)],
 				$winner['losers'],
