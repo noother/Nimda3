@@ -41,7 +41,7 @@ class WeChallLeaderboardAnnouncerPlugin extends Plugin {
 		if(!$this->getVar('leaderboard')) $this->saveVar('leaderboard', $this->getLeaderboard());
 	}
 
-	public function onInverval() {
+	public function onInterval() {
 		if(empty($this->getEnabledChannels())) return;
 
 		$new_leaderboard = $this->getLeaderboard();
