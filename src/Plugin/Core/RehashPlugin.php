@@ -11,7 +11,7 @@ class RehashPlugin extends Plugin {
 	public $hideFromHelp = true;
 
 	public function isTriggered() {
-		if($this->User->nick != $this->Bot->CONFIG['master']) {
+		if($this->User->nick != $this->Bot->CONFIG['master']) { // TODO: need auth
 			$this->reply("You have to be a {$this->Bot->CONFIG['master']} to use this command");
 			return;
 		}

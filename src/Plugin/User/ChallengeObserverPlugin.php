@@ -29,7 +29,7 @@ class ChallengeObserverPlugin extends Plugin {
 	}
 
 	public function isTriggered() {
-		if($this->data['trigger'] == '!update_challs' && $this->User->nick == $this->Bot->CONFIG['master']) {
+		if($this->data['trigger'] == '!update_challs' && $this->User->nick == $this->Bot->CONFIG['master']) { // TODO: need auth
 			$this->addJob('getDiff', $this->data['text']);
 			return;
 		}

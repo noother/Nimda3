@@ -13,7 +13,7 @@ class ConfigPlugin extends Plugin {
 	public $helpText = "Let's you configure the plugin for your channel / yourself (in query). To set channel configuration you have to be an operator in the channel";
 	
 	function isTriggered() {
-		if($this->Channel !== false && $this->User->mode != '@') {
+		if(!$this->isAuthorized()) {
 			$this->reply('You have to be an operator in this channel to use !config.');
 			return;
 		}
@@ -42,7 +42,15 @@ class ConfigPlugin extends Plugin {
 			$this->_listConfig($Plugin);
 		}
 	}
-	
+
+	private function isAuthorized(): bool {
+		if($this->User->nick == $this->Bot->CONFIG['master']) return true; // TODO: Need auth
+		if($this->Channel === false) return true; // Users can set configs for private queries
+		if($this->User->mode == '@') return true; // Channel OPs
+
+		return false;
+	}
+
 	private function _listConfig($Plugin) {
 		$config = $Plugin->getConfigList();
 		$plugin_name = $Plugin->getName();
