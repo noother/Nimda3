@@ -347,7 +347,12 @@ class Nimda {
 			)";
 		}
 		
-		$this->MySQL->query($sql);
+		try {
+			$this->MySQL->query($sql);
+		} catch(\Exception $e) {
+			// TODO: memory should use json, not serialize(), which won't have this problem
+			trigger_error("savePermanent() failed because utf8mb4 probably", E_USER_WARNING);
+		}
 		
 		$this->permanentVars[$type][$target][$name] = $value;
 	}
