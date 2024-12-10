@@ -2,6 +2,7 @@
 
 namespace Nimda\Plugin\Core;
 
+use Nimda\Common;
 use Nimda\Plugin\Plugin;
 
 class ServersPlugin extends Plugin {
@@ -10,7 +11,7 @@ class ServersPlugin extends Plugin {
 	public $hideFromHelp = true;
 	
 	function isTriggered() {
-		foreach($this->Bot->servers as $Server) {
+		foreach(Common::getBot()->servers as $Server) {
 			$output = $Server->host.': ';
 			foreach($Server->channels as $Channel) {
 				$output.= $Channel->name.' ';

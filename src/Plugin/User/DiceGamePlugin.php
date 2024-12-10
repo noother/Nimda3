@@ -2,6 +2,7 @@
 
 namespace Nimda\Plugin\User;
 
+use Nimda\Common;
 use Nimda\Plugin\Plugin;
 use noother\Library\IRC;
 use noother\Library\Strings;
@@ -136,12 +137,12 @@ class DiceGamePlugin extends Plugin {
 	}
 	
 	function onInterval() {
-		foreach($this->Bot->servers as $Server) {
+		foreach(Common::getBot()->servers as $Server) {
 			foreach($Server->channels as $Channel) {
 				$state = $Channel->getVar('dicegame_gamestate');
 				if(!$state) continue;
 				
-				if($state['state'] != 'stopped' && $state['last_action'] < $this->Bot->time-600) { // if nothing happend in the last 10 minutes
+				if($state['state'] != 'stopped' && $state['last_action'] < Common::getTime()-600) { // if nothing happend in the last 10 minutes
 					$Channel->removeVar('dicegame_gamestate');
 					$Channel->privmsg('DiceGame has been stopped due to inactivity.');
 				}
@@ -154,7 +155,7 @@ class DiceGamePlugin extends Plugin {
 			'state' => 'stopped',
 			'players' => array(),
 			'turn' => false,
-			'last_action' => $this->Bot->time
+			'last_action' => Common::getTime()
 		));
 		$this->loadGamestate();
 	}
@@ -530,7 +531,7 @@ class DiceGamePlugin extends Plugin {
 	}
 	
 	private function saveGamestate() {
-		$this->game['last_action'] = $this->Bot->time;
+		$this->game['last_action'] = Common::getTime();
 		$this->Channel->saveVar('dicegame_gamestate', $this->game);
 	}
 	

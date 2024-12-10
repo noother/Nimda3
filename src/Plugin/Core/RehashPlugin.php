@@ -2,6 +2,7 @@
 
 namespace Nimda\Plugin\Core;
 
+use Nimda\Configure;
 use Nimda\Plugin\Plugin;
 
 class RehashPlugin extends Plugin {
@@ -11,8 +12,8 @@ class RehashPlugin extends Plugin {
 	public $hideFromHelp = true;
 
 	public function isTriggered() {
-		if($this->User->nick != $this->Bot->CONFIG['master']) { // TODO: need auth
-			$this->reply("You have to be a {$this->Bot->CONFIG['master']} to use this command");
+		if($this->User->nick != Configure::read('master')) { // TODO: need auth
+			$this->reply('You have to be a '.Configure::read('master').' to use this command');
 			return;
 		}
 

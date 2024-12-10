@@ -2,6 +2,7 @@
 
 namespace Nimda\Plugin\User;
 
+use Nimda\Common;
 use Nimda\Plugin\Plugin;
 
 // Depends on Plugin_Seen
@@ -48,7 +49,7 @@ class LockdownPlugin extends Plugin {
 	}
 	
 	function onInterval() {
-		foreach($this->Bot->servers as $Server) {
+		foreach(Common::getBot()->servers as $Server) {
 			foreach($Server->channels as $Channel) {
 				if(!$Channel->getVar('lockdown_active')) continue;
 				
@@ -83,7 +84,7 @@ class LockdownPlugin extends Plugin {
 		
 		$this->channelLockdownCount++;
 		$this->interval = 5;
-		$this->lastInterval = $this->Bot->time;
+		$this->lastInterval = Common::getTime();
 	}
 	
 	private function stopChannelLockdown() {
@@ -217,7 +218,7 @@ class LockdownPlugin extends Plugin {
 			'server' => $this->Server->host,
 			'channel'=> $Channel->name,
 			'nick'   => $User->nick,
-			'time'   => $this->Bot->time
+			'time'   => Common::getTime()
 		));
 	}
 	

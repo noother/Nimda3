@@ -6,17 +6,18 @@ use noother\Database\MySQL;
 use Nimda\IRC\Server;
 
 class Nimda {
+	protected static $Instance;
+
 	public $servers = array();
 	public $plugins = array();
-	public $time;
 	public $MySQL;
 	public $version;
-	public $CONFIG = [];
 
 	public $timerCount;
 	public $jobCount;
 	public $jobCountMax;
 
+	private $time;
 	private $timersLastTriggered;
 	private $permanentVars = array();
 	private $jobsDoneDP;
@@ -25,6 +26,12 @@ class Nimda {
 		pcntl_async_signals(true);
 		pcntl_signal(SIGINT,   array($this, 'cleanShutdown'));
 		pcntl_signal(SIGTERM,  array($this, 'cleanShutdown'));
+
+		static::$Instance = $this;
+	}
+
+	public static function getInstance(): static {
+		return static::$Instance;
 	}
 
 	public function run(): never {
@@ -56,17 +63,19 @@ class Nimda {
 		}
 	}
 
-	private function initBot(): void {
-		$this->CONFIG = json_decode(file_get_contents('config/config.json'), true);
+	public function getTime(): int {
+		return $this->time;
+	}
 
+	private function initBot(): void {
 		$this->MySQL = new MySQL(
-			$this->CONFIG['mysql']['host'],
-			$this->CONFIG['mysql']['user'],
-			$this->CONFIG['mysql']['pass'],
-			$this->CONFIG['mysql']['db'],
-			$this->CONFIG['mysql']['port'],
+			Configure::read('mysql.host', 'localhost'),
+			Configure::read('mysql.user', 'nimda3'),
+			Configure::read('mysql.pass', 'nimda3'),
+			Configure::read('mysql.db',   'nimda3'),
+			Configure::read('mysql.port', 3306),
 		);
-		
+
 		$this->autoUpdateSQL();
 
 		$this->initJobs();
@@ -81,7 +90,7 @@ class Nimda {
 		if(empty($tmp)) $current_version = 0;
 		else $current_version = $this->MySQL->fetchColumn("SELECT `version` FROM `version`");
 		if($current_version === false) die("Error: Table version exists but has no entry.\n");
-		$this->version = '3.'.$current_version.'.x';
+		$this->version = '3.'.$current_version.'.x Reboot';
 		
 		preg_match_all('/-- \[(\d+?)\](.*?)-- \[\/\1\]/s', file_get_contents('sql_updates.sql'), $updates);
 		
@@ -129,7 +138,7 @@ class Nimda {
 	
 	public function connectServer($data) {
 		// Expects 1 full row of mysql table `servers`
-		$Server = new Server($this, $data['id'], $data['host'], $data['port'], $data['ssl'], $data['bind'], $data['sasl']);
+		$Server = new Server($data['id'], $data['host'], $data['port'], $data['ssl'], $data['bind'], $data['sasl']);
 		if(!empty($data['password'])) $Server->setPass($data['password']);
 		$Server->setUser(
 			$data['my_username'],
@@ -166,7 +175,7 @@ class Nimda {
 			echo "Loading $type plugin $name..\n";
 
 			require_once($file);
-			$Plugin = new $classname($this, $this->MySQL);
+			$Plugin = new $classname($this->MySQL);
 			$Plugin->onLoad();
 			$this->plugins[$Plugin->id] = $Plugin;
 		}

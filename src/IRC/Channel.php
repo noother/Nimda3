@@ -2,25 +2,23 @@
 
 namespace Nimda\IRC;
 
+use Nimda\Memory;
 use noother\Library\IRC;
 
-final class Channel extends Target {
+class Channel extends Target {
 	public $topic = '';
-	public $modes = array();
-	public $users = array();
-	
-	private $Bot;
-	
-	public function __construct($name, $Server) {
+	public $modes = [];
+	public $users = [];
+
+	public function __construct(string $name, Server $Server) {
 		$this->id     = strtolower($name);
 		$this->Server = $Server;
 		$this->name   = $name;
-		$this->Bot    = $Server->Bot;
-		
+
 		$this->sendMode();
 		$this->sendWho();
 	}
-	
+
 	private function sendMode() {
 		$this->Server->sendRaw('MODE '.$this->name, true);
 	}
@@ -125,18 +123,18 @@ final class Channel extends Target {
 	}
 	
 	public function saveVar($name, $value) {
-		$this->Bot->savePermanent($name, $value, 'channel', $this->Server->id.':'.$this->id);
+		Memory::write($name, $value, 'channel', $this->Server->id.':'.$this->id);
 	}
 	
 	public function getVar($name, $default=false) {
-		$value = $this->Bot->getPermanent($name, 'channel', $this->Server->id.':'.$this->id);
+		$value = Memory::read($name, 'channel', $this->Server->id.':'.$this->id);
 		if($value === false) return $default;
 		
 	return $value;
 	}
 	
 	public function removeVar($name) {
-		$this->Bot->removePermanent($name, 'channel', $this->Server->id.':'.$this->id);
+		Memory::delete($name, 'channel', $this->Server->id.':'.$this->id);
 	}
 	
 }

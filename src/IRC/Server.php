@@ -2,40 +2,39 @@
 
 namespace Nimda\IRC;
 
-final class Server {
+use Nimda\Memory;
+
+class Server {
 	private $socket = false;
-	private $sendQueue = array();
-	private $estimatedRecvq = array('messages' => array(), 'size' => 0, 'last_message_removed' => 0);
-	
+	private $sendQueue = [];
+	private $estimatedRecvq = ['messages' => [], 'size' => 0, 'last_message_removed' => 0];
 	private $waitingForPong = false;
 	private $floodCooldown = false;
-	private $connectCooldown = array('cooldown' => 0, 'last_connect' => 0);
+	private $connectCooldown = ['cooldown' => 0, 'last_connect' => 0];
 	private $lastLifeSign = 0;
-	private $myData = array();
-	private $supports = array();
-	
-	public $Bot;
-	public $id;
-	public $channels  = array();
-	public $users     = array();
-	public $host         = '';
-	public $port         = 0;
-	public $isSSL        = false;
-	public $useSASL      = false;
-	public $bind         = '';
-	public $Me;
+	private $myData = [];
+	private $supports = [];
+
+	public User $Me;
+	public string $id;
+	public array $channels = [];
+	public array $users    = [];
+	public string $host;
+	public int $port;
+	public bool $isSSL;
+	public bool $useSASL;
+	public string $bind;
 	//public $NickServ;
 	//public $nickservIdentifyCommand = false;
-	
-	public function __construct($Bot, $name, $host, $port, $ssl=false, $bind='0.0.0.0:0', $useSASL = false) {
-		$this->Bot          = $Bot;
+
+	public function __construct($name, $host, $port, $ssl=false, $bind='0.0.0.0:0', $useSASL = false) {
 		$this->id           = $name;
 		$this->host         = $host;
 		$this->port         = $port;
 		$this->isSSL        = $ssl;
 		$this->bind         = $bind;
 		$this->useSASL      = $useSASL;
-		
+
 		if($this->getVar('estimated_CLIENT_FLOOD') === false) $this->saveVar('estimated_CLIENT_FLOOD', -1);
 		if($this->getVar('estimated_RECVQ_SPEED') === false)  $this->saveVar('estimated_RECVQ_SPEED', 1);
 	}
@@ -53,13 +52,13 @@ final class Server {
 		$c = &$this->connectCooldown;
 		if($c['last_connect'] + $c['cooldown'] > time()) return false;
 		
-		$this->socket = @stream_socket_client(
+		$this->socket = stream_socket_client(
 			($this->isSSL?'ssl://':'').$this->host.':'.$this->port,
 			$errno,
 			$errstr,
 			5,
 			STREAM_CLIENT_CONNECT,
-			stream_context_create(array('socket' => array('bindto' => $this->bind)))
+			stream_context_create(['socket' => ['bindto' => $this->bind]])
 		);
 		
 		if(!$this->socket) {
@@ -125,8 +124,7 @@ final class Server {
 		
 		$message = fgets($this->socket);
 		if(!$message) return false;
-		while($message[strlen($message)-1] != "\n") $message.= fgets($this->socket);
-		
+
 		$message = trim($message);
 		echo '>> '.$message."\n";
 		
@@ -137,7 +135,7 @@ final class Server {
 
 	private function write($string) {
 		if(!$this->socket) return false;
-		
+
 		echo '<< '.$string."\n";
 		fputs($this->socket, $string."\r\n");
 		if($this->getVar('estimated_CLIENT_FLOOD') != -1) {
@@ -674,8 +672,10 @@ final class Server {
 		$this->saveVar('estimated_CLIENT_FLOOD', $new_client_flood);
 		if($new_recvq_speed !== false) $this->saveVar('estimated_RECVQ_SPEED', $new_recvq_speed);
 	}
-	
+
 	public function sendRaw($string, $bypass_queue=false) {
+		if(!$this->socket) return false;
+
 		if($bypass_queue) $this->write($string);
 		else $this->sendQueue[] = $string;
 	}
@@ -706,7 +706,7 @@ final class Server {
 	public function setNick($nick) {
 		$this->myData['nick'] = $nick;
 		
-		if($this->socket) $this->sendRaw('NICK '.$nick, true);
+		$this->sendRaw('NICK '.$nick, true);
 	}
 	
 	public function joinChannel($channel, $key=false) {
@@ -738,18 +738,18 @@ final class Server {
 	}
 	
 	public function saveVar($name, $value) {
-		$this->Bot->savePermanent($name, $value, 'server', $this->id);
+		Memory::write($name, $value, 'server', $this->id);
 	}
 	
 	public function getVar($name, $default=false) {
-		$value = $this->Bot->getPermanent($name, 'server', $this->id);
+		$value = Memory::read($name, 'server', $this->id);
 		if($value === false) return $default;
 		
 	return $value;
 	}
 	
 	public function removeVar($name) {
-		$this->Bot->removePermanent($name, 'server', $this->id);
+		Memory::delete($name, 'server', $this->id);
 	}
 	
 	function __destruct() {

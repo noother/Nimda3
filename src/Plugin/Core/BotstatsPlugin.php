@@ -2,6 +2,7 @@
 
 namespace Nimda\Plugin\Core;
 
+use Nimda\Common;
 use Nimda\Plugin\Plugin;
 use noother\Library\Time;
 
@@ -18,12 +19,12 @@ class BotstatsPlugin extends Plugin {
 	}
 	
 	function isTriggered() {
-		$uptime = Time::secondsToString($this->Bot->time - $this->started);
+		$uptime = Time::secondsToString(Common::getTime() - $this->started);
 		
-		$servercount = sizeof($this->Bot->servers);
+		$servercount = sizeof(Common::getBot()->servers);
 		$channelcount = 0;
 		$usercount = 0;
-		foreach($this->Bot->servers as $Server) {
+		foreach(Common::getBot()->servers as $Server) {
 			$channelcount+= sizeof($Server->channels);
 			$usercount+= sizeof($Server->users);
 		}
@@ -37,10 +38,10 @@ class BotstatsPlugin extends Plugin {
 				$mem_current,
 				$mem_peak,
 				$this->MySQL->queryCount,
-				$this->MySQL->queryCount / ($this->Bot->time - $this->started),
-				$this->Bot->jobCount,
-				$this->Bot->jobCountMax,
-				$this->Bot->timerCount,
+				$this->MySQL->queryCount / (Common::getTime() - $this->started),
+				Common::getBot()->jobCount,
+				Common::getBot()->jobCountMax,
+				Common::getBot()->timerCount,
 				$servercount,
 				$channelcount,
 				$usercount

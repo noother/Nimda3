@@ -2,11 +2,12 @@
 
 namespace Nimda\Plugin;
 
+use Nimda\Common;
+use Nimda\Memory;
 use noother\Library\Validate;
 
 abstract class Plugin {
 	public $id;
-	public $Bot;
 	public $Server;
 	public $Channel;
 	public $User;
@@ -27,13 +28,12 @@ abstract class Plugin {
 	public $hideFromHelp = false;
 	public $usage = false;
 
-	public function __construct($Bot, $MySQL) {
+	public function __construct($MySQL) {
 		$type = explode('\\', static::class)[2];
 		$classname = $this->getName();
 
 		if(!isset($this->originalInstance)) $this->originalInstance = $this;
 		$this->id           = strtolower($classname);
-		$this->Bot          = $Bot;
 		$this->MySQL        = $MySQL;
 		$this->lastInterval = time();
 		
@@ -68,13 +68,13 @@ abstract class Plugin {
 
 		$this->onUnload();
 
-		$Plugin = new $new_classname($this->Bot, $this->MySQL);
+		$Plugin = new $new_classname($this->MySQL);
 		$Plugin->id = $this->id;
 		$Plugin->originalInstance = $this->originalInstance;
 
 		$Plugin->onLoad();
 
-		$this->Bot->plugins[$this->id] = $Plugin;
+		Common::getBot()->plugins[$this->id] = $Plugin;
 	}
 
 	protected final function reply($string) {
@@ -120,23 +120,23 @@ abstract class Plugin {
 		file_put_contents($filepath, json_encode($data));
 		shell_exec('./startjob '.escapeshellarg($filepath).' >/dev/null &');
 		
-		$this->Bot->jobCount++;
-		if($this->Bot->jobCount > $this->Bot->jobCountMax) $this->Bot->jobCountMax = $this->Bot->jobCount;
+		Common::getBot()->jobCount++;
+		if(Common::getBot()->jobCount > Common::getBot()->jobCountMax) Common::getBot()->jobCountMax = Common::getBot()->jobCount;
 	}
 	
 	public final function saveVar($name, $value) {
-		$this->Bot->savePermanent($name, $value, 'plugin', $this->id);
+		Memory::write($name, $value, 'plugin', $this->id);
 	}
 	
 	public final function getVar($name, $default=false) {
-		$value = $this->Bot->getPermanent($name, 'plugin', $this->id);
+		$value = Memory::read($name, 'plugin', $this->id);
 		if($value === false) return $default;
 		
 	return $value;
 	}
 	
 	public final function removeVar($name) {
-		$this->Bot->removePermanent($name, 'plugin', $this->id);
+		Memory::delete($name, 'plugin', $this->id);
 	}
 	
 	public final function getConfigList() {
@@ -214,7 +214,7 @@ abstract class Plugin {
 	public final function getChannelsWithConfig($config, $value='yes') {
 		$channels = array();
 		
-		foreach($this->Bot->servers as $Server) {
+		foreach(Common::getBot()->servers as $Server) {
 			foreach($Server->channels as $Channel) {
 				if($Channel->getVar('config_'.$this->id.'_'.$config, $this->config[$config]['default']) === $value) {
 					$channels[] = $Channel;
@@ -251,7 +251,7 @@ abstract class Plugin {
 	}
 	
 	public final function getPluginByTrigger($trigger) {
-		foreach($this->Bot->plugins as $Plugin) {
+		foreach(Common::getBot()->plugins as $Plugin) {
 			if(array_search($trigger, $Plugin->triggers) !== false || ($trigger[0] != '!' && array_search('!'.$trigger, $Plugin->triggers) !== false)) {
 				$Plugin->Server  = $this->Server;
 				$Plugin->Channel = $this->Channel;
@@ -265,7 +265,7 @@ abstract class Plugin {
 	
 	public final function getPluginById($id) {
 		$id = strtolower($id);
-		foreach($this->Bot->plugins as $Plugin) {
+		foreach(Common::getBot()->plugins as $Plugin) {
 			if($Plugin->id == $id) {
 				$Plugin->Server  = $this->Server;
 				$Plugin->Channel = $this->Channel;
@@ -660,9 +660,9 @@ abstract class Plugin {
 	public final function triggerTimer() {
 		if(!$this->interval) return;
 		
-		if($this->Bot->time >= $this->lastInterval+$this->interval) {
+		if(Common::getTime() >= $this->lastInterval+$this->interval) {
 			$this->onInterval();
-			$this->lastInterval = $this->Bot->time;
+			$this->lastInterval = Common::getTime();
 		}
 	}
 	

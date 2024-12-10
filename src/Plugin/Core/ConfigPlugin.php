@@ -2,6 +2,7 @@
 
 namespace Nimda\Plugin\Core;
 
+use Nimda\Configure;
 use Nimda\Plugin\Plugin;
 
 class ConfigPlugin extends Plugin {
@@ -44,7 +45,7 @@ class ConfigPlugin extends Plugin {
 	}
 
 	private function isAuthorized(): bool {
-		if($this->User->nick == $this->Bot->CONFIG['master']) return true; // TODO: Need auth
+		if($this->User->nick == Configure::read('master')) return true; // TODO: Need auth
 		if($this->Channel === false) return true; // Users can set configs for private queries
 		if($this->User->mode == '@') return true; // Channel OPs
 

@@ -2,6 +2,7 @@
 
 namespace Nimda\Plugin\User;
 
+use Nimda\Common;
 use Nimda\Plugin\Plugin;
 use noother\Library\Time;
 
@@ -70,7 +71,7 @@ class SeenPlugin extends Plugin {
 			'channel' => $this->Channel->name,
 			'nick'    => $this->User->nick,
 			'text'    => $this->data['text'],
-			'time'    => $this->Bot->time
+			'time'    => Common::getTime(),
 		));
 	}
 	
@@ -84,7 +85,7 @@ class SeenPlugin extends Plugin {
 			'channel' => $this->Channel->name,
 			'nick'    => $this->User->nick,
 			'text'    => $this->data['text'],
-			'time'    => $this->Bot->time
+			'time'    => Common::getTime(),
 		));
 	}
 	
@@ -95,7 +96,7 @@ class SeenPlugin extends Plugin {
 			'server' => $this->Server->host,
 			'channel'=> $this->Channel->name,
 			'nick'   => $this->User->nick,
-			'time'   => $this->Bot->time
+			'time'   => Common::getTime(),
 		));
 	}
 	
@@ -106,7 +107,7 @@ class SeenPlugin extends Plugin {
 			'channel' => $this->Channel->name,
 			'nick'    => $this->User->nick,
 			'message' => isset($this->data['part_message']) ? $this->data['part_message'] : false,
-			'time'    => $this->Bot->time
+			'time'    => Common::getTime(),
 		));
 	}
 	
@@ -116,7 +117,7 @@ class SeenPlugin extends Plugin {
 			'server'  => $this->Server->host,
 			'nick'    => $this->User->nick,
 			'message' => $this->data['quit_message'],
-			'time'    => $this->Bot->time
+			'time'    => Common::getTime(),
 		));
 	}
 	*/

@@ -2,6 +2,7 @@
 
 namespace Nimda\Plugin\User;
 
+use Nimda\Common;
 use Nimda\Plugin\Plugin;
 use Nimda\Plugin\User\ZMachine\ZMachine;
 use noother\Library\Strings;
@@ -90,7 +91,7 @@ class ZMachinePlugin extends Plugin {
 		foreach($this->sessions as $session => $data) {
 			$this->process($session);
 			
-			if($this->Bot->time > $data['last_action']+self::MAX_IDLE_TIME) {
+			if(Common::getTime() > $data['last_action']+self::MAX_IDLE_TIME) {
 				$data['Target']->privmsg("Stopping your \x02".$data['game_name']."\x02 session due to inactivity.");
 				$this->autosave($session);
 				$this->removeSession($session);
@@ -163,7 +164,7 @@ class ZMachinePlugin extends Plugin {
 			'Game' => new ZMachine(self::FILEDIR.'/games/'.$info['gamefile']),
 			'game_id' => $info['id'],
 			'game_name' => $info['name'],
-			'last_action' => $this->Bot->time
+			'last_action' => Common::getTime()
 		);
 		
 		if(!$this->sessions[$session_id]['Game']->isReady) {
@@ -252,7 +253,7 @@ class ZMachinePlugin extends Plugin {
 				'name' => $data['Target']->name,
 				'score' => $score,
 				'moves' => $moves,
-				'time' => $this->Bot->time
+				'time' => Common::getTime()
 			));
 			
 			if($data['Target']->name != $cur['name']) {
@@ -328,7 +329,7 @@ class ZMachinePlugin extends Plugin {
 		usleep(5000); // Wait 5ms for the process to handle our message & send output - if it's not fast enough, output will be send to IRC on next timer interval
 		$this->process($session_id);
 		
-		$s['last_action'] = $this->Bot->time;
+		$s['last_action'] = Common::getTime();
 	}
 	
 	private function autosave($session_id) {

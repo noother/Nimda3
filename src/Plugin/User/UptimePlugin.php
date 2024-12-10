@@ -2,6 +2,7 @@
 
 namespace Nimda\Plugin\User;
 
+use Nimda\Common;
 use Nimda\Plugin\Plugin;
 use noother\Library\Time;
 
@@ -19,8 +20,8 @@ class UptimePlugin extends Plugin {
 	
 	function isTriggered() {
 		$this->reply(sprintf("Uptime: %s - Total Uptime: %s",
-			Time::secondsToString($this->Bot->time - $this->started),
-			Time::secondsToString($this->getVar('total_uptime', 0) + $this->Bot->time - $this->started)
+			Time::secondsToString(Common::getTime() - $this->started),
+			Time::secondsToString($this->getVar('total_uptime', 0) + Common::getTime() - $this->started)
 		));
 	}
 	

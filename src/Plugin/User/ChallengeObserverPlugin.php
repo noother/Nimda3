@@ -2,6 +2,7 @@
 
 namespace Nimda\Plugin\User;
 
+use Nimda\Configure;
 use Nimda\Plugin\Plugin;
 use noother\Network\SimpleHTTP;
 
@@ -29,7 +30,7 @@ class ChallengeObserverPlugin extends Plugin {
 	}
 
 	public function isTriggered() {
-		if($this->data['trigger'] == '!update_challs' && $this->User->nick == $this->Bot->CONFIG['master']) { // TODO: need auth
+		if($this->data['trigger'] == '!update_challs' && $this->User->nick == Configure::read('master')) { // TODO: need auth
 			$this->addJob('getDiff', $this->data['text']);
 			return;
 		}
@@ -80,7 +81,7 @@ class ChallengeObserverPlugin extends Plugin {
 
 		$class = 'noother\\ChallengeSite\\'.self::SITES[$site]['class'];
 		if(self::SITES[$site]['requires_login']??false) {
-			$login = $this->Bot->CONFIG['logins'][$site] ?? null;
+			$login = Configure::read("logins.$site");
 			if(!isset($login) || in_array($login['user'], ['CHANGE_ME']) || in_array($login['password'], ['CHANGE_ME', 'PUT_BEARER_TOKEN'])) return null;
 		}
 

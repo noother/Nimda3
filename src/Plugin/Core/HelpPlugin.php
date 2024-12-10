@@ -2,6 +2,7 @@
 
 namespace Nimda\Plugin\Core;
 
+use Nimda\Common;
 use Nimda\Plugin\Plugin;
 
 class HelpPlugin extends Plugin {
@@ -19,9 +20,9 @@ class HelpPlugin extends Plugin {
 		} else {
 			$last_triggered = $this->User->getVar('help_last_triggered', 0);
 			
-			if($this->Bot->time >= $last_triggered + 60) {
+			if(Common::getTime() >= $last_triggered + 60) {
 				$this->printHelp();
-				$this->User->saveVar('help_last_triggered', $this->Bot->time);
+				$this->User->saveVar('help_last_triggered', Common::getTime());
 			} else {
 				$this->reply('You can only show !help once a minute.');
 			}
@@ -30,7 +31,7 @@ class HelpPlugin extends Plugin {
 	
 	function printHelp() {
 		$categories = array();
-		foreach($this->Bot->plugins as $Plugin) {
+		foreach(Common::getBot()->plugins as $Plugin) {
 			if($Plugin->hideFromHelp) continue;
 			
 			if($Plugin->helpTriggers !== false) $triggers = $Plugin->helpTriggers;

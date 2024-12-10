@@ -2,6 +2,7 @@
 
 namespace Nimda\Plugin\Core;
 
+use Nimda\Common;
 use Nimda\Plugin\Plugin;
 
 class CTCPRepliesPlugin extends Plugin {
@@ -12,7 +13,7 @@ class CTCPRepliesPlugin extends Plugin {
 		switch($this->data['ctcp_command']) {
 			
 			case 'CLIENTINFO':
-				$this->User->ctcpReply('CLIENTINFO', 'Nimda v'.$this->Bot->version.' - https://github.com/noother/Nimda3/ - Tags: CLIENTINFO,FINGER,PING,TIME,VERSION,ACTION');
+				$this->User->ctcpReply('CLIENTINFO', 'Nimda v'.Common::getBot()->version.' - https://github.com/noother/Nimda3/ - Tags: CLIENTINFO,FINGER,PING,TIME,VERSION,ACTION');
 			break;
 			
 			case 'FINGER':
@@ -28,8 +29,8 @@ class CTCPRepliesPlugin extends Plugin {
 			break;
 			
 			case 'VERSION':
-				$text = 'Nimda v3.'.$this->Bot->version;
-				$this->User->ctcpReply('VERSION', 'Nimda v'.$this->Bot->version);
+				$text = 'Nimda v3.'.Common::getBot()->version;
+				$this->User->ctcpReply('VERSION', 'Nimda v'.Common::getBot()->version);
 			break;
 			
 		}

@@ -2,6 +2,8 @@
 
 namespace Nimda\IRC;
 
+use Nimda\Memory;
+
 final class User extends Target {
 	
 	public $nick     = '';
@@ -15,14 +17,11 @@ final class User extends Target {
 	
 	public $channels = array();
 	
-	private $Bot;
-	
 	public function __construct($nick, $Server) {
 		$this->id      = strtolower($nick);
 		$this->Server  = $Server;
 		$this->name    = $nick;
 		$this->nick    = $nick;
-		$this->Bot     = $Server->Bot;
 	}
 	
 	/*
@@ -93,18 +92,18 @@ final class User extends Target {
 	}
 	
 	public function saveVar($name, $value) {
-		$this->Bot->savePermanent($name, $value, 'user', $this->id);
+		Memory::write($name, $value, 'user', $this->id);
 	}
 	
 	public function getVar($name, $default=false) {
-		$value = $this->Bot->getPermanent($name, 'user', $this->id);
+		$value = Memory::read($name, 'user', $this->id);
 		if($value === false) return $default;
 		
 	return $value;
 	}
 	
 	public function removeVar($name) {
-		$this->Bot->removePermanent($name, 'user', $this->id);
+		Memory::delete($name, 'user', $this->id);
 	}
 	
 	
