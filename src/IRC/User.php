@@ -90,23 +90,16 @@ final class User extends Target {
 		
 		unset($this->Server->users[$this->id]);
 	}
-	
-	public function saveVar($name, $value) {
+
+	public function saveVar(string $name, mixed $value): void {
 		Memory::write($name, $value, 'user', $this->id);
 	}
-	
-	public function getVar($name, $default=false) {
-		$value = Memory::read($name, 'user', $this->id);
-		if($value === false) return $default;
-		
-	return $value;
-	}
-	
-	public function removeVar($name) {
-		Memory::delete($name, 'user', $this->id);
-	}
-	
-	
-}
 
-?>
+	public function getVar(string $name, mixed $default=null): mixed {
+		return Memory::read($name, 'user', $this->id) ?? $default;
+	}
+
+	public function removeVar(string $name): bool {
+		return Memory::delete($name, 'user', $this->id);
+	}
+}

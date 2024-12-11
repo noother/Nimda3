@@ -35,8 +35,8 @@ class Server {
 		$this->bind         = $bind;
 		$this->useSASL      = $useSASL;
 
-		if($this->getVar('estimated_CLIENT_FLOOD') === false) $this->saveVar('estimated_CLIENT_FLOOD', -1);
-		if($this->getVar('estimated_RECVQ_SPEED') === false)  $this->saveVar('estimated_RECVQ_SPEED', 1);
+		if($this->getVar('estimated_CLIENT_FLOOD') === null) $this->saveVar('estimated_CLIENT_FLOOD', -1);
+		if($this->getVar('estimated_RECVQ_SPEED') === null)  $this->saveVar('estimated_RECVQ_SPEED', 1);
 	}
 	
 	public function tick() {
@@ -209,7 +209,7 @@ class Server {
 				$this->users[$this->NickServ->id] = $this->NickServ;
 				
 				
-				if(false !== $var = $this->getVar('nickserv_identify_command')) {
+				if(null !== $var = $this->getVar('nickserv_identify_command')) {
 					$this->nickservIdentifyCommand = $var;
 				} else {
 					$this->NickServ->privmsg('ACC '.$this->Me->nick);
@@ -593,7 +593,7 @@ class Server {
 			else return false;
 		}
 		
-		if($this->getVar('estimated_CLIENT_FLOOD') !== -1 &&
+		if($this->getVar('estimated_CLIENT_FLOOD') != -1 &&
 			($this->estimatedRecvq['size'] + strlen($this->sendQueue[0]) > $this->getVar('estimated_CLIENT_FLOOD')) ||
 			(sizeof($this->estimatedRecvq['messages']) > 5)
 		) return false;
@@ -736,26 +736,20 @@ class Server {
 		
 	return $this->supports[$name];
 	}
-	
-	public function saveVar($name, $value) {
+
+	public function saveVar(string $name, mixed $value): void {
 		Memory::write($name, $value, 'server', $this->id);
 	}
-	
-	public function getVar($name, $default=false) {
-		$value = Memory::read($name, 'server', $this->id);
-		if($value === false) return $default;
-		
-	return $value;
+
+	public function getVar(string $name, mixed $default=null): mixed {
+		return Memory::read($name, 'server', $this->id) ?? $default;
 	}
-	
-	public function removeVar($name) {
-		Memory::delete($name, 'server', $this->id);
+
+	public function removeVar(string $name): bool {
+		return Memory::delete($name, 'server', $this->id);
 	}
-	
+
 	function __destruct() {
 		$this->quit('Terminating');
 	}
-	
 }
-
-?>

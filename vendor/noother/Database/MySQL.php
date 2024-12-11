@@ -127,6 +127,35 @@ class MySQL {
 	return $res[0];
 	}
 
+	/**
+	 * @param string|array $columns
+	 * @param int|array $conditions
+	 * @return string|array
+	 *
+	 * Returns string if $columns is a string (and not *) and array if $column is an array
+	 */
+	public function first($columns, string $table, $conditions=[]) {
+		$results = $this->select($columns, $table, $conditions, 1);
+		if(empty($results)) return null;
+
+		return is_array($columns) || $columns == '*' ? $results[0] : $results[0][$columns];
+	}
+
+	/**
+	 * @param string|array $columns
+	 * @param int|array $conditions
+	 */
+	public function select($columns, string $table, $conditions=[], int $limit=null): array {
+		$columns = (array)$columns;
+		// Keep * & function as they are
+		$columns = array_map(function($c) { return $c == '*' || strpos($c, '(') !== false ? $c : "`$c`"; }, $columns);
+		$columns = implode(', ', $columns);
+
+		$limit = isset($limit) ? "LIMIT $limit" : '';
+
+		return $this->query("SELECT $columns FROM `$table` ".$this->getWhere($conditions)." $limit");
+	}
+
 	// Return insert id
 	public function insert(string $table, array $data): int {
 		$columns = array_keys($data);
@@ -136,22 +165,15 @@ class MySQL {
 	return $this->query("INSERT INTO `$table` (".implode(', ', $columns).") VALUES (".implode(', ', $values).")");
 	}
 
-	// Return true if data got changed. Returns false if it didn't
-	public function update(string $table, $conditions, array $data): bool {
+	// Returns number of affected rows
+	public function update(string $table, array $data, $conditions=[]): int {
 		$updates = array();
 		foreach($data as $key => $value) {
 			if(is_null($value)) $updates[] = "`$key` = NULL";
 			else $updates[] = "`$key` = ".$this->escape($value);
 		}
 
-		if(!is_array($conditions)) $conditions = ['id' => $conditions];
-		$where = array();
-		foreach($conditions as $key => $value) {
-			$where[] = $this->getCompareString($key, $value);
-		}
-
-
-	return $this->query("UPDATE `$table` SET ".implode(', ', $updates)." WHERE ".implode(' AND ', $where));
+		return $this->query("UPDATE `$table` SET ".implode(', ', $updates)." ".$this->getWhere($conditions));
 	}
 
 	// Returns last insert id on INSERT or id on UPDATE
@@ -166,23 +188,23 @@ class MySQL {
 	return $this->insert($table, $data);
 	}
 
-	public function multiQuery(array $sqls) {
+	// Returns number of affected rows
+	public function delete(string $table, $conditions=[]): int {
+		return $this->query("DELETE FROM `$table` ".$this->getWhere($conditions));
+	}
+
+	public function multiQuery(array $sqls): void {
 		$queries = $this->splitQueries($sqls);
 
 		foreach($queries as $sql) {
 			$this->queryCount++;
 			$this->Instance->multi_query($sql);
 			do {
-				if($this->Instance->error) {
-					trigger_error("MySQL Error: ".$this->Instance->error." in multi-query\n", E_USER_WARNING);
-					return false;
-				}
+				if($this->Instance->error) throw new \Exception("MySQL Error: ".$this->Instance->error." in multi-query");
 
 				if(false !== $Result = $this->Instance->use_result()) $Result->close();
 			} while($this->Instance->more_results() && $this->Instance->next_result());
 		}
-
-	return true;
 	}
 
 	public function getAffectedRows() {
@@ -214,6 +236,22 @@ class MySQL {
 	return $this->max_allowed_packet;
 	}
 
+	/**
+	 * @param int|array $conditions
+	 */
+	private function getWhere($conditions=[]): string {
+		if(empty($conditions)) return '';
+
+		if(!is_array($conditions)) $conditions = ['id' => $conditions];
+
+		$where = [];
+		foreach($conditions as $key => $value) {
+			$where[] = $this->getCompareString($key, $value);
+		}
+
+		return 'WHERE '.implode(' AND ', $where);
+	}
+
 	private function getCompareString(string $key, ?string $value): string {
 		if(strstr($key, ' ')) {
 			list($column, $operator) = explode(' ', $key, 2);
@@ -239,8 +277,8 @@ class MySQL {
 			$value = $real_value;
 		}
 
-		if(is_int($value) || ctype_digit($value)) return $value;
 		if(is_null($value)) return "NULL";
+		if(is_int($value) || ctype_digit($value)) return $value;
 		if(is_bool($value)) return (int)$value;
 
 	return "'".addslashes($value)."'";

@@ -121,22 +121,16 @@ class Channel extends Target {
 			unset($User->channels[$this->id]);
 		}
 	}
-	
-	public function saveVar($name, $value) {
+
+	public function saveVar(string $name, mixed $value): void {
 		Memory::write($name, $value, 'channel', $this->Server->id.':'.$this->id);
 	}
-	
-	public function getVar($name, $default=false) {
-		$value = Memory::read($name, 'channel', $this->Server->id.':'.$this->id);
-		if($value === false) return $default;
-		
-	return $value;
-	}
-	
-	public function removeVar($name) {
-		Memory::delete($name, 'channel', $this->Server->id.':'.$this->id);
-	}
-	
-}
 
-?>
+	public function getVar(string $name, mixed $default=null): mixed {
+		return Memory::read($name, 'channel', $this->Server->id.':'.$this->id) ?? $default;
+	}
+
+	public function removeVar(string $name): bool {
+		return Memory::delete($name, 'channel', $this->Server->id.':'.$this->id);
+	}
+}

@@ -123,22 +123,19 @@ abstract class Plugin {
 		Common::getBot()->jobCount++;
 		if(Common::getBot()->jobCount > Common::getBot()->jobCountMax) Common::getBot()->jobCountMax = Common::getBot()->jobCount;
 	}
-	
-	public final function saveVar($name, $value) {
+
+	public function saveVar(string $name, mixed $value): void {
 		Memory::write($name, $value, 'plugin', $this->id);
 	}
-	
-	public final function getVar($name, $default=false) {
-		$value = Memory::read($name, 'plugin', $this->id);
-		if($value === false) return $default;
-		
-	return $value;
+
+	public function getVar(string $name, mixed $default=null): mixed {
+		return Memory::read($name, 'plugin', $this->id) ?? $default;
 	}
-	
-	public final function removeVar($name) {
-		Memory::delete($name, 'plugin', $this->id);
+
+	public function removeVar(string $name): bool {
+		return Memory::delete($name, 'plugin', $this->id);
 	}
-	
+
 	public final function getConfigList() {
 		$config = array();
 		foreach($this->config as $name => $def) {

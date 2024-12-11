@@ -256,10 +256,8 @@ class RoulettePlugin extends Plugin {
 	
 	private function restoreGame() {
 		$this->game = $this->Channel->getVar('roulette_gamedata');
-		
-		if($this->game === false) {
-			$this->initGame();
-		}
+
+		if(!isset($this->game)) $this->initGame();
 	}
 	
 	private function saveGame() {

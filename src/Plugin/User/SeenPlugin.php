@@ -20,7 +20,7 @@ class SeenPlugin extends Plugin {
 		}
 		
 		$data = $this->getVar(strtolower($this->data['text']));
-		if($data === false) {
+		if(!isset($data)) {
 			$this->reply('I don\'t know '.$this->data['text'].'.');
 			return;
 		}

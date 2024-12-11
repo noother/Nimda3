@@ -10,16 +10,15 @@ class Nimda {
 
 	public $servers = array();
 	public $plugins = array();
-	public $MySQL;
 	public $version;
 
 	public $timerCount;
 	public $jobCount;
 	public $jobCountMax;
 
+	private $MySQL;
 	private $time;
 	private $timersLastTriggered;
-	private $permanentVars = array();
 	private $jobsDoneDP;
 
 	public function __construct() {
@@ -32,6 +31,14 @@ class Nimda {
 
 	public static function getInstance(): static {
 		return static::$Instance;
+	}
+
+	public function getTime(): int {
+		return $this->time;
+	}
+
+	public function getDB(): MySQL {
+		return $this->MySQL;
 	}
 
 	public function run(): never {
@@ -61,10 +68,6 @@ class Nimda {
 
 			if(!$check) usleep(20000);
 		}
-	}
-
-	public function getTime(): int {
-		return $this->time;
 	}
 
 	private function initBot(): void {
@@ -315,96 +318,19 @@ class Nimda {
 			}
 		}
 	}
-	
-	public function savePermanent($name, $value, $type='bot', $target='me') {
-		if($this->getPermanent($name, $type, $target) === $value) return;
-		
-		$sql_value = serialize($value);
-		
-		if(false !== $this->getPermanent($name, $type, $target)) {
-			$sql = "
-				UPDATE
-					`memory`
-				SET
-					`value` = '".addslashes($sql_value)."',
-					`modified` = NOW()
-				WHERE
-					`type`   = '".addslashes($type)."' AND
-					`target` = '".addslashes($target)."' AND
-					`name`   = '".addslashes($name)."'
-			";
-		} else {
-			$sql = "
-				INSERT INTO
-					`memory` (`name`, `type`, `target`, `value`, `created`, `modified`)
-				VALUES (
-					'".addslashes($name)."',
-					'".addslashes($type)."',
-					'".addslashes($target)."',
-					'".addslashes($sql_value)."',
-					NOW(),
-					NOW()
-			)";
-		}
-		
-		try {
-			$this->MySQL->query($sql);
-		} catch(\Exception $e) {
-			// TODO: memory should use json, not serialize(), which won't have this problem
-			trigger_error("savePermanent() failed because utf8mb4 probably", E_USER_WARNING);
-		}
-		
-		$this->permanentVars[$type][$target][$name] = $value;
+
+	public function saveVar(string $name, mixed $value): void {
+		Memory::write($name, $value);
 	}
-	
-	public function getPermanent($name, $type='bot', $target='me') {
-		if(isset($this->permanentVars[$type][$target][$name])) {
-			return $this->permanentVars[$type][$target][$name];
-		}
-		
-		$value = $this->MySQL->fetchColumn("
-			SELECT
-				`value`
-			FROM
-				`memory`
-			WHERE
-				`type`   = '".addslashes($type)."' AND
-				`target` = '".addslashes($target)."' AND
-				`name`   = '".addslashes($name)."'
-		");
-		
-		if($value === false) {
-			$this->permanentVars[$type][$target][$name] = false;
-			return false;
-		}
-		
-		$value = unserialize($value);
-		
-		$this->permanentVars[$type][$target][$name] = $value;
-		
-	return $value;
+
+	public function getVar(string $name, mixed $default=null): mixed {
+		return Memory::read($name) ?? $default;
 	}
-	
-	public function removePermanent($name, $type='bot', $target='me') {
-		if(isset($this->permanentVars[$type][$target][$name])) {
-			unset($this->permanentVars[$type][$target][$name]);
-		}
-		
-		$sql = "
-			DELETE FROM
-				`memory`
-			WHERE
-				`type`   = '".addslashes($type)."' AND
-				`target` = '".addslashes($target)."' AND
-				`name`   = '".addslashes($name)."'
-		";
-		
-		$res = $this->MySQL->query($sql);
-		if(!$res) return false; // nothing deleted
-		
-	return true;
+
+	public function removeVar(string $name): bool {
+		return Memory::delete($name);
 	}
-	
+
 	public function cleanShutdown(int $signo, mixed $siginfo): void {
 		echo "Shutting down cleanly\n";
 		die();
