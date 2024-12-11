@@ -153,4 +153,6 @@
 	-- autoupdate created & modified fields
 	ALTER TABLE `memory` MODIFY COLUMN `created` datetime DEFAULT CURRENT_TIMESTAMP NOT NULL;
 	ALTER TABLE `memory` MODIFY COLUMN `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL;
+
+	UPDATE `version` SET `version` = '13';
 -- [/13]
