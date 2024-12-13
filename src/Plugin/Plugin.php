@@ -100,6 +100,7 @@ abstract class Plugin {
 	}
 	
 	public final function addJob($callback, $data=null) {
+		echo sprintf("Starting Job $this->id.$callback %s\n", is_string($data) ? $data : 'array');
 		$filename = md5(rand()).'.json';
 		$data = array(
 			'classname'         => $this->originalInstance::class,

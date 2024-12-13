@@ -9,13 +9,13 @@ use noother\Network\SimpleHTTP;
 class ChallengeObserverPlugin extends Plugin {
 	private const MAX_ANNOUNCE = 5;
 	private const SITES = [
-		'BrainQuest'   => ['class' => 'BrainQuest', 'requires_login' => true],
-		'HackMyVM'     => ['class' => 'HackMyVM',   'requires_login' => true],
-		'Hack The Box' => ['class' => 'HackTheBox', 'requires_login' => true],
-		'pwn.college'  => ['class' => 'PwnCollege'],
-		'PyDéfis'      => ['class' => 'PyDefis'],
-		'Root-Me'      => ['class' => 'RootMe'],
-		'WeChall'      => ['class' => 'WeChall'],
+		'BQ'   => ['class' => 'BrainQuest', 'requires_login' => true],
+		'HVM'  => ['class' => 'HackMyVM',   'requires_login' => true],
+		'HTB'  => ['class' => 'HackTheBox', 'requires_login' => true],
+		'PwnC' => ['class' => 'PwnCollege'],
+		'PY'   => ['class' => 'PyDefis'],
+		'Root' => ['class' => 'RootMe'],
+		'WC'   => ['class' => 'WeChall'],
 	];
 
 	public $interval = 60;

@@ -8,8 +8,8 @@
 		"db": "nimda3"
 	},
 	"logins": {
-		"BrainQuest": {"user": "CHANGE_ME", "password": "CHANGE_ME"},
-		"HackMyVM": {"user": "CHANGE_ME", "password": "CHANGE_ME"},
-		"Hack The Box": {"user": "whatever", "password": "PUT_BEARER_TOKEN"}
+		"BQ": {"user": "CHANGE_ME", "password": "CHANGE_ME"},
+		"HVM": {"user": "CHANGE_ME", "password": "CHANGE_ME"},
+		"HTB": {"user": "whatever", "password": "PUT_BEARER_TOKEN"}
 	}
 }
