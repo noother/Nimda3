@@ -349,7 +349,7 @@ class HTTP {
 			} else {
 				$tmp = explode(': ', $line, 2);
 				if(!isset($tmp[1])) $tmp[1] = '';
-				if($tmp[0] == 'Set-Cookie') {
+				if(strtolower($tmp[0]) == 'set-cookie') {
 					preg_match('#^(.+?)=(.+?)(:?;|$)#', $tmp[1], $arr);
 					$header['cookies'][$arr[1]] = $arr[2];
 				} else {
