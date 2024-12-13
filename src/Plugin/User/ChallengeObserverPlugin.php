@@ -14,6 +14,7 @@ class ChallengeObserverPlugin extends Plugin {
 		'Hack The Box' => ['class' => 'HackTheBox', 'requires_login' => true],
 		'pwn.college'  => ['class' => 'PwnCollege'],
 		'PyDéfis'      => ['class' => 'PyDefis'],
+		'Root-Me'      => ['class' => 'RootMe'],
 		'WeChall'      => ['class' => 'WeChall'],
 	];
 
