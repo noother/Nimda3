@@ -30,7 +30,7 @@ class Job {
 
 		$c = json_decode(file_get_contents('config/config.json'), true);
 		$MySQL = new MySQL($c['mysql']['host'], $c['mysql']['user'], $c['mysql']['pass'], $c['mysql']['db'], $c['mysql']['port']);
-		$this->Plugin = new $this->data['classname'](null, $MySQL);
+		$this->Plugin = new $this->data['classname']($MySQL);
 	}
 
 	private function processData() {
