@@ -104,20 +104,21 @@ class ChallengeObserverPlugin extends Plugin {
 		}
 
 		$site = $this->data['result']['site'];
+		$name = $this->getVar('sites')[$site]['name'];
 		$diff = $this->data['result']['diff'];
 
 		if(0 < $excess = count($diff['added']) - self::MAX_ANNOUNCE) $diff['added'] = array_slice($diff['added'], 0, self::MAX_ANNOUNCE);
 		foreach($diff['added'] as $chall) {
 			$text = $this->getAnnouncementText($chall);
-			$this->sendToEnabledChannels("\x02[New Challenge] $site -\x02 $text");
-			$this->addLatestChall($site, $text);
+			$this->sendToEnabledChannels("\x02[New Challenge] $name -\x02 $text");
+			$this->addLatestChall($name, $text);
 		}
 		if($excess > 0) $this->sendToEnabledChannels("and $excess more");
 
 		if(0 < $excess = count($diff['deleted']) - self::MAX_ANNOUNCE) $diff['deleted'] = array_slice($diff['deleted'], 0, self::MAX_ANNOUNCE);
 		foreach($diff['deleted'] as $chall) {
 			$text = $this->getAnnouncementText($chall);
-			$this->sendToEnabledChannels("\x02[Deleted Challenge] $site -\x02 $text");
+			$this->sendToEnabledChannels("\x02[Deleted Challenge] $name -\x02 $text");
 		}
 		if($excess > 0) $this->sendToEnabledChannels("and $excess more");
 	}
