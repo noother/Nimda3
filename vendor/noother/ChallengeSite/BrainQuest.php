@@ -8,6 +8,9 @@ class BrainQuest extends ChallengeSite {
 
 	public function doGetChallenges(): array {
 		$res = $this->HTTP->GET('/en/riddles');
+		$res.= $this->HTTP->GET('/en/adventures');
+		$res.= $this->HTTP->GET('/en/beta');
+
 		preg_match_all('#<tr id=\'trm_.+?</tr>#', $res, $arr);
 
 		$challs = [];
