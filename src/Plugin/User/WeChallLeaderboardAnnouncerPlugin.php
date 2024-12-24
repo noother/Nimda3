@@ -49,12 +49,11 @@ class WeChallLeaderboardAnnouncerPlugin extends Plugin {
 
 		$winners = $this->getWinners($old_leaderboard, $new_leaderboard);
 		foreach($winners as $winner) {
-			$message = sprintf("\x02[Leaderboard]\x02 \x02%s\x02 %s \x02%s\x02 and is now on rank \x02%d\x02 (from %d) with \x02%d\x02 points. He needs \x02%d\x02 more points %s. %s",
+			$message = sprintf("\x02[Leaderboard]\x02 \x02%s\x02 %s \x02%s\x02 and is now on rank \x02%d\x02 with \x02%d\x02 points. He needs \x02%d\x02 more points %s. %s",
 				$winner['user'],
 				self::VERBS[array_rand(self::VERBS)],
 				$winner['losers'],
-				$winner['rank_new'],
-				$winner['rank_old'],
+				$winner['rank'],
 				$winner['points'],
 				$winner['rankup_points'],
 				self::MOTIVATIONAL_PHRASES[array_rand(self::MOTIVATIONAL_PHRASES)],
@@ -82,12 +81,11 @@ class WeChallLeaderboardAnnouncerPlugin extends Plugin {
 			$rankups = ($user_diff['rank']??0)*-1;
 			if($rankups <= 0) continue; // Only send messages for winners
 
-			$rank_new = $new_by_user[$user]['rank'];
-			$rank_old = $old_by_user[$user]['rank'];
-			$points = $new[$rank_new-1]['points'];
-			$rankup_points = $new[$rank_new-2]['points'] - $points + 1;
+			$rank = $new_by_user[$user]['rank'];
+			$points = $new[$rank-1]['points'];
+			$rankup_points = $new[$rank-2]['points'] - $points + 1;
 
-			if($rank_new == 100) {
+			if($rank == 100) {
 				$losers = "no one, because he's rank 100 duh";
 			} else {
 				$losers = array_column(array_reverse(array_slice($new, $new_by_user[$user]['rank'], $rankups)), 'user');
@@ -99,8 +97,7 @@ class WeChallLeaderboardAnnouncerPlugin extends Plugin {
 
 			$winners[] = [
 				'user'     => $user,
-				'rank_new' => $rank_new,
-				'rank_old' => $rank_old,
+				'rank'     => $rank,
 				'losers'   => $losers,
 				'points'   => $points,
 				'rankup_points' => $rankup_points,
