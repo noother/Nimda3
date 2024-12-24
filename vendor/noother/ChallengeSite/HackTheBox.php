@@ -38,7 +38,7 @@ class HackTheBox extends ChallengeSite {
 		foreach($this->Api->getChallenges() as $item) {
 			$challs[] = [
 				'name'      => $item['name'],
-				'url'       => 'https://'.self::DOMAIN.'/challenges/'.urlencode($item['name']),
+				'url'       => 'https://'.self::DOMAIN.'/challenges/'.$this->htbUrlencode($item['name']),
 				'rating'    => $item['difficulty'],
 				'category'  => 'Challenges => '.$item['category_name'],
 				'solves'    => $item['solves'],
@@ -54,7 +54,7 @@ class HackTheBox extends ChallengeSite {
 		foreach($this->Api->getSherlocks() as $item) {
 			$challs[] = [
 				'name'      => $item['name'],
-				'url'       => 'https://'.self::DOMAIN.'/sherlocks/'.urlencode($item['name']),
+				'url'       => 'https://'.self::DOMAIN.'/sherlocks/'.$this->htbUrlencode($item['name']),
 				'rating'    => $item['difficulty'],
 				'category'  => 'Sherlock => '.$item['category_name'],
 				'solves'    => $item['solves'],
@@ -70,7 +70,7 @@ class HackTheBox extends ChallengeSite {
 		foreach($res as $item) {
 			$challs[] = [
 				'name'      => $item['name'],
-				'url'       => 'https://'.self::DOMAIN.'/machines/'.urlencode($item['name']),
+				'url'       => 'https://'.self::DOMAIN.'/machines/'.$this->htbUrlencode($item['name']),
 				'rating'    => $item['difficultyText'],
 				'points'    => $item['static_points'],
 				'solves'    => $item['root_owns_count'],
@@ -79,5 +79,14 @@ class HackTheBox extends ChallengeSite {
 		}
 
 		return $challs;
+	}
+
+	private function htbUrlencode(string $string): string {
+		/**
+		 * URLs don't work if urlencoded normally, instead HTB appears to only encode space and it must be encoded with %20 instead of +
+		 * Challenges are also double encoded, but it works with single encoding as well
+		 */
+
+		return str_replace(' ', '%20', $string);
 	}
 }
