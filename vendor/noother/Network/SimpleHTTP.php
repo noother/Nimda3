@@ -5,15 +5,15 @@ namespace noother\Network;
 use noother\Network\HTTP;
 
 class SimpleHTTP {
-	public static function GET(string $url): string {
+	public static function GET(string $url): ?string {
 		return self::execute($url, 'GET');
 	}
 
-	public static function POST(string $url, ?array $post=null): string {
+	public static function POST(string $url, array $post=null): ?string {
 		return self::execute($url, 'POST', $post);
 	}
 
-	private static function execute(string $url, string $method, ?array $post=null): string {
+	private static function execute(string $url, string $method, array $post=null): ?string {
 		$data = parse_url($url);
 
 		switch($data['scheme']) {
