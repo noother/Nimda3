@@ -19,6 +19,7 @@ class ZMachinePlugin extends Plugin {
 	
 	private $sessions = array();
 	private $games = array();
+	private $nick;
 	
 	const FILEDIR = __DIR__.'/ZMachine/files';
 	const MAX_SESSIONS = 100;
@@ -35,6 +36,7 @@ class ZMachinePlugin extends Plugin {
 	}
 	
 	function isTriggered() {
+		$this->nick = $this->User->nick;
 		$session_id = $this->getSessionId();
 		if(isset($this->sessions[$session_id])) {
 			$this->sendCommand($session_id, $this->data['text']);
@@ -198,14 +200,20 @@ class ZMachinePlugin extends Plugin {
 		$messages = $Game->getData();
 		
 		foreach($messages as $msg) {
+
 			switch($msg['type']) {
 				case 'text':
 					if($msg['text'] == '') $msg['text'] = "\xc2\xa0"; // whitespace
+					if($msg['text'] == $messages[count($messages)-1]['text']) $msg['text'] = $this->nick.': '.$msg['text'];
 					$Target->privmsg($msg['text']);
 				break;
 				
 				case 'location_info':
-					$Target->privmsg("\x02".$msg['text']."\x02");
+					if(count($messages) == 1) {
+						$Target->privmsg($this->nick.": Location: ".$msg['text']);
+					} else {
+						$Target->privmsg("\x02".$msg['text']."\x02");
+					}
 				break;
 				
 				case 'score_change':
