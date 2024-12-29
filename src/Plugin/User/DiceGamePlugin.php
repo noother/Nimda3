@@ -412,7 +412,7 @@ class DiceGamePlugin extends Plugin {
 		foreach($players as $player) {
 			$player_exists = false;
 			foreach($ranking as $key => $rank) {
-				if($rank['nick'] == $player['nick']) {
+				if(strtolower($rank['nick']) == strtolower($player['nick'])) {
 					$player_exists = true;
 					break;
 				}
@@ -427,12 +427,13 @@ class DiceGamePlugin extends Plugin {
 				);
 				$key = sizeof($ranking)-1;
 			}
-			
+
 			$rank = &$ranking[$key];
-			
+			$rank['nick'] = $player['nick'];
 			$rank['played']++;
 			$rank['last_played'] = time();
 			if($rank['nick'] == $winner['nick']) $rank['won']++;
+			unset($rank);
 		}
 		
 		usort($ranking, array('self', 'sortByWon'));
