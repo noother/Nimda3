@@ -482,7 +482,7 @@ class DiceGamePlugin extends Plugin {
 		
 		if(preg_match('/[^0-9]/', $nick)) {
 			foreach($ranking as $index => $rank) {
-				if($rank['nick'] == $nick) {
+				if(strtolower($rank['nick']) == strtolower($nick)) {
 					$stats = $rank;
 					$stats['rank'] = $index+1;
 					break;
