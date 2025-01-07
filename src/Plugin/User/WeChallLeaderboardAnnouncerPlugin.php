@@ -45,6 +45,7 @@ class WeChallLeaderboardAnnouncerPlugin extends Plugin {
 		if(empty($this->getEnabledChannels())) return;
 
 		$new_leaderboard = $this->getLeaderboard();
+		if(!isset($new_leaderboard)) return; // Wechall down
 		$old_leaderboard = $this->getVar('leaderboard');
 
 		$winners = $this->getWinners($old_leaderboard, $new_leaderboard);
@@ -65,7 +66,7 @@ class WeChallLeaderboardAnnouncerPlugin extends Plugin {
 		$this->saveVar('leaderboard', $new_leaderboard);
 	}
 
-	private function getLeaderboard(): array {
+	private function getLeaderboard(): ?array {
 		return (new WeChall())->getLeaderboard(self::PAGES);
 	}
 

@@ -38,10 +38,12 @@ class WeChall extends ChallengeSite {
 		return $challs;
 	}
 
-	public function getLeaderboard(int $pages=1): array {
+	public function getLeaderboard(int $pages=1): ?array {
 		$html = '';
 		for($page=1;$page<=$pages;$page++) {
-			$html.= $this->HTTP->GET("/ranking/page-$page");
+			$res = $this->HTTP->GET("/ranking/page-$page");
+			if(!$res) return null;
+			$html.= $res;
 		}
 
 		preg_match_all('#<tr id="rank_(\d+)".+?<a href="/profile/.+?>(.+?)</a>.+?"gwf_num">.+?"gwf_num">(\d+)</td>#s', $html, $arr, PREG_SET_ORDER);
