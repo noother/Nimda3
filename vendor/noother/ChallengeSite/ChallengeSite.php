@@ -12,15 +12,16 @@ abstract class ChallengeSite {
 
 	protected $HTTP;
 	protected $debug = false;
+	protected $loggedIn = false;
 
 	private $Cache;
 	private $username;
 	private $password;
-	private $loggedIn = false;
 
 	public function __construct(string $username=null, string $password=null) {
 		$this->HTTP = new HTTP(static::DOMAIN, true);
 		$this->HTTP->set('debug', $this->debug);
+		$this->HTTP->set('verbose', $this->debug);
 		$this->HTTP->set('auto-follow', false);
 
 		$this->username = $username;
@@ -40,7 +41,10 @@ abstract class ChallengeSite {
 	protected function login(string $username, string $password): void {}
 
 	public function getChallenges(): array {
-		if(!$this->loggedIn && isset($this->username, $this->password)) $this->login($this->username, $this->password);
+		if(isset($this->username, $this->password)) {
+			$this->login($this->username, $this->password);
+			$this->loggedIn = true;
+		}
 
 		$challs = $this->doGetChallenges();
 		if(count($challs) < static::SANITYCHECK_MIN_CHALLS) throw new \Exception("Sanity check failed, got ".count($challs).' challenges instead of minimum '.static::SANITYCHECK_MIN_CHALLS);

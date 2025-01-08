@@ -11,8 +11,9 @@ class ChallengeObserverPlugin extends Plugin {
 	private const MAX_ANNOUNCE = 5;
 	private const SITES = [
 		'BQ'   => ['class' => 'BrainQuest', 'requires_login' => true],
-		'HVM'  => ['class' => 'HackMyVM',   'requires_login' => true],
 		'HTB'  => ['class' => 'HackTheBox', 'requires_login' => true],
+		'HVM'  => ['class' => 'HackMyVM',   'requires_login' => true],
+		'HTW'  => ['class' => 'HackTheWeb'],
 		'PwnC' => ['class' => 'PwnCollege'],
 		'PY'   => ['class' => 'PyDefis'],
 		'Root' => ['class' => 'RootMe'],
