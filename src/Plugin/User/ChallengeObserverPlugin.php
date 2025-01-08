@@ -118,7 +118,7 @@ class ChallengeObserverPlugin extends Plugin {
 		}
 
 		$site = $this->data['result']['site'];
-		$name = $this->getVar('sites')[$site]['name'];
+		$name = $this->getVar('sites')[$site]['name'] ?? self::SITES[$site]['class'];
 		$diff = $this->data['result']['diff'];
 
 		if(0 < $excess = count($diff['added']) - self::MAX_ANNOUNCE) $diff['added'] = array_slice($diff['added'], 0, self::MAX_ANNOUNCE);
