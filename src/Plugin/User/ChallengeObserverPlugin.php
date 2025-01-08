@@ -2,6 +2,7 @@
 
 namespace Nimda\Plugin\User;
 
+use Nimda\Common;
 use Nimda\Configure;
 use Nimda\Plugin\Plugin;
 use noother\Network\SimpleHTTP;
@@ -49,6 +50,18 @@ class ChallengeObserverPlugin extends Plugin {
 		$channels = $this->getEnabledChannels();
 		if(empty($channels)) return;
 
+		if(
+			(date('H', Common::getTime()) == '18' && Common::getTime() > $this->getVar('last_full_update')+60*60) // Trigger a full update every day at 18:00
+			|| Common::getTime() > $this->getVar('last_full_update')+24*60*60 // and also trigger it if the 18:xx timeframe was missed for some reason
+		) {
+			foreach(array_keys(self::SITES) as $site) {
+				$this->addJob('getDiff', $site);
+			}
+
+			$this->saveVar('last_full_update', time());
+			return;
+		}
+
 		$new_sites = $this->getSites();
 		if(!isset($new_sites)) return;
 
@@ -91,7 +104,7 @@ class ChallengeObserverPlugin extends Plugin {
 		try {
 			return ['site' => $site, 'diff' => $ChallengeSite->getChallengeDiff()];
 		} catch(\Exception $e) {
-			return ['error' => $e->getMessage()];
+			return ['site' => $site, 'error' => $e->getMessage()];
 		}
 	}
 
@@ -99,7 +112,7 @@ class ChallengeObserverPlugin extends Plugin {
 		if(!isset($this->data['result'])) return;
 
 		if(isset($this->data['result']['error'])) {
-			$this->sendToEnabledChannels('Error: '.$this->data['result']['error']);
+			$this->sendToEnabledChannels('Error: '.$this->data['result']['site'].': '.$this->data['result']['error']);
 			return;
 		}
 
