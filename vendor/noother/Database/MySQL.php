@@ -66,14 +66,18 @@ class MySQL {
 			$start = microtime(true);
 		}
 
-		if(false === $Result = $this->Instance->query($sql)) {
-			if($this->Instance->error == 'MySQL server has gone away') {
+		try {
+			if(false === $Result = $this->Instance->query($sql)) {
+				// This should be compatible with PHP7 which returns false instead of throwing an exception and PHP8
+				throw new \Exception($this->Instance->error, $this->Instance->errno);
+			}
+		} catch(\Exception $e) {
+			if($e->getMessage() == 'MySQL server has gone away') {
 				$this->connect();
 				return $this->query($sql);
-			} else {
-				throw new \Exception("MySQL Error: ".$this->Instance->error."\nSQL: ".$sql."\n", $this->Instance->errno);
-				return false;
 			}
+
+			throw new \Exception("MySQL Error: ".$e->getMessage()."\nSQL: $sql\n", $e->getCode());
 		}
 
 		if($this->queryLogFile !== false) {
