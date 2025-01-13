@@ -52,7 +52,7 @@ class ChallengeObserverPlugin extends Plugin {
 		if(empty($channels)) return;
 
 		if(
-			(date('H', Common::getTime()) == '18' && Common::getTime() > $this->getVar('last_full_update')+60*60) // Trigger a full update every day at 18:00
+			(date('H', Common::getTime()) == '17' && Common::getTime() > $this->getVar('last_full_update')+60*60) // Trigger a full update every day at 18:00
 			|| Common::getTime() > $this->getVar('last_full_update')+24*60*60 // and also trigger it if the 18:xx timeframe was missed for some reason
 		) {
 			foreach(array_keys(self::SITES) as $site) {
