@@ -4,14 +4,14 @@ namespace noother\ChallengeSite;
 
 class RootMe extends ChallengeSite {
 	protected const DOMAIN = 'www.root-me.org';
-	protected const SANITYCHECK_MIN_CHALLS = 500;
+	protected const SANITYCHECK_MIN_CHALLS = 580;
 
 	public function doGetChallenges(): array {
 		$categories = $this->getCategories();
 		$challs = [];
 		foreach($categories as $category) {
 			$challs = [...$challs, ...$this->getChalls($category)];
-			sleep(1); // There's some rate limit resulting in 429 Too Many Requests
+			sleep(2); // There's some rate limit resulting in 429 Too Many Requests
 		}
 
 		return $challs;
