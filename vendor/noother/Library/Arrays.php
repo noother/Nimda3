@@ -166,14 +166,14 @@ class Arrays {
 		$new = [];
 		foreach($diff[0] as $key => $value) {
 			if(is_array($value)) {
-				$new[$key] = self::diffRelative($value, $diff[1][$key]);
+				$new[$key] = self::diffRelative($value, $diff[1][$key]??[]);
 				continue;
 			}
 
 			if(is_numeric($value) && is_numeric($second[$key]??0)) {
 				$new[$key] = ($second[$key]??0) - $value;
 			} else {
-				$new[$key] = $second[$key];
+				$new[$key] = $second[$key] ?? null;
 			}
 		}
 
