@@ -10,6 +10,6 @@
 	"logins": {
 		"BQ": {"user": "CHANGE_ME", "password": "CHANGE_ME"},
 		"HVM": {"user": "CHANGE_ME", "password": "CHANGE_ME"},
-		"HTB": {"user": "whatever", "password": "PUT_BEARER_TOKEN"}
+		"HTB": {"user": "config/hackthebox_token.json", "password": "EMPTY"}
 	}
 }

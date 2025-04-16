@@ -1,3 +1,4 @@
 config/config.json
+config/hackthebox_token.json
 vendor/*
 !vendor/noother/

@@ -10,11 +10,10 @@ class HackTheBoxApi extends RestApiClient {
 
 	private $Cache;
 
-	public function __construct(string $bearer_token) {
+	public function __construct(string $token_file) {
 		parent::__construct(self::API_URL);
 
-		$this->checkTokenExpire($bearer_token);
-		$this->setBearerToken($bearer_token);
+		$this->setBearerToken($this->getAccessToken($token_file));
 	}
 
 	public function getActiveMachines(): array {
@@ -47,14 +46,32 @@ class HackTheBoxApi extends RestApiClient {
 		return isset($res['error']);
 	}
 
-	private function checkTokenExpire(string $token): void {
-		$tmp = explode('.', $token);
-		$token = json_decode(base64_decode($tmp[1]));
+	private function getAccessToken(string $token_file): string {
+		$token = json_decode(file_get_contents($token_file));
 
-		if($token->exp < time()-60) {
-			throw new \Exception('Token is expired');
-		} elseif($token->exp < time()+7*24*60*60) {
-			trigger_error('Token is about to expire on '.date('Y-m-d H:i:s', (int)$token->exp), E_USER_WARNING);
+		$tmp = explode('.', $token->access_token);
+
+		$decoded = json_decode(base64_decode($tmp[1]));
+		if(!isset($decoded)) throw new \Exception("Invalid access_token in $token_file");
+
+		if($decoded->exp < time()-300) {
+			$this->refreshToken($token_file);
+			return $this->getAccessToken($token_file);
 		}
+
+		return $token->access_token;
+	}
+
+	private function refreshToken(string $token_file): void {
+		$token = json_decode(file_get_contents($token_file));
+		if(!isset($token->refresh_token)) throw new \Exception("refresh_token unset in $token_file");
+
+		$res = $this->post('/v4/login/refresh', [
+			'refresh_token' => $token->refresh_token
+		]);
+
+		if(!isset($res['message']['access_token'])) throw new \Exception('Refreshing token failed: '.json_encode($res));
+
+		file_put_contents($token_file, json_encode($res['message'], JSON_PRETTY_PRINT));
 	}
 }

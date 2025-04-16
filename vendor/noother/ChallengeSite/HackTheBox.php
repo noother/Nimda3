@@ -11,7 +11,8 @@ class HackTheBox extends ChallengeSite {
 	private $Api;
 
 	protected function login(string $username, string $password): void {
-		$this->Api = new HackTheBoxApi($password);
+		// $password unused, use .json file with {"access_token": "xxx", "refresh_token": "xxx"} as $username
+		$this->Api = new HackTheBoxApi($username);
 	}
 
 	public function doGetChallenges(): array {
