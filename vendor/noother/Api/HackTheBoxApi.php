@@ -54,7 +54,8 @@ class HackTheBoxApi extends RestApiClient {
 		$decoded = json_decode(base64_decode($tmp[1]));
 		if(!isset($decoded)) throw new \Exception("Invalid access_token in $token_file");
 
-		if($decoded->iat > time()-60*60*24) {
+		// Apparently the refresh token expires before the access_token, so refresh if the token is older than 6 hours instead of shortly before expiration
+		if($decoded->iat > time()-60*60*6) {
 			$this->refreshToken($token_file);
 			return $this->getAccessToken($token_file);
 		}
