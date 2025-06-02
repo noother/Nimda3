@@ -151,6 +151,11 @@ class ChallengeObserverPlugin extends Plugin {
 			$sites[$data[1]] = ['name' => str_replace('\:', ':', $data[0]), 'url' => str_replace('\:', ':', $data[3]), 'challs' => $data[7]];
 		}
 
+		if(count($sites) < 50) {
+			trigger_error('Sanity check failed. Got '.count($sites).' instead of minimum 50', E_USER_NOTICE);
+			return false;
+		}
+
 		return $sites;
 	}
 
