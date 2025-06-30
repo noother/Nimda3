@@ -153,7 +153,7 @@ class ChallengeObserverPlugin extends Plugin {
 
 		if(count($sites) < 50) {
 			trigger_error('Sanity check failed. Got '.count($sites).' instead of minimum 50', E_USER_NOTICE);
-			return false;
+			return null;
 		}
 
 		return $sites;
