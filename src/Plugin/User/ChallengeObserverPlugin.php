@@ -114,7 +114,7 @@ class ChallengeObserverPlugin extends Plugin {
 		if(!isset($this->data['result'])) return;
 
 		if(isset($this->data['result']['error'])) {
-			$this->sendToEnabledChannels('Error: '.$this->data['result']['site'].': '.$this->data['result']['error']);
+			trigger_error('Error: '.$this->data['result']['site'].': '.$this->data['result']['error'], E_USER_NOTICE);
 			return;
 		}
 
