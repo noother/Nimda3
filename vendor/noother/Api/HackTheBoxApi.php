@@ -14,6 +14,8 @@ class HackTheBoxApi extends RestApiClient {
 		parent::__construct(self::API_URL);
 
 		$this->setBearerToken($this->getAccessToken($token_file));
+		$this->set('user-agent', false);
+		$this->set('throttle', 10000); // There's some aggressive rate limit which blocks IP
 	}
 
 	public function getActiveMachines(): array {
