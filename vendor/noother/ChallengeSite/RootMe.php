@@ -7,11 +7,12 @@ class RootMe extends ChallengeSite {
 	protected const SANITYCHECK_MIN_CHALLS = 580;
 
 	public function doGetChallenges(): array {
+		$this->HTTP->set('throttle', 5000); // RootMe gives 429 Too Many Request errors
+
 		$categories = $this->getCategories();
 		$challs = [];
 		foreach($categories as $category) {
 			$challs = [...$challs, ...$this->getChalls($category)];
-			sleep(2); // There's some rate limit resulting in 429 Too Many Requests
 		}
 
 		return $challs;

@@ -12,6 +12,7 @@ class HTTP {
 	private $isSSL = false;
 	private $cookies   = array();
 	private $custom_headers = array();
+	private $lastRequest = 0;
 	private $settings = array(
 		'useragent'           => 'Nimda3 (https://github.com/noother/Nimda3)', // Sets the userAgent to use in the HTTP header
 		'referer'             => false,    // Sets te referer to use in HTTP header
@@ -21,6 +22,7 @@ class HTTP {
 		'xhr'                 => false,    // Make the request look like an XHR request
 		'unstable-connection' => false,    // Try to reconnect until a connection is established
 		'connect-timeout'     => 5,        // Seconds the connection might take to establish
+		'throttle'            => 0,        // At least this amount of milliseconds must have passed before doing the next request
 		'keep-alive'          => true,     // Keep HTTP 1.1 connections alive
 		'proxy'               => false,    // Use a proxy (format 1.2.3.4:5678)
 		'verify-ssl'          => true,     // Verify SSL certificates
@@ -108,7 +110,7 @@ class HTTP {
 		return $this->request('DELETE', $path);
 	}
 
-	public function request(string $method, string $path, string $headers=null): ?string {
+	public function request(string $method, string $path, ?string $headers=null): ?string {
 		$this->followed = 0;
 
 		return $this->_getResponse($method, $path, $headers);
@@ -117,6 +119,12 @@ class HTTP {
 	public function set($setting, $value) {
 		if(!isset($this->settings[$setting])) return false;
 		$this->settings[$setting] = $value;
+	}
+
+	public function getSetting(?string $key) {
+		if(isset($key)) return $this->settings[$key] ?? null;
+
+		return $this->settings;
 	}
 
 	public function setCookie($name, $value, $urlencoded=false) {
@@ -268,7 +276,9 @@ class HTTP {
 		$header.= "\r\n";
 		$header = $this->applyInjections($header);
 
+		$this->waitForThrottle();
 		fputs($this->socket, $header);
+		$this->lastRequest = microtime(true) * 1000;
 
 		$res = $this->_getHeader();
 		if($res === false) return null;
@@ -453,5 +463,15 @@ class HTTP {
 		}
 
 	return $header;
+	}
+
+	private function waitForThrottle(): void {
+		if(!$this->settings['throttle']) return;
+
+		$ms_left = round($this->lastRequest + $this->settings['throttle'] - microtime(true) * 1000);
+		if($ms_left <= 0) return;
+
+		if($this->settings['verbose']) echo "[Throttle] Waiting $ms_left ms\n";
+		usleep($ms_left * 1000);
 	}
 }
