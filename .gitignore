@@ -1,2 +1,4 @@
-plugins/user/ZMachine/files/saves/*.sav
-
+config/config.json
+config/hackthebox_token.json
+vendor/*
+!vendor/noother/

@@ -1,0 +1,15 @@
+{
+	"master": "noother",
+	"mysql": {
+		"host": "localhost",
+		"port": 3306,
+		"user": "nimda3",
+		"pass": "nimda3",
+		"db": "nimda3"
+	},
+	"logins": {
+		"BQ": {"user": "CHANGE_ME", "password": "CHANGE_ME"},
+		"HVM": {"user": "CHANGE_ME", "password": "CHANGE_ME"},
+		"HTB": {"user": "config/hackthebox_token.json", "password": "EMPTY"}
+	}
+}

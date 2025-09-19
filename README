@@ -8,7 +8,7 @@ Install:
 2) Change database auth in nimda.conf
 3) Start Nimda with ./nimda
 
-The bot will connect to irc.freenode.net, channel #nimda by default
+The bot will connect to irc.wechall.net, channel #nimda by default
 
 SQL is autoupdated if there are any changes.
 

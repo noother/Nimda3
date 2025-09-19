@@ -1,0 +1,158 @@
+-- [1]
+	CREATE TABLE `version` (
+		`version` int(11) NOT NULL,
+		PRIMARY KEY (`version`)
+	) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+	
+	INSERT INTO `version` (`version`) VALUES
+	(1);
+	
+	
+	CREATE TABLE `servers` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`host` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+		`port` int(11) NOT NULL,
+		`ssl` tinyint(1) NOT NULL,
+		`password` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+		`my_username` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Nimda',
+		`my_hostname` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Nimda',
+		`my_servername` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Nimda',
+		`my_realname` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Nimda',
+		`active` int(11) NOT NULL DEFAULT '1',
+		PRIMARY KEY (`id`),
+		KEY `active` (`active`)
+	) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
+
+	INSERT INTO `servers` (`id`, `host`, `port`, `ssl`, `password`, `my_username`, `my_hostname`, `my_servername`, `my_realname`, `active`) VALUES
+	(1, 'irc.freenode.net', 7000, 1, '', 'Nimda3', 'Nimda3', 'Nimda3', 'noother''s new bot', 1);
+	
+	
+	CREATE TABLE `autojoin` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`server` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+		`channel` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+		`key` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+		`active` int(11) NOT NULL DEFAULT '1',
+		PRIMARY KEY (`id`),
+		KEY `server` (`server`),
+		KEY `active` (`active`)
+	) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
+
+	INSERT INTO `autojoin` (`id`, `server`, `channel`, `key`, `active`) VALUES
+	(1, 'irc.freenode.net', '#nimda', '', 1);
+	
+	
+	CREATE TABLE `channelpeaks` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`server` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+		`channel` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+		`peak` int(11) NOT NULL,
+		`date` datetime NOT NULL,
+		PRIMARY KEY (`id`),
+		KEY `server` (`server`)
+	) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+	
+	UPDATE `version` SET `version` = '1';
+-- [/1]
+
+-- [2]
+	ALTER TABLE `servers` CHANGE `id` `id` VARCHAR( 255 ) NOT NULL;
+	UPDATE `servers` SET `id` = 'freenode' WHERE `id` = '1';
+	RENAME TABLE `autojoin` TO `server_channels`;
+	ALTER TABLE `server_channels` CHANGE `server` `server_id` VARCHAR( 255 ) NOT NULL;
+	ALTER TABLE `server_channels` DROP INDEX `server`, ADD INDEX `server_id` ( `server_id` );
+	UPDATE `server_channels` SET `server_id` = 'freenode' WHERE `id` = '1';
+	
+	UPDATE `version` SET `version` = '2';
+-- [/2]
+
+-- [3]
+	CREATE TABLE `memory` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+		`type` enum('bot','plugin','server','channel','user') COLLATE utf8_unicode_ci NOT NULL,
+		`target` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+		`value` text COLLATE utf8_unicode_ci NOT NULL,
+		`created` datetime NOT NULL,
+		`modified` datetime NOT NULL,
+		PRIMARY KEY (`id`),
+		KEY `type` (`type`),
+		KEY `name` (`name`),
+		KEY `target` (`target`)
+	) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+	
+	UPDATE `version` SET `version` = '3';
+-- [/3]
+
+-- [4]
+	DROP TABLE `channelpeaks`;
+	
+	UPDATE `version` SET `version` = '4';
+-- [/4]
+
+-- [5]
+	ALTER TABLE `memory` ADD `is_array` BOOLEAN NOT NULL DEFAULT '0' AFTER `value`;
+	UPDATE `memory` SET `is_array` = 1 WHERE value LIKE 'a:%';
+	
+	UPDATE `version` SET `version` = '5';
+-- [/5]
+
+-- [6]
+	CREATE TABLE `roulette` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`serverchannel` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+		`nick` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+		`played` int(11) NOT NULL DEFAULT '0',
+		`started` int(11) NOT NULL DEFAULT '0',
+		`lost` int(11) NOT NULL DEFAULT '0',
+		`clicks` int(11) NOT NULL DEFAULT '0',
+		`last_played` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+		PRIMARY KEY (`id`),
+		KEY `serverchannel` (`serverchannel`)
+	) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+	
+	UPDATE `version` SET `version` = '6';
+-- [/6]
+
+-- [7]
+	ALTER TABLE `memory` DROP `is_array`;
+	UPDATE `version` SET `version` = '7';
+-- [/7]
+
+-- [8]
+	ALTER TABLE `servers` ADD `bind` VARCHAR( 255 ) NOT NULL DEFAULT '0.0.0.0:0' AFTER `ssl`;
+	UPDATE `version` SET `version` = '8';
+-- [/8]
+
+-- [9]
+	UPDATE `memory` SET `name` = LOWER(`name`) WHERE `target` = 'seen';
+	UPDATE `version` SET `version` = '9';
+-- [/9]
+
+-- [10]
+	ALTER TABLE `memory` CHANGE `value` `value` MEDIUMTEXT NOT NULL;
+	UPDATE `version` SET `version` = '10';
+-- [/10]
+
+-- [11]
+	ALTER TABLE `servers` ADD `sasl` BOOLEAN NOT NULL DEFAULT '0' AFTER `ssl`;
+	UPDATE `version` SET `version` = '11';
+-- [/11]
+
+-- [12]
+	-- only update if default server hasn't been changed
+	UPDATE `servers` SET `id`='wechall', `host` = 'irc.wechall.net', `port` = 6697 WHERE `id`='freenode' AND `my_username` = 'Nimda3';
+
+	UPDATE `server_channels` SET `server_id` = 'wechall' WHERE `server_id` = 'freenode' AND `channel` = '#nimda';
+	DELETE FROM `memory` WHERE target = 'freenode:#nimda';
+
+	UPDATE `version` SET `version` = '12';
+-- [/12]
+
+-- [13]
+	-- autoupdate created & modified fields
+	ALTER TABLE `memory` MODIFY COLUMN `created` datetime DEFAULT CURRENT_TIMESTAMP NOT NULL;
+	ALTER TABLE `memory` MODIFY COLUMN `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL;
+
+	UPDATE `version` SET `version` = '13';
+-- [/13]
