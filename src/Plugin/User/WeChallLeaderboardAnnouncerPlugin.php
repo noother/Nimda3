@@ -37,6 +37,66 @@ class WeChallLeaderboardAnnouncerPlugin extends Plugin {
 		'Keep smashing it!', 'Mind-blowing!', 'Epic!', 'Keep conquering!', 'Legendary!', 'Splendid!', 'Keep climbing!'
 	];
 
+	private const WINNER_MESSAGES = [
+		'All hail the new grandmaster!',
+		'The throne changes hands!',
+		'The race has a winner... for now!',
+		'Their reign begins today!',
+		'Everyone else is playing for second place now.',
+		'Somebody stop this menace!',
+		'The boss battle has spawned.',
+		'Achievement unlocked: World\'s Largest Bragging Rights.',
+		'The throne has entered safe mode.',
+		'The leaderboard would like a word with HR.',
+		'Congratulations, you\'ve become the problem.',
+		'Main character energy detected.',
+		'The crown is now officially glued on.',
+		'Rank 1 acquired. Touch grass optional.',
+		'The throne has been claimed. Let the reign begin!',
+		'Rank 2 has left the chat.',
+		'We checked the logs. Somehow it\'s legal.',
+		'Somebody forgot to nerf this player.',
+		'The leaderboard\'s HR department has concerns.',
+		'The competition has been reduced to a documentary.',
+		'The throne has changed passwords.',
+		'The boss music is now permanently enabled.',
+		'Congratulations on becoming a loading screen tip.',
+		'The leaderboard is no longer a democracy.',
+		'The rest of you may now resume fighting over scraps.',
+		'Congratulations, you\'ve unlocked "Target on Your Back".',
+		'Security has been notified.',
+		'The leaderboard would like to file a complaint.',
+		'Admins are investigating possible witchcraft.',
+		'This seems statistically suspicious.',
+		'The economy may never recover.',
+		'Witness protection has been recommended for rank 2.',
+		'The competition has been downgraded to spectators.',
+		'The tutorial is officially over.',
+		'The king has arrived. Please update your taxes accordingly.',
+		'This was not in the script.',
+		'The prophecy has been fulfilled.',
+		'Rank 2 is typing...',
+		'This is why we can\'t have nice things.',
+		'Somebody call a rollback.',
+		'We asked for competition, not domination.',
+		'This victory has been reported to the authorities.',
+		'The anti-monopoly committee is watching closely.',
+		'The leaderboard is now under new management.',
+		'Several challengers have fainted.',
+		'Reality has been patched accordingly.',
+		'Congratulations on winning today\'s argument.',
+		'Everybody else may now update their expectations.',
+		'Rank 1 has been captured and domesticated.',
+		'The throne has accepted its new owner.',
+		'A new apex predator has appeared.',
+		'The patch notes forgot to mention this.',
+		'The competition is now considered endangered.',
+		'Somebody forgot to nerf this player.',
+		'The throne was seized in a hostile takeover.',
+		'The throne has been conquered without mercy.',
+		'Somebody tell the historians.',
+	];
+
 	public function onLoad() {
 		if(!$this->getVar('leaderboard')) $this->saveVar('leaderboard', $this->getLeaderboard());
 	}
@@ -50,16 +110,24 @@ class WeChallLeaderboardAnnouncerPlugin extends Plugin {
 
 		$winners = $this->getWinners($old_leaderboard, $new_leaderboard);
 		foreach($winners as $winner) {
-			$message = sprintf("\x02[Leaderboard]\x02 \x02%s\x02 %s \x02%s\x02 and is now on rank \x02%d\x02 with \x02%d\x02 points. He needs \x02%d\x02 more points %s. %s",
+			$message = sprintf("\x02[Leaderboard]\x02 \x02%s\x02 %s \x02%s\x02 and is now on rank \x02%d\x02 with \x02%d\x02 points.",
 				$winner['user'],
 				self::VERBS[array_rand(self::VERBS)],
 				$winner['losers'],
 				$winner['rank'],
 				$winner['points'],
-				$winner['rankup_points'],
-				self::MOTIVATIONAL_PHRASES[array_rand(self::MOTIVATIONAL_PHRASES)],
-				self::MOTIVATIONAL_MESSAGES[array_rand(self::MOTIVATIONAL_MESSAGES)],
 			);
+
+			if($winner['rank'] == 1) {
+				$message.= ' '.self::WINNER_MESSAGES[array_rand(self::WINNER_MESSAGES)];
+			} else {
+				$message.= sprintf(" He needs \x02%d\x02 more points %s. %s",
+					$winner['rankup_points'],
+					self::MOTIVATIONAL_PHRASES[array_rand(self::MOTIVATIONAL_PHRASES)],
+					self::MOTIVATIONAL_MESSAGES[array_rand(self::MOTIVATIONAL_MESSAGES)],
+				);
+			}
+
 			$this->sendToEnabledChannels($message);
 		}
 
@@ -84,7 +152,7 @@ class WeChallLeaderboardAnnouncerPlugin extends Plugin {
 
 			$rank = $new_by_user[$user]['rank'];
 			$points = $new[$rank-1]['points'];
-			$rankup_points = $new[$rank-2]['points'] - $points + 1;
+			$rankup_points = $rank != 1 ? $new[$rank-2]['points'] - $points + 1 : 0;
 
 			if($rank == 100) {
 				$losers = "no one, because he's rank 100 duh";
