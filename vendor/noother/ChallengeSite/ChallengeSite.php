@@ -18,7 +18,7 @@ abstract class ChallengeSite {
 	private $username;
 	private $password;
 
-	public function __construct(string $username=null, string $password=null) {
+	public function __construct(?string $username=null, ?string $password=null) {
 		$this->HTTP = new HTTP(static::DOMAIN, true);
 		$this->HTTP->set('debug', $this->debug);
 		$this->HTTP->set('verbose', $this->debug);

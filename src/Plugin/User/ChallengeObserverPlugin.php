@@ -99,7 +99,6 @@ class ChallengeObserverPlugin extends Plugin {
 		if(self::SITES[$site]['requires_login']??false) {
 			$login = Configure::read("logins.$site");
 			if(!isset($login) || $login['user'] == 'CHANGE_ME' || $login['password'] == 'CHANGE_ME') return null;
-			if($site == 'HTB' && !is_file($login['user']??'')) return null;
 		}
 
 		$ChallengeSite = new $class($login['user']??null, $login['password']??null);

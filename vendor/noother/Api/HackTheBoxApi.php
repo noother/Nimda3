@@ -10,12 +10,11 @@ class HackTheBoxApi extends RestApiClient {
 
 	private $Cache;
 
-	public function __construct(string $token_file) {
+	public function __construct(string $apitoken) {
 		parent::__construct(self::API_URL);
 
-		$this->setBearerToken($this->getAccessToken($token_file));
+		$this->setBearerToken($apitoken);
 		$this->set('user-agent', false);
-		$this->set('throttle', 10000); // There's some aggressive rate limit which blocks IP
 	}
 
 	public function getActiveMachines(): array {
@@ -46,34 +45,5 @@ class HackTheBoxApi extends RestApiClient {
 
 	protected function responseContainsError($res): bool {
 		return isset($res['error']);
-	}
-
-	private function getAccessToken(string $token_file): string {
-		$token = json_decode(file_get_contents($token_file));
-
-		$tmp = explode('.', $token->access_token);
-
-		$decoded = json_decode(base64_decode($tmp[1]));
-		if(!isset($decoded)) throw new \Exception("Invalid access_token in $token_file");
-
-		if($decoded->iat < time()-60*60*11) {
-			$this->refreshToken($token_file);
-			return $this->getAccessToken($token_file);
-		}
-
-		return $token->access_token;
-	}
-
-	private function refreshToken(string $token_file): void {
-		$token = json_decode(file_get_contents($token_file));
-		if(!isset($token->refresh_token)) throw new \Exception("refresh_token unset in $token_file");
-
-		$res = $this->post('/v4/login/refresh', [
-			'refresh_token' => $token->refresh_token
-		]);
-
-		if(!isset($res['message']['access_token'])) throw new \Exception('Refreshing token failed: '.json_encode($res));
-
-		file_put_contents($token_file, json_encode($res['message'], JSON_PRETTY_PRINT));
 	}
 }
