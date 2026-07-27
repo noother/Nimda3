@@ -2,19 +2,13 @@
 
 namespace noother\Api;
 
-use noother\Cache\FilesystemCache;
-use noother\Network\HTTP;
-
 class HackTheBoxApi extends RestApiClient {
 	private const API_URL = 'https://labs.hackthebox.com/api';
-
-	private $Cache;
 
 	public function __construct(string $apitoken) {
 		parent::__construct(self::API_URL);
 
 		$this->setBearerToken($apitoken);
-		$this->set('user-agent', false);
 	}
 
 	public function getActiveMachines(): array {
