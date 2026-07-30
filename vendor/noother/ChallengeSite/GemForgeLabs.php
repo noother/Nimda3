@@ -2,50 +2,28 @@
 
 namespace noother\ChallengeSite;
 
+use noother\Api\RestApiClient;
+
 class GemForgeLabs extends ChallengeSite {
 	protected const DOMAIN = 'gemforgelabs.io';
-	protected const SANITYCHECK_MIN_CHALLS = 5;
+	protected const SANITYCHECK_MIN_CHALLS = 10;
 
 	public function doGetChallenges(): array {
-		$res = $this->HTTP->GET('/sitemap.xml');
-		preg_match_all('#(/labs/view/slug/.+?)<#', $res, $arr);
+		$Api = new RestApiClient('https://'.self::DOMAIN.'/api');
 
-		foreach($arr[1] as $url) {
-			$challs[] = $this->getChallenge($url);
+		$challs = [];
+		foreach($Api->get('/v1/labs/all') as $chall) {
+			$challs[] = [
+				'url'      => $chall['url'],
+				'name'     => $chall['name'],
+				'category' => implode(', ', $chall['tags']),
+				'author'   => implode(', ', array_column($chall['authors'], 'user')),
+				'points'   => $chall['score'],
+				'rating'   => $chall['difficulty'],
+				'solves'   => $chall['solves'],
+			];
 		}
 
 		return $challs;
-	}
-
-	private function getChallenge(string $url): array {
-		$chall = ['url' => 'https://'.self::DOMAIN.$url];
-
-		$res = $this->HTTP->GET($url);
-
-		if(preg_match('/<meta name="og:title" content="(.+?)">/', $res, $arr)) {
-			$chall['name'] = $arr[1];
-		}
-
-		if(preg_match('/<meta name="article:tag" content="(.+?)">/', $res, $arr)) {
-			$chall['category'] = rtrim($arr[1], ', ');
-		}
-
-		if(preg_match('/<meta name="author" content="(.+?)">/', $res, $arr)) {
-			$chall['author'] = $arr[1];
-		}
-
-		if(preg_match('#<div.+?title="Score".+?is-warning">(.+?)</#s', $res, $arr)) {
-			$chall['points'] = (int)$arr[1];
-		}
-
-		if(preg_match('#<div.+?title="Difficulty".+?is-link">(.+?)</#s', $res, $arr)) {
-			$chall['rating'] = $arr[1];
-		}
-
-		if(preg_match('#<div.+?title="Completions".+?is-link">(\d+?)</#s', $res, $arr)) {
-			$chall['solves'] = (int)$arr[1];
-		}
-
-		return $chall;
 	}
 }
