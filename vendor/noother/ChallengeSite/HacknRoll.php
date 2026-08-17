@@ -22,7 +22,7 @@ class HacknRoll extends ChallengeSite {
 	}
 
 	private function getCategories(string $html): array {
-		preg_match_all('#<h5.+?(?=<h5|href="/users)#s', $html, $arr);
+		preg_match_all('#<h5.+?(?=<h5|<script)#s', $html, $arr);
 		if(empty($arr[0])) throw new \Exception('Failed getting categories html');
 
 		$categories = [];
